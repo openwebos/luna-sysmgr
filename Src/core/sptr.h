@@ -265,7 +265,7 @@ public:
 	 * non-smart pointer code and largely allows smart pointers to be used as a drop-in
 	 * replacement for regular pointers.
 	 * 
-	 * @param	s		Pointer to object to point to
+	 * @param	ptr		Pointer to object to point to
 	 */
 	void	operator=(T* ptr) { setRef(ptr); }
 	
