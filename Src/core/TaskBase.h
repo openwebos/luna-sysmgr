@@ -1,7 +1,8 @@
 /**
  * @file
  * 
- * Main entry point for Luna
+ * This file contains the definitions for the TaskBase class, which is a base class meant to serve
+ * as an event queue for building "task" classes.
  *
  * @author Hewlett-Packard Development Company, L.P.
  * @author tyrok1
