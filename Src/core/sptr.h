@@ -1,7 +1,7 @@
 /**
  * @file
  * 
- * Main entry point for Luna
+ * Classes for implementing smart pointers.
  *
  * @author Hewlett-Packard Development Company, L.P.
  * @author tyrok1
