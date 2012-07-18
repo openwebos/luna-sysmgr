@@ -102,21 +102,29 @@ public:
 	void postEvent(sptr<Event> event, bool highPriority=false);
 	
 	/**
-	 * Gets this task's GLib main loop struct
+	 * Gets a pointer to this task's GLib main event loop
 	 * 
-	 * @todo Figure out why this is needed and document it in more detail - not very familiar with GLib.
+	 * Main GLib functions require a pointer to the main GLib event
+	 * loop, which (from what I can tell) is specific to each
+	 * process or fork.  This allows access to it, thereby allowing
+	 * central storage of the main event loop pointer without having
+	 * to use a global variable.
 	 * 
-	 * @return				Pointer to GMainLoop structure filled with info about the GLib main loop
+	 * @return				Pointer to GLib main event loop
 	 */
 	GMainLoop* mainLoop() const { return m_mainLoop; }
 
 	/**
 	 * Gets a pointer to the master timer for this task
 	 * 
+	 * The master timer is a class which simplified access to the
+	 * system clock.  It is specific to a GLib main event loop, so
+	 * it is returned here so construction of it can be abstracted
+	 * away from the caller, removing a few explicit GLib
+	 * dependencies.
+	 * 
 	 * Note: This pointer is set to 0 by default by {@link TaskBase::TaskBase() TaskBase::TaskBase()} and
 	 * cannot be used until a derived class sets it up.
-	 * 
-	 * @todo After documenting a few derived classes, figure out what this is used for and document it here.
 	 * 
 	 * @return				Pointer to the master timer for this task
 	 */
