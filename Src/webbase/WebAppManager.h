@@ -418,32 +418,234 @@ public:
 	const std::string& getActiveAppId() { return m_activeAppId; }
 protected:
 	// IPC control message handlers
+	/**
+	 * Handle an IPC message asking us to open a URL
+	 * 
+	 * This method is run whenever the Palm InterProcess
+	 * Communication hands us a message from another process
+	 * asking us to open a URL.
+	 * 
+	 * @param	url			URL to open.
+	 * @param	winType			Type of window to open.
+	 * @param	procId			Process ID to use for the new WebPage being opened.
+	 * @param	launchingAppId		App ID of the app launching this URL.
+	 * @param	launchingProcId		Process ID of the app launching this URL.
+	 */
 	void onLaunchUrl(const std::string& url, int winType,
 		 		     const std::string& appDesc, const std::string& procId,
 					 const std::string& args, const std::string& launchingAppId,
 					 const std::string& launchingProcId);
+	
+	/**
+	 * Handle an IPC message asking us to launch a URL as a child window of another process
+	 * 
+	 * This method is run whenever the Palm InterProcess
+	 * Communication hands us a message from another process
+	 * asking us to open a URL as a child of another window.
+	 * 
+	 * @todo Document isHeadless parameter if we can find a reason for it to exist.
+	 * 
+	 * @param	url			URL to open.
+	 * @param	winType			Type of window to open.
+	 * @param	procId			Process ID to use for the new WebPage being opened.
+	 * @param	launchingAppId		App ID of the app launching this URL.
+	 * @param	launchingProcId		Process ID of the app launching this URL.
+	 * @param	errorCode		Variable (passed by reference) for this method to return an error code into if something goes wrong.
+	 * @param	isHeadless		Ignored, at the moment.  Purpose is currently unclear.
+	 */
 	void onLaunchUrlChild(const std::string& url, int winType,
 			 		      const std::string& appDesc, const std::string& procId,
 						  const std::string& args, const std::string& launchingAppId,
 						  const std::string& launchingProcId, int& errorCode, bool isHeadless);
+	
+	/**
+	 * Finds an app and relaunches it
+	 * 
+	 * Unsure at the moment why an app would need to be
+	 * relaunched.
+	 * 
+	 * @todo Document this further once WebAppBase::relaunch() is documented.
+	 * 
+	 * @see WebAppBase::relaunch()
+	 * 
+	 * @param	procId			Process ID of the app to relaunch.
+	 * @param	args			Launch arguments to pass to the app when it relaunches.
+	 * @param	launchingAppId		App ID of the app requesting the relaunch.
+	 * @param	launchingProcId		Process ID of the app requesting the relaunch.
+	 */
 	void onRelaunchApp(const std::string& procId, const std::string& args,
 			  		   const std::string& launchingAppId, const std::string& launchingProcId);
 
 	//void onInputEvent(int ipcKey, const SysMgrEventWrapper& wrapper);
+	
+	/**
+	 * Run when device orientation has changed
+	 * 
+	 * Lets all open WebApps know that "up" has changed
+	 * direction and that their displays need to rotate to
+	 * match the screen's direction.
+	 * 
+	 * @param	orient			New orientation - one of Event::Orientation_Up, Event::Orientation_Down, Event::Orientation_Left, Event::Orientation_Right.
+	 */
 	void onSetOrientation(int orient);
+	
+	/**
+	 * Unknown at the moment
+	 * 
+	 * Both the purpose and function of this are currently unknown.
+	 * 
+	 * @param	key			Unknown.
+	 */
 	void onGlobalProperties(int key);
+	
+	/**
+	 * Calls WebAppBase::inspect() for an app
+	 * 
+	 * Unknown exactly what the function of this is.
+	 * 
+	 * @todo Document this fully once WebAppBase::inspect() is fully documented.
+	 * 
+	 * @param	processId		Process ID of the app to inspect.
+	 */
 	void onInspectByProcessId( const std::string& processId );
+	
+	/**
+	 * Ask MemoryWatcher and the main SysMgr process to perform low memory actions
+	 * 
+	 * @todo Document this fully once MemoryWatcher::doLowMemActions() and SysMgr's low memory actions are fully documented.
+	 * 
+	 * @param	allowExpensive		Guessing this is whether or not to spend additional time to clean up memory due to running really low.
+	 */
 	void performLowMemoryActions( const bool allowExpensive = false );
+	
+	/**
+	 * Missing implementation
+	 * 
+	 * Can't seem to find an implementation of this.  Without that, it's
+	 * unknown what this does.
+	 * 
+	 * @param	pid			Unknown.
+	 * @param	maxMemory		Unknown.
+	 * @param	updateFromPid		Unknown.
+	 */
 	void monitorNativeProcessMemory( const pid_t pid, const int maxMemory, pid_t updateFromPid = 0 );
+	
+	/**
+	 * Clears the global system WebKit cache
+	 * 
+	 * @see Palm::WebGlobal::clearDOMCache()
+	 */
 	void clearWebkitCache();
+	
+	/**
+	 * Enables the debugger
+	 * 
+	 * Current just a wrapper for
+	 * {@link Palm::WebGlobal::enableDebugger() Palm::WebGlobal::enableDebugger()}.
+	 * 
+	 * @see Palm::WebGlobal::enableDebugger()
+	 * 
+	 * @todo Document this more fully once Palm::WebGlobal::enableDebugger() is publicly documented.
+	 */
 	void enableDebugger( bool enable );
+	
+	/**
+	 * Handles an IPC message to close all apps
+	 * 
+	 * If TARGET_DESKTOP is defined, this method deletes
+	 * all open apps from memory then runs the garbage
+	 * collector to clean up memory.
+	 * 
+	 * Either way, it then closes down the GLib main loop
+	 * and returns.
+	 */
 	void onShutdownEvent();
+	
+	/**
+	 * Handles an IPC message to close an app
+	 * 
+	 * Closes all instances of a given app in response
+ 	 * to something else asking us (via InterProcess
+	 * Communication message) to close an app.
+	 * 
+	 * @param	appId			App ID of the app to close.
+	 * @return				true if one or more instances of the given app were open and have now been closed or false if the app was not already open.
+	 */
 	bool onKillApp(const std::string& appId);
+	
+	/**
+	 * Handles an IPC message to close an app and notify the caller when done
+	 * 
+	 * Closes all instances of a given app in response
+ 	 * to something else asking us (via InterProcess
+	 * Communication message) to close an app.
+	 * 
+	 * Differs from
+	 * {@link WebAppManager::onKillApp() WebAppManager::onKillApp()}
+	 * in that this one returns a result back to the
+	 * caller to let them know that, yes, we did close
+	 * everything asked of us.
+	 * 
+	 * @see WebAppManager::onKillApp()
+	 * 
+	 * @param	appId			App ID of the app to close.
+	 * @param	result			Where to store the result of closing apps.  Value will be set to true if one or more instances of the given app were open and have now been closed or false if the app was not already open.
+	 */
 	void onSyncKillApp(const std::string& appId, bool* result);
+	
+	/**
+	 * Handles an IPC message asking us to launch an app
+	 * 
+	 * Launches a web app given its App ID.  Pretty
+	 * simple.  See
+	 * {@link ProcessManager::launch() ProcessManager::launch()}
+	 * for more information (it's actually quite
+	 * well-documented already.
+	 * 
+	 * @see ProcessManager::launch()
+	 * 
+	 * @param	appDescString		App ID of the web app to launch.
+	 * @param	params			JSON launch parameters to pass to the new app.
+	 * @param	launchingAppId		App ID of the app asking us to launch this new app.
+	 * @param	launchingProcId		Process ID of the app asking us to launch this new app (can be NULL).
+	 */
 	void onProcMgrLaunch(const std::string& appDescString, const std::string& params,
                          const std::string& launchingAppId, const std::string& launchingProcId);
+	
+	/**
+	 * Handles an IPC message asking us to launch an app as a modal child of another app
+	 * 
+	 * Launches a web app given its App ID.  Differs
+	 * from
+	 * {@link WebAppManager::onProcMgrLaunch() WebAppManager::onProcMgrLaunch()}
+	 * in that the new app is set up as a child of
+	 * the given launching parent and is launched
+	 * in a modal configuration where it must be
+	 * dismissed in some way before returning to
+	 * the parent.
+	 * 
+	 * @see ProcessManager::launchModal()
+	 * 
+	 * @param	appDescString		App ID of the web app to launch.
+	 * @param	params			JSON launch parameters to pass to the new app.
+	 * @param	launchingAppId		App ID of the app asking us to launch this new app.
+	 * @param	launchingProcId		Process ID of the app asking us to launch this new app (can be NULL).
+	 * @param	isHeadless		true to create an app with no visible window, false to create a modal child app.
+	 * @param	isParentPdk		Pass in true if the parent is a PDK app instead of a web app, false otherwise.
+	 */
 	void onProcMgrLaunchChild(const std::string& appDescString, const std::string& params,
 	                         const std::string& launchingAppId, const std::string& launchingProcId, bool isHeadless, bool isParentPdk);
+	
+	/**
+	 * Appears to handles an IPC message asking us to launch a headless app at boot time
+	 * 
+	 * @see ProcessManager::launchBootTimeApp()
+	 * 
+	 * @todo Document this more fully once ProcessManager::launchBootTimeApp() is fully documented.
+	 * @todo Add the missing "e" into the name so it matches ProcessManager.
+	 * 
+	 * @param	appDescString		App ID of the app to launch.
+	 */
 	void onProcMgrLaunchBootTimApp(const std::string& appDescString);
 	void onListOfRunningAppsRequest(bool includeSysApps);
 	void onDeleteHTML5Database(const std::string& domain);
