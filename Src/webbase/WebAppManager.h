@@ -647,23 +647,189 @@ protected:
 	 * @param	appDescString		App ID of the app to launch.
 	 */
 	void onProcMgrLaunchBootTimApp(const std::string& appDescString);
+	
+	/**
+	 * Handles an IPC message asking for a list of all running processes
+	 * 
+	 * Sends back an IPC
+	 * ViewHost_ListOfRunningAppsResponse
+	 * with a single parameter - a JSON string
+	 * laid out as follows:
+	 * 
+	 * @code
+	 * {
+	 *   running : [
+	 *       { id : [App ID], processid : [Process ID] },
+	 *       ...
+	 *     ],
+	 *   returnValue : true
+	 * }
+	 * @endcode
+	 * 
+	 * @param	includeSysApps		Whether or not to include system app processes (those without an app ID) in the list.
+	 */
 	void onListOfRunningAppsRequest(bool includeSysApps);
+	
+	/**
+	 * Handles an IPC message asking us to delete all HTML5 localStorage data for a given domain
+	 * 
+	 * Since we're managing web apps, it's quite
+	 * possible they will store data in
+	 * localStorage.  This IPC call gives other
+	 * processes a canonical way to delete that.
+	 * 
+	 * Could be quite dangerous, actually, if
+	 * this is exposed to non-system apps.  At
+	 * this point, it's unknown if that is the
+	 * case or not.
+	 * 
+	 * @see Palm::WebGlobal::deleteDatabasesForDomain()
+	 * 
+	 * @todo Confirm details of this once Palm::WebGlobal::deleteDatabasesForDomain() is publicly documented.
+	 * @todo Ensure this IPC call is not exposed to non-system apps.
+	 * 
+	 * @param	domain			The domain to delete localStorage for.
+	 */
 	void onDeleteHTML5Database(const std::string& domain);
-
+	
+	/**
+	 * Posts an event to the event queue to be dispatched to a given app
+	 * 
+	 * This used to be used by
+	 * WebAppManager::onInputEvent(), but
+	 * since that has been commented out, this
+	 * is probably unnecessary to have around
+	 * anymore.
+	 * 
+	 * @todo Figure out if we should remove this and associated functionality.
+	 * 
+	 * @param	ipcKey			IPC key of the app to dispatch the event to.
+	 * @param	e			Event to dispatch.
+	 */
 	void inputEvent(int ipcKey, sptr<Event> e);
-
-    void onUiDimensionsChanged(int width, int height);
-    void onSuspendWebkitProcess(bool* result);
+	
+	/**
+	 * Handle an IPC message telling us that output dimensions have changed
+	 * 
+	 * @todo Document this fully once we figure out what calls this so we can figure out what it's used for to figure out what it does.
+	 * 
+	 * @param	width			New width.
+	 * @param	height			New height.
+	 */
+	void onUiDimensionsChanged(int width, int height);
+	
+	/**
+	 * Handle an IPC message from the SysMgr process telling us our process is going to be suspended
+	 * 
+	 * The SysMgr process is suspending this
+	 * process. As soon as we return from
+	 * this function the process will be
+	 * suspended.
+	 * 
+	 * @param	result			Variable to place a result into to return to the caller.  Always set to true in our implementation.
+	 */
+	void onSuspendWebkitProcess(bool* result);
 
 protected:
-
+	/**
+	 * Initializes WebAppManager
+	 * 
+	 * Initializes the various components
+	 * of WebAppManager:
+	 * 
+	 * - Reads in browser preferences from
+	 *   /etc/palm/browser.conf and
+	 *   /etc/palm/browser-platform.conf
+	 * 
+	 * - Starts up BackupManager and starts
+	 *   listening for events from it.
+	 * 
+	 * - Disables the garbage collector for
+	 *   two minutes to give us a chance to
+	 *   start up first.
+	 * 
+	 * - Disables JavaScript timeouts until
+	 *   after we're done booting.
+	 * 
+	 * - Sets the system locale from the
+	 *   value in Preferences::locale().
+	 * 
+	 * - Starts MemoryWatcher.
+	 * 
+	 * - Connects to the Luna statistics
+	 *   reporting service.
+	 * 
+	 * - Asks Luna stats to call
+	 *   WebAppManager::systemServiceConnectCallback()
+	 *   when com.palm.systemservice
+	 *   changes status.
+	 * 
+	 * - Asks Luna stats to call
+	 *   WebAppManager::displayManagerConnectCallback()
+	 *   when com.palm.display changes
+	 *   status.
+	 * 
+	 * @todo Figure out why this isn't just put into WebAppManager::run(), since that appears to be the only place it's used, at least unless this class is derived from someplace.
+	 * @todo can locale change without restarting sysmgr?
+	 */
 	virtual void threadStarting();
+	
+	/**
+	 * Clean up WebAppManager as much as possible in preparation for having our thread stopped
+	 * 
+	 * Doesn't currently do anything.
+	 */
 	virtual void threadStopping();
-
+	
+	/**
+	 * Handles a GLib event from the event queue
+	 * 
+	 * Currently the only event we handle
+	 * is InputEvent, which is sent by us
+	 * internally when
+	 * WebAppManager::inputEvent() is
+	 * called.
+	 * 
+	 * Doesn't appear to be used anymore.
+	 * 
+	 * @todo See if the functionality of this can be removed along with WebAppManager::inputEvent().
+	 * 
+	 * @param	event			The event to handle.
+	 */
 	virtual void handleEvent(sptr<Event>);
-
+	
+	/**
+	 * Add an already-launched app to the group of apps we're managing
+	 * 
+	 * Used internally by
+	 * WebAppManager::launchUrl() and
+	 * WebAppManager::launchUrlChild().
+	 * 
+	 * @param	app			New already-launched app to manage.
+	 */
 	virtual void windowedAppAdded(WindowedWebApp *app);
+	
+	/**
+	 * Lets us know that an app's key has changed
+	 * 
+	 * @see WindowedWebApp::getKey()
+	 * 
+	 * @todo Document this more fully once WindowedWebApp::getKey() is fully documented.
+	 * 
+	 * @param	app			The app that changed keys.
+	 * @param	oldKey			The key it used to use before the change.
+	 */
 	virtual void windowedAppKeyChanged(WindowedWebApp *app, int oldKey);
+	
+	/**
+	 * Remove an app from the list of apps we're managing
+	 * 
+	 * Tells us not to manage an app
+	 * anymore.  Essentially just removes
+	 * the tracking link between it and us.
+	 * 
+	 * @param	app			App that we should no longer manage.
+	 */
 	virtual void windowedAppRemoved(WindowedWebApp *app);
 
 private:
