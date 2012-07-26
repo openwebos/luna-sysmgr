@@ -1,0 +1,59 @@
+/* Copyright 2009 Palm, Inc.  All rights reserved. */
+/* 
+ * This file is an unused dummy file that exists for the localization scripts to
+ * pick out new strings to translate. If you have a new string in your
+ * c++ code that needs translation, put it here and the scripts will find it
+ * automatically and the globalization team will get it translated in the next
+ * cycle.
+ */
+
+LOCALIZED("Can't Open New Cards");
+LOCALIZED("Dismiss unused cards to free memory.");
+LOCALIZED("Drag up to answer");
+LOCALIZED("Drag up to power off");
+LOCALIZED("Drag up to unlock");
+LOCALIZED("Help");
+LOCALIZED("Memory critical, too many cards!");
+LOCALIZED("Memory low, too many cards!");
+LOCALIZED("OK");
+LOCALIZED("Please throw away cards to recover.");
+LOCALIZED("Throw away cards to recover.");
+LOCALIZED("Throw away cards to recover");
+LOCALIZED("Sorry, Too Many Cards");
+LOCALIZED("Please toss away any you're not using to make room for more.");
+LOCALIZED("Full Erase");
+LOCALIZED("Erases applications you installed and all your files on the USB drive.");
+LOCALIZED("Continue holding for %0 seconds...");
+LOCALIZED("Continue holding for 1 second...");
+LOCALIZED("Updating the system");
+LOCALIZED("Do not remove battery");
+LOCALIZED("%s was closed");
+LOCALIZED("Default Title");
+LOCALIZED("Just type...");
+LOCALIZED("China Telecom");
+LOCALIZED("Unknown Network");
+LOCALIZED("Extended Network");
+LOCALIZED("(No Title)");
+LOCALIZED("New Card");
+LOCALIZED("New Page");
+LOCALIZED("User Items");
+LOCALIZED("Carrier");
+LOCALIZED("System");
+LOCALIZED("Services");
+LOCALIZED("Preferences");
+LOCALIZED("Applications");
+LOCALIZED("Extras");
+LOCALIZED("Press and hold any app icon, then drag it here to add a favorite app.");
+LOCALIZED("all");
+LOCALIZED("favorites");
+LOCALIZED("Turn on Airplane Mode");
+LOCALIZED("Turning on Airplane Mode");
+LOCALIZED("Turning off Airplane Mode");
+LOCALIZED("Turn off Airplane Mode");
+LOCALIZED("APPS");
+LOCALIZED("DOWNLOADS");
+LOCALIZED("FAVORITES");
+LOCALIZED("SETTINGS");
+LOCALIZED("OWWW! That hurts!");
+LOCALIZED("Next time, please unmount the drive from the desktop.");
+

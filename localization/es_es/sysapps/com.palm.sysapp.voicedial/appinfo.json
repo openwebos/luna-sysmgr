@@ -1,0 +1,9 @@
+{
+	"category": "Applications",
+	"entrypoint": "slotBuiltInAppEntryPoint_VoiceDial",
+	"icon": "../../../../icon-64x64.png",
+	"id": "com.palm.sysapp.voicedial",
+	"removable": false,
+	"title": "Marcación por voz",
+	"type": "sysmgrbuiltin"
+}

@@ -1,0 +1,28 @@
+<html>
+	<head>
+		<style>
+			.palm-notification-button:active {
+				 -webkit-border-image: url(palm-notification-button.png) 45 20 0 20 repeat repeat !important;
+			}
+		</style>
+	</head>
+	<script type="text/javascript">
+	 function setInnerText(id, text) {
+	 	document.getElementById(id).innerHTML = PalmSystem.getLocalizedString(text);
+	 }
+
+	 function insertText() {
+		setInnerText("header", "Sorry, Too Many Cards");
+		setInnerText("content", "Please toss away any you're not using to make room for more.");
+	 	setInnerText("ok", "OK");
+	 }
+	</script>
+	<body style="background:black; margin:0px; font: normal normal normal 20px/normal Coconut, sans-serif;" onload="insertText()">
+		<div style="margin:15px 20px 10px 20px; min-height:52px;">
+			<img style="float:right; margin-left:10px;" src="notif_icon-carddismiss.png" height="64" width="64"></img>
+			<div style="color: white;font-size: 18px;font-weight: bold;margin-bottom:5px" id="header"></div>
+			<div style="color: white;font-size: 14px;font-weight: bold;" id="content"></div>	
+		</div>
+		<div class="palm-notification-button" style="-webkit-border-image: url(palm-notification-button.png) 0 20 45 20 repeat repeat;-webkit-box-sizing: border-box;-webkit-user-select: none;border-width: 0px 20px 0px 20px;color: white;font-size: 20px;height: 45px;line-height: 45px;margin: 10px;padding-top: 2px;text-align: center; " onclick="window.close()" id="ok"></div>	
+	</body>
+</html>

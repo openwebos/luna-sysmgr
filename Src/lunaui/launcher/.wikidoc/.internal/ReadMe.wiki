@@ -1,0 +1,4 @@
+.internal is a place where dev internal notes are kept. Things here don't need to be timely or correct
+and in general not for the casual consumer. Don't touch things in here. If they are externally relevant,
+they will be rewritten and exported out to the top level doc dir
+

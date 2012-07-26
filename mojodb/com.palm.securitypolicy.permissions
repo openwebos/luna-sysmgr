@@ -1,0 +1,5 @@
+[
+	{"type":"db.kind","object":"com.palm.securitypolicy:1","caller":"com.palm.systemmanager","operations":{"create":"allow","read":"allow","update":"allow","delete":"allow"}},
+	{"type":"db.kind","object":"com.palm.securitypolicy.device:1","caller":"com.palm.systemmanager","operations":{"create":"allow","read":"allow","update":"allow","delete":"allow"}},
+	{"type":"db.kind","object":"com.palm.securitypolicy:1","caller":"com.palm.eas","operations":{"extend":"allow"}}
+]

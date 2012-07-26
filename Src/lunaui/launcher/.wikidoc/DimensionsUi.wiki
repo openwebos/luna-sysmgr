@@ -1,0 +1,4 @@
+DimensionsUi is the proto name for the DartFish project's application launcher. It is the 3rd version of an application
+launcher since webos 1.0
+
+ 

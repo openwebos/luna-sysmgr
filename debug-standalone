@@ -1,0 +1,6 @@
+#!/bin/bash
+
+PWD=$(dirname $0)
+gdb --args ${PWD}/debug-x86/LunaSysMgr "$@"
+
+

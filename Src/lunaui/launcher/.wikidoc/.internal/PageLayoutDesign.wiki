@@ -1,0 +1,20 @@
+page layouts are in general just a logical storage for coordinates of what a page should look like statically;
+where icons are - what config; rows, clumps, etc - and the positioning of those rows, etc
+layouts themselves aren't supposed to be in the painting-space of things; they have a paint() currently, 
+but it should be used just to paint the initial layout or reset the layout to initial state
+
+IconCell will have a pointer to an icon (IconBase) so that it can affect its position in paint-space
+IconBase will not have a ptr back to IconCell. 
+
+Painter functions  (particularly in non QGraphicsItem objects)
+
+paintAuto() is to be called during the regular scene self-painting chain
+paintOffscreen() is intended to paint to pixmaps
+
+--------------------------
+absolute dimensions vs relative (%'age of max) dimensions
+--------------------------
+easier code-wise to have actual variables in the "settings" classes to have absolute positions, and then
+to have some higher level class apply %'age calculations (if desired); can possibly have multiple Settings objects
+pre-created based on fixed UI sizes and %'ages and then just swap the ones returned from calls to settings::instance()-like 
+functions

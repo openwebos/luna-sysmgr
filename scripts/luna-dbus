@@ -1,0 +1,223 @@
+#!/bin/sh
+
+# luna dbus
+
+scriptdir=$(dirname $0)
+
+# set up luna environment
+. "${scriptdir}/luna-setup.sh"
+
+#
+# usage
+#
+# Prints usage message
+#
+usage() {
+	cat <<-EOF
+	Starts or stops a local Luna DBUS session.
+
+	Usage: $(basename $0 .sh) [--help] [command] [args...]
+
+	Options:
+	    --help    Show this help message
+
+	Commands:
+	    start                               Starts the dbus daemon
+	    stop                                Stops the currently running dbus daemon
+	    monitor [--dbus target] [...]       Invokes luna-dbus-monitor
+	    query [--dbus target] [...]         Invokes luna-qdbus
+	    run <cmd> [--dbus target] [...]     Invokes <cmd> using Luna DBUS
+	    add <service1> [<service2> ...]     Register one or more dbus services
+	    remove <service1> [<service2> ...]  Unregister one or more dbus services
+	    purge                               Unregister all dbus services
+	    dir <svcsDir>                       Register all dbus services in <svcsDir>
+	    list                                Lists all registered dbus services
+
+	EOF
+	luna_dbus_target_help
+	echo
+}
+
+#
+# start_dbus
+#
+# Starts dbus daemon
+#
+start_dbus() {
+	PID=$(find_dbus_process)
+	if [ ! -z "$PID" ]
+	then
+		echo "dbus-daemon already running [$PID]."
+	else
+		# first add default (desktop-binaries) services
+		add_dbus_services_dir $LUNA_SIM_DIR/services
+
+		# luna-simulator calls luna-dbus start <appSvcDir>
+		# so we'll go and add any services found there...
+		if [ -n "$1" ]
+		then
+			# add services from <appSvcDir>
+			add_dbus_services_dir "$1"
+		fi
+
+		if [ -n "$DBUS_LOCAL_PATH" ]; then
+			rm -f $DBUS_LOCAL_PATH
+		fi
+		if [ -n "$DBUS_LOCAL_PATH_SYS" ]; then
+			rm -f $DBUS_LOCAL_PATH_SYS
+		fi
+
+		dbus-daemon --config-file="${scriptdir}/luna-dbus.conf" &
+		dbus-daemon --config-file="${scriptdir}/luna-dbus_private.conf" &
+
+		echo "dbus-daemon started."
+	fi
+}
+
+#
+# stop_dbus
+#
+# Stops dbus daemon
+#
+stop_dbus() {
+	PID=$(find_dbus_process)
+	PID_SYS=$(find_dbus_process_sys)
+	if [ ! -z "$PID" ]
+	then
+		kill $PID 2>/dev/null
+		kill -9 $PID 2>/dev/null
+		kill $PID_SYS 2>/dev/null
+		kill -9 $PID_SYS 2>/dev/null
+
+		echo "dbus-daemon stopped [$PID $PID_SYS]."
+	else
+		echo "dbus-daemon not running."
+	fi
+
+	SERVICE_LIST=`grep luna-dbus $LUNA_DBUS_SERVICES_DIR/* | \
+	  cut -d'=' -f2 | cut -d' ' -f3`
+	if [ -n "$SERVICE_LIST" ] ; then
+	    for service in `echo "$SERVICE_LIST" | xargs -n 1 basename` ; do
+		killall -v $service
+	    done
+	fi
+
+}
+
+#
+# add_dbus_services <service1> <service2> ...
+#
+# Adds one or more dbus services
+#
+add_dbus_services() {
+	for s in $@; do
+		#ln -f -s "$src" "$dest"
+		cp -f "$(abs_path "$s")" "$LUNA_DBUS_SERVICES_DIR/$(basename "$s")"
+	done
+}
+
+#
+# remove_dbus_service <service1> <service2> ...
+#
+# Removes one or more dbus services
+#
+remove_dbus_services() {
+	for s in $@; do
+		rm -f "$LUNA_DBUS_SERVICES_DIR/$(basename "$s")"
+	done
+}
+
+#
+# add_dbus_services_dir <svcsDir> ...
+#
+# Add all dbus services in <svcsDir>
+#
+add_dbus_services_dir() {
+	SVCS_DIR=`abs_path $1`
+	if [ -d "$SVCS_DIR" ]
+	then
+	    # add each service in SVCS_DIR
+	    for svc in `find $SVCS_DIR -maxdepth 3 -type f -name "*.service" `
+	    do
+		TARGET_SVC="$LUNA_DBUS_SERVICES_DIR/$(basename $svc)"
+		# don't add it (and don't say anything) if it's already there
+		if [ ! -e $TARGET_SVC ] || \
+			! diff -q $svc $TARGET_SVC >/dev/null ; then
+		    echo "Adding dbus service $(basename $svc)"
+		    add_dbus_services "$svc"
+		#else
+		#    echo "Skipping dbus service $(basename $svc)"
+		fi
+	    done
+	fi
+}
+
+#
+# list_dbus_services
+#
+# Lists the dbus services
+#
+list_dbus_services() {
+	/bin/ls -1 "$LUNA_DBUS_SERVICES_DIR"
+}
+
+#
+# run_with_dbus
+#
+# Runs the command with Luna DBUS as the session bus
+#
+run_with_dbus() {
+	DBUS_TARGET="$DBUS_LOCAL"
+
+	CMD="$1"
+	shift
+
+	if [ "$1" = "--dbus" ]
+	then
+		DBUS_TARGET="$2"
+		shift 2
+	fi
+
+	# set the DBUS target
+	luna_dbus_set_target "$DBUS_TARGET"
+
+	exec "$CMD" "$@"
+}
+
+
+CMD="$1"
+if [ -z "$CMD" ]; then
+	CMD=help
+else
+	shift
+fi
+
+case "$CMD" in
+monitor)
+	run_with_dbus dbus-monitor "$@" ;;
+query)
+	run_with_dbus qdbus "$@" ;;
+start)
+	start_dbus "$@" ;;
+stop)
+	stop_dbus ;;
+purge)
+	remove_dbus_services `list_dbus_services` ;;
+services)
+	echo "Invalid command; Use $0 list" ;;
+list)
+	list_dbus_services ;;
+add)
+	add_dbus_services "$@" ;;
+remove)
+	remove_dbus_services "$@" ;;
+dir)
+	add_dbus_services_dir "$@" ;;
+run)
+	run_with_dbus "$@" ;;
+help|--help)
+	usage ;;
+*)
+	usage && false ;;
+esac
+

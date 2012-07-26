@@ -1,0 +1,6 @@
+#!/bin/bash
+
+PWD=$(dirname $0)
+${PWD}/debug-x86/LunaSysMgr
+
+

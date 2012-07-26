@@ -1,0 +1,10 @@
+/* The schema used to parse the configuration file storing the
+ * launcher card layout
+ */
+array [
+	object {
+		string {1, } title;
+		array [ string ] items;
+	}*;
+];
+

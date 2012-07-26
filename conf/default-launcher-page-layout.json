@@ -1,0 +1,52 @@
+[
+    {
+        "title" : "apps",
+        "items" : [
+            "com.palm.app.browser_default",
+            "com.palm.app.email_default",
+            "com.palm.app.calendar_default",
+            "com.palm.app.messaging_default",
+            "com.palm.app.notes_default",
+            "com.quickoffice.webos_default",
+            "com.quickoffice.ar_default",
+            "com.palm.app.maps_default",
+            "com.palm.app.contacts_default",
+            "com.palm.app.phone_default",
+            "com.palm.app.musicplayer_default",
+            "com.palm.app.photos_default",
+            "com.palm.app.enyo-facebook_default",
+ 			"com.palm.app.youtube_default",
+			"com.palm.app.kindle_default",
+			"com.palm.app.amazonmp3_default"
+        ] 
+    },
+    {
+        "title" : "downloads",
+        "items" : [
+            "com.palm.app.enyo-findapps_default"
+        ] 
+    },
+    {
+        "title" : "prefs",
+        "items" : [
+            "com.palm.app.accounts_default",
+            "com.palm.app.backup_default",
+            "com.palm.app.bluetooth_default",
+            "com.palm.app.dateandtime_default",
+            "com.palm.app.deviceinfo_default",
+            "com.palm.app.exhibitionpreferences_default",
+            "com.palm.app.help_default",
+            "com.palm.app.searchpreferences_default",
+            "com.palm.app.location_default",
+            "com.palm.app.printmanager_default",
+            "com.palm.app.languagepicker_default",
+            "com.palm.app.screenlock_default",
+            "com.palm.app.swmanager_default",
+            "com.palm.app.soundsandalerts_default",
+            "com.palm.app.updates_default",
+            "com.palm.app.textassist_default",
+            "com.palm.app.vpn_default",
+            "com.palm.app.wifi_default" 
+        ] 
+    }
+]

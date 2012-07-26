@@ -1,0 +1,15 @@
+Two bash settings files are provided so that you can set up your environment prior
+to running applications for desktop or tethered to device.
+
+========== USAGE ===========
+
+To run LunaSysMgr (or any lunabus app on the desktop):
+
+source ./lunaenv.bashrc
+./LunaSysMgr
+
+To run LunaSysMgr in tethered mode:
+
+source ./lunaenv_remote.bashrc
+./LunaSysMgr
+

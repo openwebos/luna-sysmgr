@@ -1,0 +1,56 @@
+{ 
+    "locale":[
+                 {
+                         "languageName":"English",
+                         "languageCode":"en",
+                         "countries":[
+                                                 {"countryName":"United States", "countryCode":"us"},
+                                                 {"countryName":"United Kingdom", "countryCode":"gb"},
+                                                 {"countryName":"Pseudoland", "countryCode":"pl"},
+                                                 {"countryName":"Canada", "countryCode":"ca"},
+                                                 {"countryName":"Ireland", "countryCode":"ie"},
+                                                 {"countryName":"Mexico", "countryCode":"mx"},
+                                                 {"countryName":"China", "countryCode":"cn"}
+                                           ]
+                 },     
+                 {
+                         "languageName":"Español",
+                         "languageCode":"es",
+                         "countries":[
+                                                 {"countryName":"Estados Unidos", "countryCode":"us"},
+                                                 {"countryName":"España", "countryCode":"es"},
+                                                 {"countryName":"México", "countryCode":"mx"}
+                                           ]
+                 },
+                 {
+                         "languageName":"Deutsch",
+                         "languageCode":"de",
+                         "countries":[
+                                                 {"countryName":"Deutschland", "countryCode":"de"}
+                                           ]
+                 },
+                 {
+                         "languageName":"Italiano",
+                         "languageCode":"it",
+                         "countries":[
+                                                 {"countryName":"Italia", "countryCode":"it"}
+                                           ]
+                 },
+                 {
+                         "languageName":"Français",
+                         "languageCode":"fr",
+                         "countries":[
+                                                 {"countryName":"France", "countryCode":"fr"},
+                                                 {"countryName":"Canada", "countryCode":"ca"}
+                                           ]
+                 },
+                 {
+                         "languageName":"中文",
+                         "languageCode":"zh",
+                         "countries":[
+                                                 {"countryName":"简体", "countryCode":"cn"},
+                                                 {"countryName":"繁体", "countryCode":"hk"}
+                                           ]
+                 }
+             ]
+}

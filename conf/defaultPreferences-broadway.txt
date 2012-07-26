@@ -1,0 +1,5 @@
+{ 
+  "preferences": {
+		"ringtone":				{ "fullPath":"/usr/lib/luna/customization/copy_binaries/media/internal/ringtones/Pixi.mp3" , "name":"Pixi" }
+	}
+}

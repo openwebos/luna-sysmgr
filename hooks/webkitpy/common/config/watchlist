@@ -1,0 +1,67 @@
+#  -*- mode: Python;-*-
+{
+    "DEFINITIONS": {
+        "ChromiumGraphics": {
+            "filename": r"Source/WebCore/platform/graphics/chromium/.*",
+        },
+        "ChromiumPublicApi": {
+            "filename": r"Source/WebKit/chromium/public/.*"
+        },
+        "ThreadingFiles": {
+            "filename": r"Source/JavaScriptCore/wtf/ThreadSpecific\..*"
+                        r"|Source/JavaScriptCore/wtf/ThreadSafeRefCounted\..*"
+                        r"|Source/JavaScriptCore/wtf/ThreadingPrimitives\..*"
+                        r"|Source/JavaScriptCore/wtf/Threading\..*"
+                        r"|Source/WebCore/dom/CrossThreadTask\..*"
+                        r"|Source/WebCore/platform/CrossThreadCopier\..*",
+        },
+        "ThreadingUsage": {
+            # The intention of this regex is to detect places where people are using common threading mechanisms,
+            # so that one can look them over for common mistakes. This list is long and likely to get longer over time.
+            # Note the negative look-ahead to avoid new mentions of the files (for builds or includes).
+            "more": r"(AllowCrossThreadAccess|AtomicallyInitialize|CrossThreadCopier|CrossThreadRefCounted|Mutex|ReadWriteLock|ThreadCondition|ThreadSafeRefCounted|ThreadSpecific"
+                    r"|createCallbackTask|crossThreadString|deprecatedTurnOffVerifier|threadsafeCopy)(?!\.(h|cpp))",
+        },
+        "WatchListScript": {
+            "filename": r"Tools/Scripts/webkitpy/common/watchlist/.*",
+        },
+        "webkitpy": {
+            "filename": r"Tools/Scripts/webkitpy/.*",
+        },
+        "TestFailures": {
+            "filename": r"Tools/BuildSlaveSupport/build.webkit.org-config/public_html/TestFailures/.*",
+        },
+        "SecurityCritical": {
+            "more": r"[Ss]ecurityOrigin(?!\.(h|cpp))",
+            "less": r"[Ss]ecurityOrigin(?!\.(h|cpp))",
+            "filename": r"XSS|[Ss]ecurity",
+        },
+        "V8Bindings": {
+            "filename": r"Source/WebCore/bindings/v8/.*",
+        },
+        "BindingsScripts": {
+            "filename": r"Source/WebCore/bindings/scripts/.*",
+        },
+        "FrameLoader": {
+            "more": r"FrameLoader\.(cpp|h)",
+        },
+        "StyleChecker": {
+            "filename": r"Tools/Scripts/webkitpy/style/.*",
+        },
+    },
+    "CC_RULES": {
+        # Note: All email addresses listed must be registered with bugzilla.
+        # Specifically, levin@chromium.org and levin+threading@chromium.org are
+        # two different accounts as far as bugzilla is concerned.
+        "ChromiumGraphics": [ "jamesr@chromium.org", ],
+        "ChromiumPublicApi": [ "fishd@chromium.org", ],
+        "StyleChecker": [ "levin@chromium.org", ],
+        "ThreadingFiles|ThreadingUsage": [ "levin+threading@chromium.org", ],
+        "WatchListScript": [ "levin+watchlist@chromium.org", ],
+        "webkitpy|TestFailures|SecurityCritical|V8Bindings|BindingsScripts|FrameLoader": [ "abarth@webkit.org" ],
+    },
+    "MESSAGE_RULES": {
+        "ChromiumPublicApi": [ "Please wait for approval from fishd@chromium.org before submitting "
+                               "because this patch contains changes to the Chromium public API.", ],
+    },
+}

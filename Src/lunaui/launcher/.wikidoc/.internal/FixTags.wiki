@@ -1,0 +1,78 @@
+FixTags : definitions of keywords within code comments, TODO: blocks,... which will require some kind of attention past the "0.9" version
+of the project
+
+DEBUG:
+  code included for debugging. May or may not be desirable to leave in for future work
+
+TEST:
+  code included for testing a sub-feature. Mostly tagged for removal
+  
+EXPERIMENTAL:
+	temp code for trying something out. probably is violating OOPisms, or is unsafe. 
+	it will either be removed or turned into real implementation
+
+OOP-S:
+	functionally correct code that violates some OOP design paradigm or would be better if it was moved in the class hiearchy
+	 	
+ASSUMPTION:
+  	lists an assumption about preconditions, conventions, etc., that may not be clear from the code. 
+
+DFISH-FC-ASSUMPTION:
+ 	assumptions specific to how the launcher will behave in FC of dfish
+ 	
+PIXEL-ALIGN:
+  flags potential alignment/rounding problems between pixel (screen) space and logical (scene) space.
+  pixel space is in whole numbers (ints) whereas logical space is in floats (reals)
+  Consistency needs to be used throughout to avoid rounding and truncating errors that will result in 
+  rendering "gaps" between elements, elements being too small, etc (usually by 1 or 2 pixels)
+   
+SLOW:
+	In the interests of complete functionality before optimization, the code marked this way may be suboptimal, either subtly
+	or blatantly obviously. In fact, it may be unacceptably slow for general use.
+	
+INCOMPLETE: , IMPLEMENT: , UNIMPLEMENTED:
+	This means the code is missing handling of all possible cases; it could be it only implements the cases that are currently
+	used/valid, just to get things working.
+	
+BROKEN: (self explanatory)
+
+CUSTOMIZE:
+	hardcoded or arbitrarily defaulted, but intended to be a setting in a conf file, or a saved setting, or any other type of 
+	user modifiable property
+
+LOCALIZE:
+	hardcoded string that shouldn't be, due to localization reqs.
+
+PMO-MANAGE:
+	pixmapobjects were intended to be grouped,pooled, and not usually owned by the graphics items that use them as pixmaps
+	but the system for this isn't in place yet. thus, this tag usually marks places where a Pmo is explicitly delete-d,
+	is implicitly taken/p0wned, or otherwise compromised in a way that could upset something that thinks its managing it
+
+ICON-MANAGE:
+	similar to PMO-MANAGE, but for icons and the icon heap.
+MEMLEAK:
+	alias for PMO-MANAGE and ICON-MANAGE, and for other places unrelated to them that are flagged as potential or confirmed leaks 
+	waiting to be fixed
+	
+MULTI-TOUCH:
+	possible issues when the general assumption that there can only be 1 valid touch point, no longer holds.
+	This also marks the places where modifications can/should be made to add some good features that can only be realized w/ M.T.
+
+LAUNCHER-REF:
+	placeholder for specific launcher object references
+	
+MAJOR-MOD-WARNING:
+	something that makes a significant assumption, and if a major revamp of the code is done, these tags should
+	be examined carefully to see if the code is still valid
+	
+FANCY-FU:
+	suggestions on how to make things prettier, add some wow, etc.
+	
+BUG-MARKER:
+	a known bug, marked to be impl'd later
+
+PAST-CRASH:
+	a crash was seen here; comments about it follow (for future ref and/or later debugging)
+
+UPDATE-PAINT-WORKAROUND:
+	aka the Pseudo-Item-Update problem. See PaintingItems

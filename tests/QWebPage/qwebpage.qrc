@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>html/index.html</file>
+    <file>html/child.html</file>
+</qresource>
+</RCC>

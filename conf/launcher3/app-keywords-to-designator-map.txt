@@ -1,0 +1,11 @@
+[designators]
+1\designator=apps
+2\designator=downloads
+3\designator=prefs
+3\name=settings
+size=3
+
+[keywords]
+1\keyword=EXAMPLE_DUMMY
+1\designator=system
+size=1

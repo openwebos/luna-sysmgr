@@ -1,0 +1,42 @@
+Layouts are not graphics items, and so when they are used for painting operations, there are two ways to go.
+
+1. paintAuto() which is roughly equivalent to the QGraphicsItem paint() functions. 
+before the final paintAuto takes place that actually puts stuff on the screen (this is usually a call to an actual GraphicsItem paint()
+...see IconBase ), a painter->translate() or other appropriate transform must be done to put the painter origin in the "position" of the item,
+which by my convention is the center of the item (0,0 in the item's coordinate space)
+This is what paint() expects that the system would have done before calling it, if it was being called as a part of a regular
+render which would have painted all the items from the top of the scene tree and all the way down
+
+When paintAuto is used, then an item can draw normally within its own geom/b-rect, which by convention is in ItemCoordinateSpace (ICS) and spans
+-w/2->w/2, -h/2->h/2 and has its origin at 0,0 (in the center)
+
+2. paintOffscreen(), which is the "raw" paint and just paints into 0,0 of its own pixmap. This doesn't have to be the case of course, since 
+it can just be painting into an area of a larger pixmap that has already had others paint on it.
+
+When paintOffscreen is used, then the item should never draw at x<0, y<0...and its geom/b-rect should be thought of as remapped as 
+bRect = bRect->moveBy(bRect.bottomRight)   (since bRect is always in ICS with 0,0 at center; similarly for geom)
+Therefore, painter->translate() or equiv. should be done ahead of time to move the painter origin to the "top left" position of the item
+so that when the item paints from 0,0 (its remapped origin), it will paint in the expected area
+
+Summary:  When using paintAuto(), translate the painter beforehand to the ICS center; the item will paint itself from here, -w/2,w/2 and -h/2,h/2 
+sideways and up/down, respectively
+
+When using paintOffscreen(), translate the painter beforehand to the ICS topLeft (where you'd want item's topLeft to be painter)
+
+
+
+-----
+Since IconBase is in theory supposed to be derivable to other icon types besides just those made up of pixmaps,
+its paint___() functions should really be redone such that they take item coordinate space params (i.e. compatible with
+geoms; -w/2->w/2...)
+
+-----
+Pseudo-Item-Update problem:
+
+e.g. IconBase is a real QGItem but when it's a part of a layout, it's being drawn manually by the layout, not by paint() tree as part of a 
+QGScene render. Therefore, an update() call from within IconBase will not do the right thing. To get around this, the Icon would need to signal the
+nearest QGItem that is being drawn by the scene, and tell it to call update() on Icon's behalf. Unfortunately, many times this isn't convenient,
+since objects like Icon move around between owners (Pages) which are QGItems and those Pages might themselves be deleted in theory.
+The workaround solution for this is to call update() at the first possible chance (i.e. the first QGItem on the call stack) after a call to
+IconBase 's functions that may affect Icon in such a way as to need an update.
+The other possibility is to have a static/global instance of the QGView or scene, and call update() on it directly within Icon

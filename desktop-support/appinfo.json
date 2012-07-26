@@ -1,0 +1,9 @@
+{
+        "title": "Launcher",
+        "appmenu": "Just Type",
+        "type": "web",
+        "main": "index.html",
+        "id": "com.palm.launcher",
+        "icon": "icon.png",
+        "theme":"palm-dark"
+}

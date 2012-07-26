@@ -1,0 +1,25 @@
+<html>
+   <head>
+     <style type="text/css" media="screen">
+       .dashboard-notification-module {-webkit-border-image: url(./dashboard-container.png) 0 12 / 0px 12px repeat stretch;}
+       .dashboard-notification-module:active {-webkit-border-image: url(./dashboard-container-active.png) 0 12 / 0px 12px repeat stretch;}
+     </style>
+   </head>
+   <script type="text/javascript">
+	 function insertText() {
+	 	document.getElementById("header").innerHTML = PalmSystem.getLocalizedString("Memory critical, too many cards!");
+	 	document.getElementById("content").innerHTML = PalmSystem.getLocalizedString("Throw away cards to recover");
+
+		PalmSystem.addBannerMessage(PalmSystem.getLocalizedString("Memory critical, too many cards!"), "{}", "dashboard-icon-small.png");
+	 }
+   </script>
+   <body style="margin:4px 0px 0px 0px; background:black;color:white;font: 16px 'Coconut', sans-serif;-webkit-user-select: none;" onload="insertText()">
+     <div class="dashboard-notification-module">
+         <image src="./low-memory-icon-dash.png" style="float:left;padding-right:7px;-webkit-user-drag:none;"/>
+         <div style="height:22px;line-height:28px; padding-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:bold;" id="header">
+		 </div>
+         <div style="height:24px;margin-top:-4px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:normal;" id="content">
+		 </div>
+     </div>
+   </body>
+</html>
