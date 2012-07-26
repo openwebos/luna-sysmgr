@@ -2,7 +2,9 @@
 LunaSysMgr
 ==========
 
-This is the repository for luna-sysmgr, the System Manager for webOS.
+LunaSysMgr is responsible for rendering webOS Card View, Launcher, Lock Screen, Status Bar and Status Menus, in addition to other system management features that are viewable in the System Manager User Interface.
+
+LunaSysMgr is also responsible for hosting a WebKit shared library, WebApp Management, rendering of web applications.
 
 This is the current active development repository for luna-sysmgr.
 
@@ -29,25 +31,31 @@ Install components needed to build SysMgr by typing the following:
   
   * Ensure you have at least 3GB of available disk space
 
-b) Get the script
+b) Get the code
 -----------------
 
-From the openwebos/luna-sysmgr repository, download the "build-luna-sysmgr.sh" build script. Then make it executable and run it by typing the following:
-
-
-     chmod +x build-luna-sysmgr.sh  
-     ./build-luna-sysmgr.sh
-      
-  Note: It isn't necessary to download the rest of the luna-sysmgr source code, as the script does this automatically.
+Get the zip file and unzip it into a known directory.
   
 c) Building luna-sysmgr
 -----------------------
  
-  Change to the folder where you downloaded the build script and run it:
-    ./build-luna-sysmgr.sh
+Change to the folder where you downloaded the build script and run it:
 
-  Note: This will typically take one to three hours, depending on the speed of your system and of your internet connection.
 
+        ./build-luna-sysmgr.sh
+
+Note: This will typically take one to three hours, depending on the speed of your system and of your internet connection.
+
+d) Install luna-sysmgr
+----------------------
+
+1) Change to the folder where the files are located:
+
+        cd ~/luna-desktop-binaries
+
+2) Install expected folders and links into /etc/palm:
+
+        sudo ./install-luna-sysmgr.sh
 
 How to Run on Linux
 ===================
@@ -55,19 +63,21 @@ How to Run on Linux
 Please note that this version of the build provides minimal runtime functionality.
 
 1) Change to the folder where the files are located:
-    cd ~/luna-desktop-binaries
 
-2) Install expected folders and links into /etc/palm   (Only needed once):
-    sudo ./install-luna-sysmgr.sh
+        cd ~/luna-desktop-binaries
 
-3) Start up the service bus:
-    ./service-bus.sh  start
+2) Start up the service bus:
 
-4) Run luna-sysmgr   (ignore the messages from LunaService):
-    ./run-luna-sysmgr.sh
+        ./service-bus.sh  start
+
+3) Run luna-sysmgr   (ignore the messages from LunaService):
+
+        ./run-luna-sysmgr.sh
+
 
 When you are finished running luna-sysmgr, stop the service bus:
-    ./service-bus.sh  stop
+
+       ./service-bus.sh  stop
 
 
 # Copyright and License Information
