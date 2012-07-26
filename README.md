@@ -1,21 +1,3 @@
-# Copyright and License Information
-
-All content, including all source code files and documentation files in this repository except otherwise noted are: 
-
- Copyright (c) 2008-2012 Hewlett-Packard Development Company, L.P.
-
-All content, including all source code files and documentation files in this repository except otherwise noted are:
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this content except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
 LunaSysMgr
 ==========
@@ -33,22 +15,30 @@ Note:  The build script has been successfully tested on both Ubuntu 11.04 and 12
 a) Prerequisites
 ----------------
 
-  * Install the following standard components:
+Install components needed to build SysMgr by typing the following:
+
         sudo apt-get update
+
         sudo apt-get install git git-core pkg-config cmake make autoconf libtool g++ tcl unzip libyajl-dev libyajl1 qt4-qmake build-dep libsqlite3-dev curl
-        sudo apt-get install gperf bison libglib2.0-dev libssl-dev libxi-dev libxrandr-dev libxfixes-dev libxcursor-dev libfreetype6-dev libxinerama-dev libgl1-mesa-dev libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev flex libicu-dev 
+
+        sudo apt-get install gperf bison libglib2.0-dev libssl-dev libxi-dev libxrandr-dev libxfixes-dev libxcursor-dev libfreetype6-dev libxinerama-dev libgl1-mesa-dev libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev flex libicu-dev
+
+        sudo apt-get build-dep qt4-qmake
 
   * Ensure you have a fast and reliable internet connection since you'll be downloading about 310MB
   
   * Ensure you have at least 3GB of available disk space
-  
+
 b) Get the script
 -----------------
 
-  From the openwebos/luna-sysmgr repository, download the script file and make it executable:
-      build-luna-sysmgr.sh
+From the openwebos/luna-sysmgr repository, download the "build-luna-sysmgr.sh" build script. Then make it executable and run it by typing the following:
+
+
+     chmod +x build-luna-sysmgr.sh  
+     ./build-luna-sysmgr.sh
       
-  Note: It isn't necessary to download the rest of the luna-sysmgr source code as the script does this automatically
+  Note: It isn't necessary to download the rest of the luna-sysmgr source code, as the script does this automatically.
   
 c) Building luna-sysmgr
 -----------------------
@@ -78,3 +68,23 @@ Please note that this version of the build provides minimal runtime functionalit
 
 When you are finished running luna-sysmgr, stop the service bus:
     ./service-bus.sh  stop
+
+
+# Copyright and License Information
+
+All content, including all source code files and documentation files in this repository except otherwise noted are: 
+
+ Copyright (c) 2008-2012 Hewlett-Packard Development Company, L.P.
+
+All content, including all source code files and documentation files in this repository except otherwise noted are:
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this content except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
