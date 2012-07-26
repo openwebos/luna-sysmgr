@@ -1,10 +1,10 @@
 
-LunaSysMgr
-==========
+luna-sysmgr
+============
 
-LunaSysMgr is responsible for rendering webOS Card View, Launcher, Lock Screen, Status Bar and Status Menus, in addition to other system management features that are viewable in the System Manager User Interface.
+luna-sysmgr is responsible for rendering webOS Card View, Launcher, Lock Screen, Status Bar and Status Menus, in addition to other system management features that are viewable in the System Manager User Interface.
 
-LunaSysMgr is also responsible for hosting a WebKit shared library, WebApp Management, rendering of web applications.
+luna-sysmgr is also responsible for hosting a WebKit shared library, WebApp Management, for rendering of Enyo applications.
 
 This is the current active development repository for luna-sysmgr.
 
@@ -17,7 +17,7 @@ Note:  The build script has been successfully tested on both Ubuntu 11.04 and 12
 a) Prerequisites
 ----------------
 
-Install components needed to build SysMgr by typing the following:
+Install components needed to build luna-sysmgr by typing the following:
 
         sudo apt-get update
 
@@ -31,8 +31,8 @@ Install components needed to build SysMgr by typing the following:
   
   * Ensure you have at least 3GB of available disk space
 
-b) Get the code
------------------
+b) Getting the code
+-------------------
 
 Get the zip file and unzip it into a known directory.
   
@@ -46,8 +46,8 @@ Change to the folder where you downloaded the build script and run it:
 
 Note: This will typically take one to three hours, depending on the speed of your system and of your internet connection.
 
-d) Install luna-sysmgr
-----------------------
+d) Installing luna-sysmgr
+-------------------------
 
 1) Change to the folder where the files are located:
 
