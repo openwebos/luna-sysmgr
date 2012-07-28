@@ -1,20 +1,28 @@
-/* @@@LICENSE
-*
-*      Copyright (c) 2008-2012 Hewlett-Packard Development Company, L.P.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*
-* LICENSE@@@ */
+/**
+ * @file
+ * 
+ * Common functionality for all ARM-based devices.
+ *
+ * @author Hewlett-Packard Development Company, L.P.
+ * @author tyrok1
+ *
+ * @section LICENSE
+ *
+ *      Copyright (c) 2008-2012 Hewlett-Packard Development Company, L.P.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
+ */
 
 
 
@@ -96,39 +104,89 @@ typedef enum
     NUM_GESTURES
 } GestureType_t;
 
+/**
+ * Base class for all ARM-based host device classes to derive from
+ */
 class HostArm : public HostBase, public NYXConnectorObserver
 {
     Q_OBJECT
 public:
-
+	/**
+	 * Constructs an ARM-based host device
+	 * 
+	 * Initializes common ARM hardware.
+	 */
 	HostArm();
+	
+	/**
+	 * Shuts down ARM-specific hardware
+	 */
 	virtual ~HostArm();
-
+	
+	//Documented in parent
 	virtual void init(int w, int h);
 	virtual void show();
-
+	
+	//Documented in parent
 	virtual int getNumberOfSwitches() const;
+	
+	/**
+	 * Asks the HIDD service for the state of each of the switches
+	 * 
+	 * Posts KeyPress/KeyRelease events to the
+	 * event queue of the active window for each
+	 * of the hardware switches of this device.
+	 * 
+	 * Possible keys include:
+	 * - Qt::Key_unknown
+	 * - Qt::Key_Ringer
+	 * - Qt::Key_Slider
+	 * - Qt::Key_HeadsetMic
+	 * - Qt::Key_Headset
+	 */
 	virtual void getInitialSwitchStates(void);
 
 	int readHidEvents(int fd, struct input_event* eventBuf, int bufSize);
-
+	
+	/**
+	 * @copybrief HostBase::hardwareName()
+	 * 
+	 * Since this class is a generic base for
+	 * ARM-based devices, this always returns
+	 * "ARM Device".
+	 * 
+	 * @return				Returns the string "ARM Device".
+	 */
 	virtual const char* hardwareName() const;
-
+	
+	//Documented in parent
 	virtual InputControl* getInputControlALS();
+	
+	//Documented in parent
 	virtual InputControl* getInputControlBluetoothInputDetect();
+	
+	//Documented in parent
 	virtual InputControl* getInputControlProximity();
+	
+	//Documented in parent
 	virtual InputControl* getInputControlTouchpanel();
+	
+	//Documented in parent
 	virtual InputControl* getInputControlKeys();
 
 	virtual LedControl* getLedControlKeypadAndDisplay();
+	
+	/**
+	 * Function enables/disables the orientation sensor
+	 * 
+	 * @param	enable			true to enable the orientation sensor, false to disable it.
+	 */
+	virtual void OrientationSensorOn(bool enable);
 
-    /**
-      * Function enables/disables the orientation sensor
-      */
-    virtual void OrientationSensorOn(bool enable);
-
-    virtual void setBluetoothKeyboardActive(bool active);
-    virtual bool bluetoothKeyboardActive() const;
+	virtual void setBluetoothKeyboardActive(bool active);
+	
+	//Documented in parent
+	virtual bool bluetoothKeyboardActive() const;
 
 protected:
 
@@ -171,16 +229,50 @@ protected:
 
 	void startService(void);
 	void stopService(void);
-
+	
+	/**
+	 * Disable screen blanking and puts the screen into graphics mode
+	 * 
+	 * Enabled screen blanking to restore the screen
+	 * from sleep, then immediately disables it.
+	 * 
+	 * After that, it puts the screen into grahics
+	 * mode to get it ready to draw to (and hide
+	 * the cursor).
+	 * 
+	 * When deciphering the implementation of this,
+	 * see the manpage for console_ioctl,
+	 * specifically TIOCLINUX subcodes 0 and 10.
+	 */
 	void disableScreenBlanking();
-
+	
+	//Documented in parent
 	virtual void flip();
 
 	virtual QImage takeScreenShot() const;
 	virtual QImage takeAppDirectRenderingScreenShot() const;
 	virtual void setAppDirectRenderingLayerEnabled(bool enable);
 	virtual void setRenderingLayerEnabled(bool enable);
-
+	
+	/**
+	 * Given a return value from an IPC call with a "value" element, returns the integer value of it
+	 * 
+	 * When an IPC call passes back a JSON structure
+	 * in a format such as:
+	 * 
+	 * <code>
+	 * {
+	 *   value : "127"
+	 * }
+	 * </code>
+	 * 
+	 * It returns the integer value of the "value"
+	 * element.
+	 * 
+	 * @param	msg			Return value message to parse from IPC call.
+	 * @param	value			Where to store the integer version of the value.
+	 * @return				true if parsing was successful, false if parsing failed.
+	 */
 	static bool getMsgValueInt(LSMessage* msg, int& value);
 	static bool switchStateCallback(LSHandle* handle, LSMessage* msg, void* data);
 
