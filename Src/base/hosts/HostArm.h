@@ -145,7 +145,21 @@ public:
 	 * - Qt::Key_Headset
 	 */
 	virtual void getInitialSwitchStates(void);
-
+	
+	/**
+	 * Reads input_event structures from a file descriptor and returns the number read
+	 * 
+	 * Mainly just a utility method for use
+	 * within this class.  Very purpose-
+	 * specific.
+	 * 
+	 * @see input_event
+	 * 
+	 * @param	fd			File descriptor to read from.
+	 * @param	eventBuf		Buffer to read input_events into.
+	 * @param	bufSize			Amount of allocated memory (in bytes) that eventBuf points to.
+	 * @return				Returns the number of events read on success (may be 0) or -1 on failure.
+	 */
 	int readHidEvents(int fd, struct input_event* eventBuf, int bufSize);
 	
 	/**
@@ -194,8 +208,27 @@ protected:
 	QSocketNotifier* m_nyxProxNotifier;
 
 	virtual void wakeUpLcd();
-
+	
+	/**
+	 * Remap a raw X value from the touchscreen to a pixel value
+	 * 
+	 * @todo Confirm this, since there's only one implementation of this at the moment.
+	 * 
+	 * @param	rawX			Raw X value from the touchscreen.
+	 * @param	type			Type of event which gave us this coordinate value.
+	 * @return				Screen X of the touch, in pixels.
+	 */
 	virtual int screenX(int rawX, Event::Type type) { return rawX; }
+	
+	/**
+	 * Remap a raw Y value from the touchscreen to a pixel value
+	 * 
+	 * @todo Confirm this, since there's only one implementation of this at the moment.
+	 * 
+	 * @param	rawY			Raw Y value from the touchscreen.
+	 * @param	type			Type of event which gave us this coordinate value.
+	 * @return				Screen Y of the touch, in pixels.
+	 */
 	virtual int screenY(int rawY, Event::Type type) { return rawY; }
 
 	virtual void setCentralWidget(QWidget* view);
@@ -224,10 +257,50 @@ protected:
     NYXOrientationSensorConnector* m_OrientationSensor;
 
 protected:
+	/**
+	 * Starts talking to this device's sensors
+	 * 
+	 * Calls both
+	 * {@link HostArm::getInputControlALS() HostArm::getInputControlALS()}
+	 * and
+	 * {@link HostArm::getInputControlProximity() HostArm::getInputControlProximity()}
+	 * to connect to HAL for the sensors.  After
+	 * each, it also subscribes to notifiers for
+	 * them.
+	 * 
+	 * @todo Document how the notifier functionality works.
+	 */
 	void setupInput(void);
+	
+	/**
+	 * Disconnects from HAL for each of the sensors
+	 * 
+	 * Sensors which are disconnected from include:
+	 * - Ambient light sensor.
+	 * - Face proximity sensor.
+	 * - Touch panel.
+	 * - Control keys (probably either hardware switches or the keyboard).
+	 * 
+	 * And closes down the HAL notifiers for:
+	 * - Face proximity sensor.
+	 * - Ambient light sensor.
+	 * 
+	 * @todo Figure out whether "control keys" refers to hardware switches or the keyboard.
+	 */
 	void shutdownInput(void);
-
+	
+	/**
+	 * Attaches the main GLib event loop for this host to the IPC system
+	 * 
+	 * @todo Confirm this once LSRegister is publicly documented.
+	 */
 	void startService(void);
+	
+	/**
+	 * Disconnects the main GLib event loop for this host from the IPC system
+	 * 
+	 * @todo Confirm this once LSUnregister is publicly documented.
+	 */
 	void stopService(void);
 	
 	/**
@@ -274,6 +347,24 @@ protected:
 	 * @return				true if parsing was successful, false if parsing failed.
 	 */
 	static bool getMsgValueInt(LSMessage* msg, int& value);
+	
+	/**
+	 * Handle an event related to the hadware switches
+	 * 
+	 * Internal handler for switch state
+	 * transitions.  Reads the switch information
+	 * in and translates it into either a
+	 * {@link QEvent::KeyPress QEvent::KeyPress}
+	 * or
+	 * {@link QEvent::KeyRelease QEvent::KeyRelease}
+	 * based on the new value of the switch which
+	 * is then dispatched to the active window's
+	 * event queue.
+	 * 
+	 * @param	handle			IPC handle.
+	 * @param	msg			IPC return value text.  Must be in JSON format.  See HostArm::getMsgValueInt().
+	 * @param	data			Not a pointer, despite what it looks like.  The switch that changed state.  Can be SW_RINGER, SW_SLIDER, or SW_HEADPHONE_INSERT.
+	 */
 	static bool switchStateCallback(LSHandle* handle, LSMessage* msg, void* data);
 
     /**
@@ -285,7 +376,39 @@ protected:
     virtual void NYXDataAvailable (NYXConnectorBase::Sensor aSensorType);
 
 protected Q_SLOTS:
+	/**
+	 * Read the value of the ambient light sensor
+	 * 
+	 * Reads the value of the ambient light sensor
+	 * and posts an AlsEvent event to the active
+	 * window's event queue with the value IF it
+	 * is able to successfully retrieve the value.
+	 * 
+	 * @note You MUST run HostArm::setupInput() (or HostArm::getInputControlALS() directly if you feel adventurous) before calling this method for it to actually do anything.
+	 * 
+	 * @see HostArm::getInputControlALS()
+	 * @see AlsEvent
+	 * 
+	 * @todo Document the value range for the ambient light sensor.
+	 */
 	void readALSData();
+	
+	/**
+	 * Read the value of the face proximity sensor
+	 * 
+	 * Reads the value of the face proximity
+	 * sensor and posts an ProximityEvent event
+	 * to the active window's event queue with
+	 * the value IF it is able to successfully
+	 * retrieve the value.
+	 * 
+	 * @note You MUST run HostArm::setupInput() (or HostArm::getInputControlProximity() directly if you feel adventurous) before calling this method for it to actually do anything.
+	 * 
+	 * @see HostArm::getInputControlProximity()
+	 * @see ProximityEvent
+	 * 
+	 * @todo Document the value range for the face proximity sensor.
+	 */
 	void readProxData();
 };
 
