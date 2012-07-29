@@ -1,20 +1,28 @@
-/* @@@LICENSE
-*
-*      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*
-* LICENSE@@@ */
+/**
+ * @file
+ * 
+ * Device-specific functionality for the Topaz devices
+ *
+ * @author Hewlett-Packard Development Company, L.P.
+ * @author tyrok1
+ *
+ * @section LICENSE
+ *
+ *      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
+ */
 
 
 
@@ -23,10 +31,29 @@
 
 #include "HostArm.h"
 
+/**
+ * Device-specific functionality for the Topaz devices
+ * 
+ * Device details:
+ * - ARMv7.
+ * - Turbo mode from 40% to 95% of speed.
+ * - Switches (2): headphones inserted and power.
+ * - Raw orientation readings are rotated +90 degrees from correct orientation before being translated.
+ * - Home button wakes up the screen.
+ * 
+ * @see https://en.wikipedia.org/wiki/HP_TouchPad
+ */
 class HostArmTopaz : public HostArm
 {
 public:
+	/**
+	 * Constructs a Topaz device host
+	 */
 	HostArmTopaz();
+	
+	/**
+	 * Destroys a Topaz device host
+	 */
 	virtual ~HostArmTopaz();
 
 	virtual const char* hardwareName() const;
@@ -84,11 +111,14 @@ void HostArmTopaz::turboMode(bool enable)
 }
 
 /**
+  * Translates an orientation sensor reading to the actual correct value
+  * 
   * For Topaz, the orientation events are rotated by +90 relative to the
   * display orientation. For Topaz Screen up = Left Orientation
   *
   * Following is the actual screen (Frame Buffer) orientation
   *
+  * <pre>
   *       Left(90)
   *     -----------
   *     |         |
@@ -100,10 +130,12 @@ void HostArmTopaz::turboMode(bool enable)
   *          o <- home button
   *     -----------
   *    Right(270/-90)
+  * </pre>
   *-----------------------------------------------------------
   *
   * But, Nyx gives us data 270 rotated clock-wise (-90 anti clock-wise)
   *
+  * <pre>
   *             Up
   *         -----------
   *         |         |
@@ -115,6 +147,10 @@ void HostArmTopaz::turboMode(bool enable)
   *             o <- home button
   *         -----------
   *            Down
+  * </pre>
+  * 
+  * @param	curOrientation			Raw sensor event.
+  * @return					Translated (correct) sensor reading event.
   */
 OrientationEvent* HostArmTopaz::postProcessDeviceOrientation(OrientationEvent* currOrientation)
 {
