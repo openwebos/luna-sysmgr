@@ -125,6 +125,8 @@ public:
 	
 	//Documented in parent
 	virtual void init(int w, int h);
+	
+	//Documented in parent
 	virtual void show();
 	
 	//Documented in parent
@@ -196,17 +198,41 @@ public:
 	 * @param	enable			true to enable the orientation sensor, false to disable it.
 	 */
 	virtual void OrientationSensorOn(bool enable);
-
+	
+	//Documented in parent
 	virtual void setBluetoothKeyboardActive(bool active);
 	
 	//Documented in parent
 	virtual bool bluetoothKeyboardActive() const;
 
 protected:
-
+	/**
+	 * Watches for changes in the ambient light sensor value and posts events to the event queue when they occur
+	 * 
+	 * Initialized by HostArm::setupInput().
+	 * 
+	 * @see QSocketNotifier
+	 * @see HostArm::setupInput()
+	 */
 	QSocketNotifier* m_nyxLightNotifier;
+	
+	/**
+	 * Watches for changes in the face proximity sensor value and posts events to the event queue when they occur
+	 * 
+	 * Initialized by HostArm::setupInput().
+	 * 
+	 * @see QSocketNotifier
+	 * @see HostArm::setupInput()
+	 */
 	QSocketNotifier* m_nyxProxNotifier;
 
+	/**
+	 * Turns the LCD on
+	 * 
+	 * Not much more to say about this one.
+	 * The function of it is pretty
+	 * straightforward.
+	 */
 	virtual void wakeUpLcd();
 	
 	/**
@@ -230,30 +256,160 @@ protected:
 	 * @return				Screen Y of the touch, in pixels.
 	 */
 	virtual int screenY(int rawY, Event::Type type) { return rawY; }
-
+	
+	//Documented in parent
 	virtual void setCentralWidget(QWidget* view);
-
+	
+	/**
+	 * Hardware revision
+	 * 
+	 * Initialized by the constructor
+	 * ({@link HostArm::HostArm() HostArm::HostArm()}
+	 * via
+	 * {@link HidGetHardwareRevision() HidGetHardwareRevision()}.
+	 * 
+	 * @todo Document this more fully once HidGetHardwareRevision() is publicly documented.
+	 */
 	HidHardwareRevision_t m_hwRev;
+	
+	/**
+	 * Hardware platform
+	 * 
+	 * Initialized by the constructor
+	 * ({@link HostArm::HostArm() HostArm::HostArm()}
+	 * via
+	 * {@link HidGetHardwarePlatform() HidGetHardwarePlatform()}.
+	 * 
+	 * @todo Document this more fully once HidGetHardwarePlatform() is publicly documented.
+	 */
 	HidHardwarePlatform_t m_hwPlatform;
-
+	
+	/**
+	 * File descriptor for the first framebuffer device (/dev/fb0, the LCD)
+	 * 
+	 * Initialized by
+	 * {@link HostArm::init() HostArm::init()}.
+	 */
 	int m_fb0Fd;
+	
+	/**
+	 * File descriptor for the secondary framebuffer device (/dev/fb1, for direct rendering)
+	 * 
+	 * Initialized by
+	 * {@link HostArm::init() HostArm::init()}.
+	 */
 	int m_fb1Fd;
+	
+	/**
+	 * Memory-mapped pointer to /dev/fb0
+	 * 
+	 * Write pixel data to this to display it.
+	 */
 	void* m_fb0Buffer;
+	
+	/**
+	 * Number of buffers successfully memory mapped for /dev/fb0
+	 * 
+	 * Looks like this is where you can tell how
+	 * many back buffers have been enabled for the
+	 * device (in addition to the main buffer).
+	 * This should be the total number of buffers
+	 * for the device, including back buffers.
+	 * 
+	 * @todo Confirm the documentation on this.
+	 */
 	int m_fb0NumBuffers;
+	
+	/**
+	 * Memory-mapped pointer to /dev/fb1
+	 * 
+	 * Write pixel data to this to display it to
+	 * /dev/fb1.
+	 */
 	void* m_fb1Buffer;
+	
+	/**
+	 * Number of buffers successfully memory mapped for /dev/fb1
+	 * 
+	 * Looks like this is where you can tell how
+	 * many back buffers have been enabled for the
+	 * device (in addition to the main buffer).
+	 * This should be the total number of buffers
+	 * for the device, including back buffers.
+	 * 
+	 * @todo Confirm the documentation on this.
+	 */
 	int m_fb1NumBuffers;
-
+	
+	/**
+	 * IPC system connection
+	 * 
+	 * Appears to be initialized by
+	 * {@link HostArm::startService() HostArm::startService()}.
+	 */
 	LSHandle* m_service;
 
+	/**
+	 * Nyx input control for the ambient light sensor
+	 * 
+	 * Initialized in
+	 * {@link HostArm::getInputControlALS() HostArm::getInputControlALS()}.
+	 */
 	InputControl* m_nyxInputControlALS;
+	
+	/**
+	 * Nyx input control for the whether or not a Bluetooth input device is connected
+	 * 
+	 * Initialized in
+	 * {@link HostArm::getInputControlBluetoothInputDetect() HostArm::getInputControlBluetoothInputDetect()}.
+	 * 
+	 * @todo Confirm that this is what the Bluetooth input detect input control is for.
+	 */
 	InputControl* m_nyxInputControlBluetoothInputDetect;
+	
+	/**
+	 * Nyx input control for the face proximity sensor
+	 * 
+	 * Initialized in
+	 * {@link HostArm::getInputControlProximity() HostArm::getInputControlProximity()}.
+	 */
 	InputControl* m_nyxInputControlProx;
+	
+	/**
+	 * Nyx input control for the keyboard
+	 * 
+	 * Initialized in
+	 * {@link HostArm::getInputControlKeys() HostArm::getInputControlKeys()}.
+	 * 
+	 * @todo Confirm that this is in fact for the keyboard.
+	 */
 	InputControl* m_nyxInputControlKeys;
+	
+	/**
+	 * Nyx input control for the touch panel
+	 * 
+	 * Initialized in
+	 * {@link HostArm::getInputControlTouchpanel() HostArm::getInputControlTouchpanel()}.
+	 */
 	InputControl* m_nyxInputControlTouchpanel;
 	LedControl* m_nyxLedControlKeypadAndDisplay;
 
+	
+	/**
+	 * Whether or not a Bluetooth keyboard is active
+	 * 
+	 * Set by
+	 * {@link HostArm::setBluetoothKeyboardActive() HostArm::setBluetoothKeyboardActive()}.
+	 */
     bool m_bluetoothKeyboardActive;
 
+	
+	/**
+	 * Nyx sensor connector for the orientation sensor
+	 * 
+	 * Initialized, enabled, and disabled by
+	 * {@link HostArm::OrientationSensorOn() HostArm::OrientationSensorOn()}.
+	 */
     NYXOrientationSensorConnector* m_OrientationSensor;
 
 protected:
@@ -266,9 +422,10 @@ protected:
 	 * {@link HostArm::getInputControlProximity() HostArm::getInputControlProximity()}
 	 * to connect to HAL for the sensors.  After
 	 * each, it also subscribes to notifiers for
-	 * them.
+	 * them so when either of them changes value
+	 * an event is posted to our event queue.
 	 * 
-	 * @todo Document how the notifier functionality works.
+	 * @see QSocketNotifier
 	 */
 	void setupInput(void);
 	
@@ -321,10 +478,17 @@ protected:
 	
 	//Documented in parent
 	virtual void flip();
-
+	
+	//Documented in parent
 	virtual QImage takeScreenShot() const;
+	
+	//Documented in parent
 	virtual QImage takeAppDirectRenderingScreenShot() const;
+	
+	//Documented in parent
 	virtual void setAppDirectRenderingLayerEnabled(bool enable);
+	
+	//Documented in parent
 	virtual void setRenderingLayerEnabled(bool enable);
 	
 	/**

@@ -389,9 +389,11 @@ public:
 	virtual InputControl* getInputControlTouchpanel()    { return 0; }
 	
 	/**
-	 * Gets an InputControl pointer for the control keys
+	 * Gets an InputControl pointer for the keyboard
 	 * 
-	 * Allows the control keys (probably the keyboard) to be turned on/off.
+	 * Allows the keyboard to be turned on/off.
+	 * 
+	 * @todo Confirm documentation on this.
 	 * 
 	 * @return				Control keys sensor control.
 	 */
