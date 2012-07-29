@@ -238,7 +238,7 @@ protected:
 	 * 
 	 * After that, it puts the screen into grahics
 	 * mode to get it ready to draw to (and hide
-	 * the cursor).
+	 * the text terminal cursor).
 	 * 
 	 * When deciphering the implementation of this,
 	 * see the manpage for console_ioctl,
