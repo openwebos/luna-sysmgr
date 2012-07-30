@@ -79,6 +79,11 @@ When you are finished running luna-sysmgr, stop the service bus:
 
        ./service-bus.sh  stop
 
+# Known Issues
+
+1) Running of applications causes User Interface display issues.
+2) Error messages are generated in the LunaService log file, which can be ignored.
+3) Since the components supporting "Just Type" have not yet been released, attempting to enter text in the "Just Type" field will cause luna-sysmgr to fail. 
 
 # Copyright and License Information
 
