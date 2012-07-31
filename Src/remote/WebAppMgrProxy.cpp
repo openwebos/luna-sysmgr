@@ -737,7 +737,7 @@ std::string WebAppMgrProxy::launchBootTimeApp(const char* appId)
 
 void WebAppMgrProxy::inputEvent(Window* win, Event* e)
 {
-	if (G_UNLIKELY(!win->isIpcWindow())) {
+    if (G_UNLIKELY(!win || !win->isIpcWindow())) {
 		g_critical("%s (%d): Invoked for a non-IPC Window.",
 		           __PRETTY_FUNCTION__, __LINE__);
 		return;
@@ -752,7 +752,7 @@ void WebAppMgrProxy::inputEvent(Window* win, Event* e)
 
 void WebAppMgrProxy::inputQKeyEvent(Window* win, QKeyEvent* event)
 {
-	if(!win->isIpcWindow()) {
+    if(!win || !win->isIpcWindow()) {
 		g_critical("%s (%d): Invoked for a non-IPC Window.",
 		           __PRETTY_FUNCTION__, __LINE__);
 		return;
@@ -768,7 +768,7 @@ void WebAppMgrProxy::inputQKeyEvent(Window* win, QKeyEvent* event)
 
 void WebAppMgrProxy::focusEvent(Window* win, bool focused)
 {
-	if(!win->isIpcWindow()) {
+    if(!win || !win->isIpcWindow()) {
 		g_critical("%s (%d): Invoked for a non-IPC Window.",
 		           __PRETTY_FUNCTION__, __LINE__);
 		return;
@@ -783,7 +783,7 @@ void WebAppMgrProxy::uiDimensionsChanged(int width, int height)
 
 void WebAppMgrProxy::resizeEvent(Window* win, int newWidth, int newHeight, bool resizeBufer)
 {
-	if(!win->isIpcWindow()) {
+    if(!win || !win->isIpcWindow()) {
 		g_critical("%s (%d): Invoked for a non-IPC Window.",
 		           __PRETTY_FUNCTION__, __LINE__);
 		return;
@@ -834,7 +834,7 @@ void WebAppMgrProxy::postShutdownEvent()
 
 void WebAppMgrProxy::emitCopy( Window *win )
 {
-	if(!win->isIpcWindow()) {
+    if(!win || !win->isIpcWindow()) {
 		g_critical("%s (%d): Invoked for a non-IPC Window.",
 		           __PRETTY_FUNCTION__, __LINE__);
 		return;
@@ -844,7 +844,7 @@ void WebAppMgrProxy::emitCopy( Window *win )
 
 void WebAppMgrProxy::emitCut( Window *win )
 {
-	if(!win->isIpcWindow()) {
+    if(!win || !win->isIpcWindow()) {
 		g_critical("%s (%d): Invoked for a non-IPC Window.",
 		           __PRETTY_FUNCTION__, __LINE__);
 		return;
@@ -854,7 +854,7 @@ void WebAppMgrProxy::emitCut( Window *win )
 
 void WebAppMgrProxy::emitPaste( Window *win )
 {
-	if(!win->isIpcWindow()) {
+    if(!win || !win->isIpcWindow()) {
 		g_critical("%s (%d): Invoked for a non-IPC Window.",
 		           __PRETTY_FUNCTION__, __LINE__);
 		return;
@@ -864,7 +864,7 @@ void WebAppMgrProxy::emitPaste( Window *win )
 
 void WebAppMgrProxy::emitSelectAll( Window *win )
 {
-	if(!win->isIpcWindow()) {
+    if(!win || !win->isIpcWindow()) {
 		g_critical("%s (%d): Invoked for a non-IPC Window.",
 		           __PRETTY_FUNCTION__, __LINE__);
 		return;
