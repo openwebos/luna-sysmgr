@@ -21,7 +21,7 @@ Install components needed to build luna-sysmgr by typing the following:
 
         sudo apt-get update
 
-        sudo apt-get install git git-core pkg-config cmake make autoconf libtool g++ tcl unzip libyajl-dev libyajl1 qt4-qmake build-dep libsqlite3-dev curl
+        sudo apt-get install git git-core pkg-config cmake make autoconf libtool g++ tcl unzip libyajl-dev libyajl1 qt4-qmake libsqlite3-dev curl
 
         sudo apt-get install gperf bison libglib2.0-dev libssl-dev libxi-dev libxrandr-dev libxfixes-dev libxcursor-dev libfreetype6-dev libxinerama-dev libgl1-mesa-dev libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev flex libicu-dev
 
@@ -81,9 +81,9 @@ When you are finished running luna-sysmgr, stop the service bus:
 
 # Known Issues
 
-1) Running of applications causes User Interface display issues.
-2) Error messages are generated in the LunaService log file, which can be ignored.
-3) Since the components supporting "Just Type" have not yet been released, attempting to enter text in the "Just Type" field will cause luna-sysmgr to fail. 
+1) Running of applications causes User Interface display issues.  
+2) Error messages are generated in the LunaService log file, which can be ignored.  
+3) Since the components supporting "Just Type" have not yet been released, attempting to enter text in the "Just Type" field will cause luna-sysmgr to fail.  
 
 # Copyright and License Information
 
