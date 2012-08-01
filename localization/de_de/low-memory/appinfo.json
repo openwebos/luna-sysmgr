@@ -1,7 +1,0 @@
-{
-	"icon": "../../../icon.png",
-	"id": "com.palm.memory",
-	"main": "../../../index.html",
-	"title": "Speicher",
-	"type": "web"
-}

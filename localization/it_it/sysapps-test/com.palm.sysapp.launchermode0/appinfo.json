@@ -1,9 +1,0 @@
-{
-	"category": "Applications",
-	"entrypoint": "slotBuiltInAppEntryPoint_Launchermode0",
-	"icon": "../../../../icon-64x64.png",
-	"id": "com.palm.sysapp.launchermode0",
-	"removable": false,
-	"title": "Anger My Cards",
-	"type": "sysmgrbuiltin"
-}

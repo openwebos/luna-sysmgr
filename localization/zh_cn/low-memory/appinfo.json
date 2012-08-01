@@ -1,7 +1,0 @@
-{
-	"icon": "../../../icon.png",
-	"id": "com.palm.memory",
-	"main": "../../../index.html",
-	"title": "内存",
-	"type": "web"
-}
