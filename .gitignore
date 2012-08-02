@@ -20,6 +20,18 @@
 .project
 .cproject
 
-# Ignore all build directories and their trees. This should exclude all
-# build products.
-/BUILD*
+# Ignore the build artifacts.
+BUILD*/
+/build
+release-*/
+debug-*/
+Makefile*
+sysapps/com.palm.sysapp.voicedial/resources/
+sysapps/com.palm.sysapp.voicedial/*.xliff
+localization/
+debug-standalone
+run-standalone
+patches/
+/get-tests.sh
+use-this-*-folder.sh
+

@@ -21,9 +21,9 @@
 # To force a rebuild of components pass the parameter clean to the script.
 ############################
 
-if [ "$1" = 'clean' ] ; then
+if [ "$1" = "clean" ] ; then
   export SKIPSTUFF=0
-  set -ex
+  set -e
 else
   export SKIPSTUFF=1
   set -e
@@ -32,6 +32,7 @@ fi
 
 
 export BASE=$HOME/luna-desktop-binaries
+
 export LUNA_STAGING="${BASE}/staging"
 mkdir -p ${BASE}/tarballs
 mkdir -p ${LUNA_STAGING}
@@ -82,7 +83,8 @@ do_fetch() {
     ZIPFILE="${BASE}/tarballs/`basename ${1}`_${2}.zip"
 
     if [ -e ${ZIPFILE} ] ; then
-        if [[ "file -bi ${ZIPFILE}" == "text/html; charset=utf-8" ]] ; then 
+        file_type=$(file -bi ${ZIPFILE})
+        if [ "${file_type}" != "application/zip; charset=binary" ] ; then 
             rm -f ${ZIPFILE}
         fi
     fi
@@ -100,8 +102,9 @@ do_fetch() {
         fi      
     fi
     if [ -e ${ZIPFILE} ] ; then
-        if [[ "file -bi ${ZIPFILE}" == "text/html; charset=utf-8" ]] ; then 
-            echo "FAILED DOWNLOAD OF ${1}"
+        file_type=$(file -bi ${ZIPFILE})
+        if [ "${file_type}" != "application/zip; charset=binary" ] ; then 
+            echo "FAILED DOWNLOAD: ${ZIPFILE} is ${file_type}"
             rm -f ${ZIPFILE}
             exit 1
         fi
@@ -134,7 +137,7 @@ function build_cjson
 ##########################
 function build_pbnjson
 {
-    ###do_fetch openwebos/pbnjson $1 pbnjson submissions/ 
+    ##do_fetch openwebos/pbnjson $1 pbnjson submissions/ 
     do_fetch isis-project/pbnjson $1 pbnjson 
     mkdir -p $BASE/pbnjson/build
     cd $BASE/pbnjson/build
@@ -322,19 +325,27 @@ function build_luna-sysmgr
       do_fetch openwebos/luna-sysmgr $1 luna-sysmgr
     fi
     cd $BASE/luna-sysmgr
-    if [ ! -e Makefile.Ubuntu ] ; then
+    if [ ! -e luna-desktop-build.stamp ] ; then
         $LUNA_STAGING/bin/qmake-palm
     fi
     make $JOBS -f Makefile.Ubuntu
     mkdir -p $LUNA_STAGING/lib/sysmgr-images
     cp -frad images/* $LUNA_STAGING/lib/sysmgr-images
     cp debug-x86/LunaSysMgr $LUNA_STAGING/lib
-    
+
     cp desktop-support/service-bus.sh  ../service-bus.sh
     cp desktop-support/run-luna-sysmgr.sh  ../run-luna-sysmgr.sh
     cp desktop-support/install-luna-sysmgr.sh ../install-luna-sysmgr.sh
     mkdir -p ../ls2
     cp desktop-support/ls*.conf ../ls2
+
+    mkdir -p ../ls2/roles/prv
+    cp -f service/com.palm.luna.json.prv ../ls2/roles/prv/com.palm.luna.json
+    mkdir -p ../ls2/roles/pub
+    cp -f service/com.palm.luna.json.pub ../ls2/roles/pub/com.palm.luna.json
+    mkdir -p ../pubsub_handlers
+    cp -f service/com.palm.appinstaller.pubsub ../pubsub_handlers/com.palm.appinstaller
+
 }
 
 ###############
@@ -383,8 +394,10 @@ mkdir -p $LUNA_STAGING/include
 mkdir -p $LUNA_STAGING/share/dbus-1/system-services
 set -x
 
-if [ ! -d $BASE/luna-sysmgr ] ; then
-    do_fetch openwebos/luna-sysmgr 0.820 luna-sysmgr
+export LSM_TAG="0.821"
+
+if [ ! -d "$BASE/luna-sysmgr" ] || [ ! -d "$BASE/tarballs" ] || [ ! -e "$BASE/tarballs/luna-sysmgr_${LSM_TAG}.zip" ] ; then
+    do_fetch openwebos/luna-sysmgr ${LSM_TAG} luna-sysmgr
 fi
 rm -f $BASE/luna-sysmgr/luna-desktop-build.stamp
 
@@ -400,7 +413,7 @@ build luna-webkit-api 0.90
 build webkit 0.3
 build luna-sysmgr-ipc 0.90
 build luna-sysmgr-ipc-messages 0.90
-build luna-sysmgr 0.820
+build luna-sysmgr ${LSM_TAG}
 
 echo ""
 echo "Complete. "

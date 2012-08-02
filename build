@@ -1,6 +1,0 @@
-if [ "x${LUNA_STAGING}" = "x" ]; then
-LUNA_STAGING=${HOME}/Local
-fi
-
-export PKG_CONFIG_PATH=${LUNA_STAGING}/lib/pkgconfig:${PKG_CONFIG_PATH}
-make -f Makefile.Ubuntu $*
