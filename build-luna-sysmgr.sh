@@ -394,7 +394,7 @@ mkdir -p $LUNA_STAGING/include
 mkdir -p $LUNA_STAGING/share/dbus-1/system-services
 set -x
 
-export LSM_TAG="0.821"
+export LSM_TAG="0.820"
 
 if [ ! -d "$BASE/luna-sysmgr" ] || [ ! -d "$BASE/tarballs" ] || [ ! -e "$BASE/tarballs/luna-sysmgr_${LSM_TAG}.zip" ] ; then
     do_fetch openwebos/luna-sysmgr ${LSM_TAG} luna-sysmgr
