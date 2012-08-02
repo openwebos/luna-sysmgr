@@ -265,7 +265,6 @@ CardWebApp::CardWebApp(Window::Type winType, PIpcChannel *channel, ApplicationDe
     m_webview->setResizesToContents(false);
     scene->addItem(m_webview);
     setSceneRect(0, 0, m_width, m_height);
-    show();
 }
 
 CardWebApp::~CardWebApp()
@@ -1655,7 +1654,7 @@ void CardWebApp::directRenderingAllowed()
 
     m_directRendering = true;
     m_data->directRenderingAllowed(m_directRendering);
-    showFullScreen();
+    show();
 }
 
 void CardWebApp::directRenderingDisallowed()
@@ -1675,6 +1674,7 @@ void CardWebApp::directRenderingDisallowed()
 	m_renderOrientation = Event::Orientation_Invalid;
 	m_data->directRenderingAllowed(m_directRendering);
     page()->page()-> settings()->setAttribute(QWebSettings::AcceleratedCompositingEnabled, false);
+    hide();
 }
 
 void CardWebApp::displayOn()

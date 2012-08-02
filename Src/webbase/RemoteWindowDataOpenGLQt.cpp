@@ -118,7 +118,6 @@ QPainter* RemoteWindowDataOpenGLQt::qtRenderingContext()
         sGLWidget->setAttribute(Qt::WA_NoSystemBackground, true);
     }
 
-    sGLWidget->showFullScreen();
     sGLWidget->setAutoFillBackground(false);
 
     m_context = new QPainter;
