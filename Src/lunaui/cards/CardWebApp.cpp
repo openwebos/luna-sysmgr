@@ -75,6 +75,7 @@ void CardWebApp::paintEvent(QPaintEvent* event)
     qDebug() << "rect:" << m_paintRect;
     qDebug() << "own  geometry" << geometry();
     qDebug() << "viewport  geometry" << viewport()->geometry();
+    qDebug() << m_webview->geometry()<<"->"<<mapFromScene(m_webview->geometry()).boundingRect();
 #endif
 
     if (m_directRendering) {
@@ -264,7 +265,6 @@ CardWebApp::CardWebApp(Window::Type winType, PIpcChannel *channel, ApplicationDe
     m_webview->setGeometry(QRectF(0, 0, m_windowWidth, m_windowHeight));
     m_webview->setResizesToContents(false);
     scene->addItem(m_webview);
-    setSceneRect(0, 0, m_width, m_height);
 }
 
 CardWebApp::~CardWebApp()
@@ -646,13 +646,6 @@ int CardWebApp::resizeEvent(int newWidth, int newHeight, bool resizeBuffer)
     resize(newWidth, newHeight);
     m_webview->resize(newWidth, newHeight);
 	if (m_setWindowWidth == newWidth && m_setWindowHeight == newHeight) {
-		// Force a full app repaint (not clipped to window dimensions)
-		m_paintRect.setRect(0, 0, m_appBufWidth, m_appBufHeight);
-
-        forcePaint();
-
-        qDebug("ROTATION: [%s]: Skipping ResizeEvent, but forcing app repaint. newWidth = %d, newHeight = %d",
-               __PRETTY_FUNCTION__, newWidth, newHeight);
 		return -1;
 	}
 
@@ -785,7 +778,6 @@ void CardWebApp::flipEvent(int newWidth, int newHeight)
     // events when invisible.
     viewport()->resize(newWidth, newHeight);
 
-    setSceneRect(QRectF(0, 0, newWidth, newHeight));
     m_webview->resize(m_windowWidth, m_windowHeight);
     update();
     forcePaint();
@@ -1623,7 +1615,6 @@ void CardWebApp::directRenderingChanged(bool directRendering, int renderOffsetX,
 		directRenderingAllowed();
     else
 		directRenderingDisallowed();
-    forcePaint();
 }
 
 void CardWebApp::directRenderingAllowed()
