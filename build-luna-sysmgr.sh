@@ -70,21 +70,21 @@ do_fetch() {
     if [ -n "$3" -a -d "$3" ] ; then
         rm -rf ./$3
     fi
-    
+
     if [ "$1" = "isis-project/WebKit" ] ; then
         GIT_SOURCE=https://github.com/downloads/isis-project/WebKit/WebKit_${2}s.zip
     elif [ -n “${GITHUB_USER}” ]; then
         GIT_SOURCE=https://${GITHUB_USER}:${GITHUB_PASS}@github.com/${1}/zipball/${GIT_BRANCH}
     else
         GIT_SOURCE=https://github.com/${1}/zipball/${GIT_BRANCH}
-        
+
     fi
 
     ZIPFILE="${BASE}/tarballs/`basename ${1}`_${2}.zip"
 
     if [ -e ${ZIPFILE} ] ; then
         file_type=$(file -bi ${ZIPFILE})
-        if [ "${file_type}" != "application/zip; charset=binary" ] ; then 
+        if [ "${file_type}" != "application/zip; charset=binary" ] ; then
             rm -f ${ZIPFILE}
         fi
     fi
@@ -99,11 +99,11 @@ do_fetch() {
         else
             echo "About to fetch ${1}#${GIT_BRANCH} from github"
             curl -L -R -# ${GIT_SOURCE} -o "${ZIPFILE}"
-        fi      
+        fi
     fi
     if [ -e ${ZIPFILE} ] ; then
         file_type=$(file -bi ${ZIPFILE})
-        if [ "${file_type}" != "application/zip; charset=binary" ] ; then 
+        if [ "${file_type}" != "application/zip; charset=binary" ] ; then
             echo "FAILED DOWNLOAD: ${ZIPFILE} is ${file_type}"
             rm -f ${ZIPFILE}
             exit 1
@@ -137,8 +137,8 @@ function build_cjson
 ##########################
 function build_pbnjson
 {
-    ##do_fetch openwebos/pbnjson $1 pbnjson submissions/ 
-    do_fetch isis-project/pbnjson $1 pbnjson 
+    ##do_fetch openwebos/pbnjson $1 pbnjson submissions/
+    do_fetch isis-project/pbnjson $1 pbnjson
     mkdir -p $BASE/pbnjson/build
     cd $BASE/pbnjson/build
     sed -i 's/set(EXTERNAL_YAJL TRUE)/set(EXTERNAL_YAJL FALSE)/' ../src/CMakeLists.txt
@@ -214,8 +214,8 @@ function build_luna-service2
     make $JOBS
     make install
 
-    cp ${LUNA_STAGING}/include/luna-service2/lunaservice.h ${LUNA_STAGING}/include/ 
-    cp ${LUNA_STAGING}/include/luna-service2/lunaservice-errors.h ${LUNA_STAGING}/include/ 
+    cp ${LUNA_STAGING}/include/luna-service2/lunaservice.h ${LUNA_STAGING}/include/
+    cp ${LUNA_STAGING}/include/luna-service2/lunaservice-errors.h ${LUNA_STAGING}/include/
 
     cd $LUNA_STAGING/lib
     ln -sf libluna-service2.so liblunaservice.so
@@ -259,7 +259,7 @@ function build_webkit
     fi
     if [ ! -e Source/WebCore/platform/webos/LunaServiceMgr.cpp.prepatch ] ; then
       cp Source/WebCore/platform/webos/LunaServiceMgr.cpp \
-        Source/WebCore/platform/webos/LunaServiceMgr.cpp.prepatch 
+        Source/WebCore/platform/webos/LunaServiceMgr.cpp.prepatch
       patch --directory=Source/WebCore/platform/webos < ${BASE}/luna-sysmgr/desktop-support/webkit-PALM_SERVICE_BRIDGE.patch
     fi
     export QTDIR=$BASE/qt4
@@ -394,7 +394,7 @@ mkdir -p $LUNA_STAGING/include
 mkdir -p $LUNA_STAGING/share/dbus-1/system-services
 set -x
 
-export LSM_TAG="0.820"
+export LSM_TAG="0.822"
 
 if [ ! -d "$BASE/luna-sysmgr" ] || [ ! -d "$BASE/tarballs" ] || [ ! -e "$BASE/tarballs/luna-sysmgr_${LSM_TAG}.zip" ] ; then
     do_fetch openwebos/luna-sysmgr ${LSM_TAG} luna-sysmgr
