@@ -23,6 +23,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include <cjson/json.h>
 #include <cjson/json_util.h>
