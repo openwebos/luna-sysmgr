@@ -25,7 +25,7 @@ debug {
 	BUILD_TYPE = release
 }
 
-MACHINE_NAME = x86
+MACHINE_NAME = $$system(uname -m)
 
 LUNA_SRC_BASE = $$(LUNA_SRC_BASE)
 
