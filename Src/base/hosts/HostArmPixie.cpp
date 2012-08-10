@@ -23,10 +23,6 @@
  * limitations under the License.
  * 
  */
-/* @@@LICENSE
-*
-*
-* LICENSE@@@ */
 
 
 
@@ -57,11 +53,36 @@ public:
 	 * Destroys a Pixie device host
 	 */
 	virtual ~HostArmPixie();
-
+	
+	/**
+	 * @copybrief HostArm::hardwareName()
+	 * 
+	 * Returns one of the following depending on
+	 * hardware model:
+	 * 
+	 * - Pixie EVT1
+	 * - Pixie EVT2
+	 * - Pixie EVT3
+	 * - Pixie DVT1
+	 * - Pixie DVT2
+	 * - Pixie DVT3
+	 * - Pixie DVT4
+	 * - Pixie A
+	 * - Pixie B
+	 * - Pixie C
+	 * - Pixie -- unknown revision
+	 * 
+	 * @return				Returns a string starting with "Pixie".  See description for full list.
+	 */
 	virtual const char* hardwareName() const;
-
+	
+	//Documented in parent
 	virtual int getNumberOfSwitches() const { return 2; }
+	
+	//Documented in parent
 	virtual void getInitialSwitchStates();
+	
+	//Documented in parent
 	virtual void wakeUpLcd();
 };
 

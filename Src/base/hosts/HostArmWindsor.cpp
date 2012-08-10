@@ -50,6 +50,22 @@ public:
 	 */
 	virtual ~HostArmWindsor();
 
+	/**
+	 * @copybrief HostArm::hardwareName()
+	 * 
+	 * Returns one of the following depending on
+	 * hardware model:
+	 * 
+	 * - Windsor EVT1
+	 * - Windsor EVT2
+	 * - Windsor EVT3
+	 * - Windsor DVT1
+	 * - Windsor DVT2
+	 * - Windsor DVT3
+	 * - Windsor -- unknown revision
+	 * 
+	 * @return				Returns a string starting with "Windsor".  See description for full list.
+	 */
 	virtual const char* hardwareName() const;
 };
 

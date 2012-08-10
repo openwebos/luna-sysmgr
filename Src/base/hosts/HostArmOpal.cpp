@@ -54,7 +54,12 @@ public:
 	 * Destroys an Opal device host
 	 */
 	virtual ~HostArmOpal();
-
+	
+	/**
+	 * @copybrief HostArm::hardwareName()
+	 * 
+	 * @return				Returns a string "Opal -- unknown revision".
+	 */
 	virtual const char* hardwareName() const;
 
 	virtual bool homeButtonWakesUpScreen();

@@ -52,6 +52,12 @@ public:
 	 */
 	virtual ~HostArmChile();
 
+	
+	/**
+	 * @copybrief HostArm::hardwareName()
+	 * 
+	 * @return				Returns a string "Chile".
+	 */
 	virtual const char* hardwareName() const;
 
 	int getNumberOfSwitches() const;

@@ -65,7 +65,31 @@ public:
 	 * Destroys a Castle-based device host
 	 */
 	virtual ~HostArmCastle();
-
+	
+	/**
+	 * @copybrief HostArm::hardwareName()
+	 * 
+	 * Returns one of the following depending on
+	 * hardware model:
+	 * 
+	 * - Castle Plus EVT1
+	 * - Castle Plus EVT2
+	 * - Castle Plus EVT3
+	 * - Castle Plus DVT1
+	 * - Castle Plus DVT2
+	 * - Castle Plus DVT3
+	 * - Castle Plus -- unknown revision
+	 * - Roadrunner
+	 * - Castle EVT1
+	 * - Castle EVT2
+	 * - Castle EVT3
+	 * - Castle DVT1
+	 * - Castle DVT2
+	 * - Castle DVT3
+	 * - Castle -- unknown revision
+	 * 
+	 * @return				Returns a string starting with "Castle" or "Roadrunner".  See description for full list.
+	 */
 	virtual const char* hardwareName() const;
 	
 protected:

@@ -54,6 +54,23 @@ public:
 	 */
 	virtual ~HostArmMantaray();
 
+	
+	/**
+	 * @copybrief HostArm::hardwareName()
+	 * 
+	 * Returns one of the following depending on
+	 * hardware model:
+	 * 
+	 * - Mantaray EVT1
+	 * - Mantaray EVT2
+	 * - Mantaray EVT3
+	 * - Mantaray DVT1
+	 * - Mantaray DVT2
+	 * - Mantaray DVT3
+	 * - Mantaray -- unknown revision
+	 * 
+	 * @return				Returns a string starting with "Mantaray".  See description for full list.
+	 */
 	virtual const char* hardwareName() const;
 };
 

@@ -1,7 +1,7 @@
 /**
  * @file
  * 
- * Device-specific functionality for the never-released WindsorNot/Unicorn device(s)
+ * Device-specific functionality for the never-released WindsorNot device(s)
  *
  * @author Hewlett-Packard Development Company, L.P.
  * @author tyrok1
@@ -32,7 +32,7 @@
 #include "HostArm.h"
 
 /**
- * Device-specific functionality for the never-released WindsorNot/Unicorn device(s)
+ * Device-specific functionality for the never-released WindsorNot device(s)
  * 
  * Device details:
  * - Unknown instruction set.
@@ -52,9 +52,17 @@ public:
 	 */
 	virtual ~HostArmWindsorNot();
 
+	/**
+	 * @copybrief HostArm::hardwareName()
+	 * 
+	 * @return				Returns the string "WindsorNot -- unknown revision".
+	 */
 	virtual const char* hardwareName() const;
-
+	
+	//Documented in parent
 	virtual bool homeButtonWakesUpScreen();
+	
+	//Documented in parent
 	virtual int getNumberOfSwitches() const;
 };
 

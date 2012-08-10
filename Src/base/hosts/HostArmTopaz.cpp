@@ -56,11 +56,21 @@ public:
 	 */
 	virtual ~HostArmTopaz();
 
+	/**
+	 * @copybrief HostArm::hardwareName()
+	 * 
+	 * @return				Returns the string "Topaz -- unknown revision".
+	 */
 	virtual const char* hardwareName() const;
-
+	
+	//Documented in parent
 	virtual bool homeButtonWakesUpScreen();
+	
+	//Documented in parent
 	virtual int getNumberOfSwitches() const;
-    virtual OrientationEvent* postProcessDeviceOrientation(OrientationEvent* currOrientation);
+	
+	//Documented in parent
+	virtual OrientationEvent* postProcessDeviceOrientation(OrientationEvent* currOrientation);
 protected:
 	virtual void turboMode(bool enable);
 };

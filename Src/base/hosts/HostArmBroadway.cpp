@@ -53,7 +53,23 @@ public:
 	 * Destroys a Broadway device host
 	 */
 	virtual ~HostArmBroadway();
-
+	
+	/**
+	 * @copybrief HostArm::hardwareName()
+	 * 
+	 * Returns one of the following depending on
+	 * hardware model:
+	 * 
+	 * - Broadway EVT1
+	 * - Broadway EVT2
+	 * - Broadway EVT3
+	 * - Broadway DVT1
+	 * - Broadway DVT2
+	 * - Broadway DVT3
+	 * - Broadway -- unknown revision
+	 * 
+	 * @return				Returns a string starting with "Broadway".  See description for full list.
+	 */
 	virtual const char* hardwareName() const;
 
 	int getNumberOfSwitches() const;

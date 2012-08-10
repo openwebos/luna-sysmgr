@@ -1,20 +1,28 @@
-/* @@@LICENSE
-*
-*      Copyright (c) 2008-2012 Hewlett-Packard Development Company, L.P.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*
-* LICENSE@@@ */
+/**
+ * @file
+ * 
+ * Device-specific functionality for the never-released Zepfloyd device(s)
+ *
+ * @author Hewlett-Packard Development Company, L.P.
+ * @author tyrok1
+ *
+ * @section LICENSE
+ *
+ *      Copyright (c) 2008-2012 Hewlett-Packard Development Company, L.P.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
+ */
 
 
 
@@ -28,43 +36,163 @@
 #include "HostArm.h"
 
 
+/**
+ * Device-specific functionality for the never-released Zepfloyd device(s)
+ * 
+ * Device details:
+ * - Unknown instruction set.
+ * - Requires a bunch of key remapping.
+ * - Switches (3): unknown, but since it's not overridden we can probably assume ringer, slider, and headphones inserted.
+ * - Appears to have had a resistive touch panel for pen input.
+ */
 class HostArmZepfloyd : public HostArm
 {
 public:
+	/**
+	 * Constructs a Zepfloyd device host
+	 */
 	HostArmZepfloyd();
+	
+	/**
+	 * Destroys a Zepfloyd device host
+	 */
 	virtual ~HostArmZepfloyd();
 	
+	/**
+	 * Remaps a hardware keycode with or without a meta key in effect to the correct system keycode
+	 * 
+	 * @note Also handles hardware buttons like the Phone, Power, Home, Calendar, Mail, etc. buttons.
+	 * 
+	 * @param	keyType			Type of key.  Must be set to EV_KEY.
+	 * @param	keyCode			Meta key currently pressed.  Only one is allowed at a time.
+	 * @param	keyValue		Keycode from hardware keyboard.
+	 * @return				Translated keycode.
+	 */
 	Event::Key lookupKeyCode(uint16_t keyType, uint16_t keyCode, int32_t keyValue);
 	
+	/**
+	 * Remaps a hardware keycode assuming that Opt is currently pressed, with or without other meta keys in effect, to the correct system keycode
+	 * 
+	 * @note Does not translate hardware buttons like Phone, Power, Home, Calendar, Mail, etc.
+	 * 
+	 * @param	key			Hardware keycode.
+	 * @param	withShift		Whether or not Shift is currently pressed.
+	 * @param	withAlt			Whether or not Alt is currently pressed.
+	 * @return				Translated keycode.
+	 */
 	virtual unsigned short translateKeyWithMeta( unsigned short key, bool withShift, bool withAlt );
-
+	
+	/**
+	 * @copybrief HostArm::hardwareName()
+	 * 
+	 * @return				Returns the string "ZepFloyd".
+	 */
 	virtual const char* hardwareName() const;
 	
 private:
 	void setupInput(void);
 	void shutdownInput(void);
 	
+	/**
+	 * Unknown - currently unused
+	 */
 	static const int m_kMinX = 280;
+	
+	/**
+	 * Unknown - currently unused
+	 */
 	static const int m_kMaxX = 3780;
+	
+	/**
+	 * Unknown - currently unused
+	 */
 	static const int m_kMinY = 368;
+	
+	/**
+	 * Unknown - currently unused
+	 */
 	static const int m_kMaxY = 3780;
-
+	
+	/**
+	 * Keycode translation table
+	 * 
+	 * An array of KeyMapTypes with elements [KEY_SOMETHING, normal keycode, keycode with Shift in effect, keycode with Opt in effect].
+	 */
 	static const KeyMapType m_keyMap[KEY_SPACE+2];
-
+	
+	/**
+	 * Keycode for Alt
+	 */
 	static const int m_keyAlt = 0xF6;
+	
+	/**
+	 * Keycode for Opt key
+	 */
 	static const int m_keyOpt = 0x64;
+	
+	/**
+	 * Keycode for the Phone/Send button
+	 */
 	static const int m_keyHardPhone = 0xE7;
+	
+	/**
+	 * Keycode for the End/Power button
+	 */
 	static const int m_keyHardPower = 0x6B;
+	
+	/**
+	 * Keycode for the Home button
+	 */
 	static const int m_keyHardHome = 0x3B;
+	
+	/**
+	 * Keycode for the Ok button
+	 */
 	static const int m_keyHardOk = 0x3C;
+	
+	/**
+	 * Keycode for the Calendar button
+	 */
 	static const int m_keyHardCalendar = 0x3D;
+	
+	/**
+	 * Keycode for the Mail button
+	 */
 	static const int m_keyHardMail = 0x3E;
+	
+	/**
+	 * Keycode for the Left button
+	 */
 	static const int m_keySoftLeft = 0xF5;
+	
+	/**
+	 * Keycode for the Right button
+	 */
 	static const int m_keySoftRight = 0x8B;
+	
+	/**
+	 * Keycode for the Rocker Up button
+	 */
 	static const int m_keyRockerUp = 0x67;
+	
+	/**
+	 * Keycode for the Rocker Down button
+	 */
 	static const int m_keyRockerDown = 0x6C;
+	
+	/**
+	 * Keycode for the Rocker Left button
+	 */
 	static const int m_keyRockerLeft = 0x69;
+	
+	/**
+	 * Keycode for the Rocker Right button
+	 */
 	static const int m_keyRockerRight = 0x6A;
+	
+	/**
+	 * Keycode for the Rocker Center button
+	 */
 	static const int m_keyRockerCenter = 0xE8;
 };
 

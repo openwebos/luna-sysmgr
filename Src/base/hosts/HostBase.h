@@ -263,9 +263,11 @@ public:
 	/**
 	 * Sets the Qt widget that the display should reside in
 	 * 
-	 * Mostly unused except under the QtDesktop and Qemu hosts.
+	 * Mostly unused except under the QtDesktop and Qemu hosts, where
+	 * it is used to attach a keyboard remapping filter.
 	 * 
-	 * @todo Document this a bit more thoroughly once we figure out exactly why this is needed.
+	 * Called by
+	 * {@link WindowServer::WindowServer() WindowServer::WindowServer()}.
 	 * 
 	 * @param	view			Qt widget to display within.
 	 */
