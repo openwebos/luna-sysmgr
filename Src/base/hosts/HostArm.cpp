@@ -169,7 +169,7 @@ void HostArm::init(int w, int h)
 
 	m_fb0Buffer = ::mmap(0, fixinfo.smem_len, PROT_READ, MAP_SHARED, m_fb0Fd, 0);
 	if (m_fb0Buffer == MAP_FAILED) {
-		g_warning("Failed to map fb1 buffer: %s", strerror(errno));
+		g_warning("Failed to map fb0 buffer: %s", strerror(errno));
 		m_fb0Buffer = 0;
 		return;
 	}

@@ -1,20 +1,28 @@
-/* @@@LICENSE
-*
-*      Copyright (c) 2008-2012 Hewlett-Packard Development Company, L.P.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*
-* LICENSE@@@ */
+/**
+ * @file
+ * 
+ * Device-specific functionality for the Qemu ARM emulator
+ *
+ * @author Hewlett-Packard Development Company, L.P.
+ * @author tyrok1
+ *
+ * @section LICENSE
+ *
+ *      Copyright (c) 2008-2012 Hewlett-Packard Development Company, L.P.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
+ */
 
 
 
@@ -28,10 +36,32 @@
 #include <QtDebug>
 #include <QGraphicsView>
 
+/**
+ * Event filter which translates PC keyboard keys to simulated hardware device buttons
+ */
 class HostArmQemuKeyFilter : public QObject
 {
 
 protected:
+	/**
+	 * Translates a KeyPress or KeyRelease event from a keyboard key to a hardware button and posts the translated event to the queue
+	 * 
+	 * The keys which are translated are as follows:
+	 * - Left arrow key = Previous button
+	 * - Right arrow key = Next button
+	 * - Home key = Home button
+	 * - Escape key = Back button
+	 * - End key = Launcher button
+	 * - Pause/Break key = Power button
+	 * - F6 key = simulate orientation with the top of the screen facing up
+	 * - F7 key = simulate orientation with the right of the screen facing up
+	 * - F8 key = simulate orientation with the bottom of the screen facing up
+	 * - F9 key = simulate orientation with the left of the screen facing up
+	 * 
+	 * @param	obj			Object the KeyPress/KeyRelease event was sent to, presumably.
+	 * @param	event			Event which, if it is a KeyPress or KeyRelease event that we know how to translate, is transleted.
+	 * @return				true if we translated the event, false if we did not.
+	 */
 	bool eventFilter(QObject* obj, QEvent* event)
 	{
 		bool handled = false;
@@ -170,20 +200,49 @@ protected:
 	}
 };
 
+/**
+ * Device-specific functionality for the Qemu ARM emulator
+ * 
+ * Device details:
+ * - Requires a bunch of key remapping.
+ * - Switches (0)
+ * - Translates a bunch of desktop keys to hardware keycodes.   See {@link HostArmQemuKeyFilter HostArmQemuKeyFilter} for information on which keys are remapped to which phone keycodes.
+ * 
+ * @see HostArmQemuKeyFilter
+ */
 class HostArmQemu : public HostArm
 {
 public:
+	/**
+	 * Constructs a Qemu device host
+	 */
 	HostArmQemu();
+	
+	/**
+	 * Destroys a Qemu device host
+	 */
 	virtual ~HostArmQemu();
 
+	/**
+	 * @copybrief HostArm::hardwareName()
+	 * 
+	 * @return				Returns the string "ARM Emulator".
+	 */
 	virtual const char* hardwareName() const{ return "ARM Emulator"; }
+	
+	//Documented in parent
 	virtual void setCentralWidget(QWidget* view);
 
 	// switches aren't available in the emulator
 	virtual void getInitialSwitchStates() { }
+	
+	//Documented in parent
 	virtual int getNumberOfSwitches() const { return 0; }
 
 private:
+	/**
+	 * The key filter that remaps desktop keybaord keys to phone keycodes
+	 */
 	HostArmQemuKeyFilter* m_keyFilter;
 };
 

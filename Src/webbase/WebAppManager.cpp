@@ -1,20 +1,28 @@
-/* @@@LICENSE
-*
-*      Copyright (c) 2008-2012 Hewlett-Packard Development Company, L.P.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*
-* LICENSE@@@ */
+/**
+ * @file
+ * 
+ * Manages running web apps.
+ *
+ * @author Hewlett-Packard Development Company, L.P.
+ * @author tyrok1
+ *
+ * @section LICENSE
+ *
+ *      Copyright (c) 2008-2012 Hewlett-Packard Development Company, L.P.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 
 #include "Common.h"
@@ -75,6 +83,9 @@
 // you will also need to update launcher.
 static const char* kReorderClipboardDataKey = "LAUNCHPOINTID";
 
+/**
+ * Event type for InputEvent events
+ */
 static const int inputEventType = (Event::User + 1);
 static const int pageCloseRequestEventType = (Event::User + 2);
 
@@ -87,6 +98,11 @@ enum BootState {
 	BootStateFinished
 };
 
+/**
+ * Whether or not Universal Search has ever been reported as being ready in this process
+ * 
+ * @see WebAppManager::markUniversalSearchReady()
+ */
 static bool s_universalSearchReady = false;
 
 static BootState s_bootState = BootStateUninitialized;
@@ -95,6 +111,10 @@ static PIpcChannel *s_ipcChannel = 0;
 static PIpcBuffer* s_globalPropsBuffer = 0;
 
 static std::string s_lastCopyClipboardMessageId = std::string();
+
+/**
+ * Time zone reported by the system clock last time we checked the time
+ */
 static std::string s_timeZone = std::string();
 static const uint32_t kHeadlessAppAllowedTimeForSoloRunMs = 60000;
 static const uint32_t kHeadlessAppWatchTimeoutMs = kHeadlessAppAllowedTimeForSoloRunMs / 5 + 100;
@@ -104,17 +124,46 @@ static const int kGcStartTimeout = 2000;
 static const unsigned kGcCpuIdleThreshold = 800; // percentage times 1000
 static const unsigned kNumTimesIgnoreGc = 5;
 
+/**
+ * Contains an event passed in from an IPC call to be dispatched to a specific app
+ * 
+ * There are times when one app may need to pass
+ * an input event (such as a keypress event) to
+ * another app.  InputEvent allows passing of that
+ * data over an IPC call.
+ * 
+ * @note The event type is defined as inputEventType, which is defined as (Event::User + 1).
+ * @note Not to be used outside of WebAppManager.
+ * 
+ * @todo Figure out if we should remove this along with WebAppManager::inputEvent().
+ */
 class InputEvent : public Event
 {
 public:
-
+	/**
+	 * Construct an InputEvent
+	 * 
+	 * @param	ipcKey			IPC key of the app that this event needs to be dispatched to.
+	 * @param	e			Smart pointer to the event to be sent.
+	 */
 	InputEvent(int ipcKey, sptr<Event> e)
 		: m_event(e) {
 		m_ipcKey = ipcKey;
 		type = (Event::Type) inputEventType;
 	}
-
+	
+	/**
+	 * The IPC key of the app to dispatch this event to
+	 * 
+	 * @note Defined as public since this is a utility class to be used within the implementation of WebAppManager.
+	 */
 	int m_ipcKey;
+	
+	/**
+	 * The event sent by the IPC call
+	 * 
+	 * @note Defined as public since this is a utility class to be used within the implementation of WebAppManager.
+	 */
 	sptr<Event> m_event;
 };
 
@@ -135,8 +184,16 @@ public:
 };
 
 
+/**
+ * This process's WebAppManager instance
+ */
 static WebAppManager* sInstance = 0;
 
+/**
+ * How often to report statistics to Luna when WebAppBase::initiateLunaStatsReporting() is called
+ * 
+ * @see WebAppBase::initiateLunaStatsReporting()
+ */
 static const int kLunaStatsReportingIntervalSecs = 5;
 
 static bool PrvGetMemoryStatus(LSHandle* handle, LSMessage* message, void* ctxt);
