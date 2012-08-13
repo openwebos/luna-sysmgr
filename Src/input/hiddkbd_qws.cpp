@@ -33,7 +33,6 @@
 #include <QtGui/qmouse_qws.h>
 #include "hiddkbd_qws.h"
 #include "HostBase.h"
-#include "HidLib.h"
 #include "Settings.h"
 #include "Logging.h"
 

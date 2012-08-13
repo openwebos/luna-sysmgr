@@ -60,8 +60,9 @@
 #include "Logging.h"
 #include "SystemUiController.h"
 
-
+#if defined(TARGET_DEVICE)
 #include "HidLib.h"
+#endif
 
 #define HOSTARM_LOG	"HostArm"
 
@@ -71,8 +72,6 @@
 
 // TODO: these should come from hidd headers
 #define MAX_HIDD_EVENTS 100 
-
-static int s_currentOrientation = ORIENTATION_UNKNOWN;
 
 #ifdef HAVE_QPA
 //TODO: Move me to a header!
@@ -91,8 +90,10 @@ static void bluetoothCallback(bool enable)
 HostArm::HostArm() :
       m_nyxLightNotifier(NULL)
 	, m_nyxProxNotifier(NULL)
+#if defined(TARGET_DEVICE)
 	, m_hwRev(HidHardwareRevisionEVT1)
 	, m_hwPlatform (HidHardwarePlatformCastle)
+#endif
 	, m_fb0Fd(-1)
 	, m_fb1Fd(-1)
 	, m_fb0Buffer(0)
@@ -109,8 +110,10 @@ HostArm::HostArm() :
     , m_bluetoothKeyboardActive(false)
     , m_OrientationSensor(0)
 {
+#if defined(TARGET_DEVICE)
 	m_hwRev = HidGetHardwareRevision();
 	m_hwPlatform = HidGetHardwarePlatform();
+#endif
 #ifdef HAVE_QPA
 	setBluetoothCallback(&bluetoothCallback);
 #endif
@@ -505,7 +508,9 @@ void HostArm::show()
     disableScreenBlanking();
     startService();
     setupInput();
+#if defined(TARGET_DEVICE)
 	getInitialSwitchStates();
+#endif
 }
 
 int HostArm::getNumberOfSwitches() const
@@ -534,6 +539,8 @@ bool HostArm::getMsgValueInt(LSMessage* msg, int& value)
 	return true;
 }
 
+
+#if defined(TARGET_DEVICE)
 bool HostArm::switchStateCallback(LSHandle* handle, LSMessage* msg, void* data)
 {
 	int switchCode = (int)data;
@@ -593,6 +600,7 @@ Error:
 		LSErrorFree(&err);
 	}
 }
+#endif
 
 void HostArm::flip()
 {

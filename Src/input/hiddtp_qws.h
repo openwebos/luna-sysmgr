@@ -31,7 +31,6 @@
 #include <stdio.h>
 #include <glib.h>
 
-#include "HidLib.h"
 #include "FlickGesture.h"
 #include "ScreenEdgeFlickGesture.h"
 

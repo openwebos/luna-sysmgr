@@ -106,7 +106,7 @@ contains(MACHINE_NAME, "qemux86") {
 	TARGET_TYPE = TARGET_EMULATOR
 
 	# emulator doesn't support these libraries
-    LIBS -= -ljemalloc_mt -lpowerd -lmemchute
+    LIBS -= -ljemalloc_mt -lpowerd -lmemchute -lhid
     LIBS += -Wl,-rpath $$(STAGING_LIBDIR)
 }
 
@@ -144,10 +144,11 @@ INCLUDEPATH += \
 		$$(STAGING_INCDIR)/webkit \
 		$$(STAGING_INCDIR)/webkit/npapi \
 		$$(STAGING_INCDIR)/sysmgr-ipc \
-		$$(STAGING_INCDIR)/hid/IncsPublic \
 		$$(STAGING_INCDIR)/freetype2 \
 		$$(STAGING_INCDIR)/PmLogLib/IncsPublic \
 		$$(STAGING_INCDIR)/napp \
 		$$(STAGING_INCDIR)/ime \
-		
 
+contains(TARGET_TYPE, TARGET_DEVICE) {
+        INCLUDEPATH +=  $$(STAGING_INCDIR)/hid/IncsPublic
+}

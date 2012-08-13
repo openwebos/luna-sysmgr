@@ -27,7 +27,6 @@
 #include <QWSMouseHandler>
 #include <qsocketnotifier.h>
 #include <map>
-#include "HidLib.h"
 
 #include <nyx/nyx_client.h>
 
@@ -38,6 +37,11 @@
 // Same as default kernel values
 #define REPEAT_DELAY	250
 #define REPEAT_PERIOD	33
+
+#define DEV_TYPE_KEYBOARD          0x00
+#define DEV_TYPE_MOUSE             0x01
+#define DEV_TYPE_JOYSTICK          0x02
+
 
 typedef enum
 {
