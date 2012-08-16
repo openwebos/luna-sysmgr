@@ -31,7 +31,7 @@
 #include "sptr.h"
 #include "Timer.h"
 
-#if defined(TARGET_DESKTOP)
+#if defined(TARGET_DESKTOP) || defined(TARGET_EMULATOR)
 #include "SoundPlayerDummy.h"
 #else
 #include "SoundPlayer.h"

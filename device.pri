@@ -101,13 +101,15 @@ contains(MACHINE_NAME, "pyramid") {
 	CONFIG_BUILD += haptics
 }
 contains(MACHINE_NAME, "qemux86") {
-	DEFINES += MACHINE_QEMUX86
-	#DEFINES += ENABLE_JS_DEBUG_VERBOSE
-	TARGET_TYPE = TARGET_EMULATOR
+    DEFINES += MACHINE_QEMUX86
+    #DEFINES += ENABLE_JS_DEBUG_VERBOSE
+    TARGET_TYPE = TARGET_EMULATOR
 
-	# emulator doesn't support these libraries
-    LIBS -= -ljemalloc_mt -lpowerd -lmemchute -lhid
+    # emulator doesn't support these libraries
+    LIBS -= -ljemalloc_mt -lpowerd -lmemchute -lhid -lmedia-api
     LIBS += -Wl,-rpath $$(STAGING_LIBDIR)
+    SOURCES += SoundPlayerDummy.cpp
+    HEADERS += SoundPlayerDummy.h
 }
 
 DEFINES += $$TARGET_TYPE HAVE_LUNA_PREF=1 PALM_DEVICE QT_PLUGIN QT_STATICPLUGIN
@@ -128,16 +130,14 @@ else {
 }
 
 
-HEADERS += 		HostArm.h \
-			SoundPlayer.h \
+HEADERS +=  HostArm.h \
             NyxInputControl.h \
-            NyxLedControl.h
+            NyxLedControl.h \
 
 VPATH += Src/input
 
-SOURCES += SoundPlayer.cpp \
-           NyxInputControl.cpp \
-           NyxLedControl.cpp
+SOURCES += NyxInputControl.cpp \
+           NyxLedControl.cpp \
 
 INCLUDEPATH += \
 		$$(STAGING_INCDIR)/glib-2.0 \
@@ -151,4 +151,6 @@ INCLUDEPATH += \
 
 contains(TARGET_TYPE, TARGET_DEVICE) {
         INCLUDEPATH +=  $$(STAGING_INCDIR)/hid/IncsPublic
+        SOURCES += SoundPlayer.cpp
+        HEADERS += SoundPlayer.h
 }
