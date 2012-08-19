@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=com.palm.appinstaller;com.palm.applicationManager;com.palm.lunastats;com.palm.nativealertmanager;com.palm.systemmanager;com.palm.vibrate;com.palm.ambientLightSensor;com.palm.display;com.palm.keys;com.palm.appDataBackup;com.palm.eventreporter.LunaSysMgr,com.palm.eventreporter.WebAppMgr
+Exec=/usr/lib/luna/LunaSysMgr
+Type=static

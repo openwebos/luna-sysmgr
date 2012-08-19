@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=com.palm.applicationManager;com.palm.lunastats;com.palm.display;com.palm.keys;com.palm.appDataBackup
+Exec=/usr/lib/luna/LunaSysMgr
+Type=static

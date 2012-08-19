@@ -46,7 +46,7 @@ usage() {
 }
 
 get_pidfile() {
-  echo "/tmp/ls2/ls-hubd.${1}.pid"
+  echo "/tmp/webos/ls2/ls-hubd.${1}.pid"
 }
 
 hubd_status() {
@@ -63,7 +63,7 @@ hubds_status() {
 }
 
 hubd_stop() {
-  PID_FILE="/tmp/ls2/ls-hubd.${1}.pid"
+  PID_FILE="/tmp/webos/ls2/ls-hubd.${1}.pid"
   if [ -e "${PID_FILE}" ] ; then
     echo "Stopping ${1} hub daemon"
     kill -9 `cat ${PID_FILE}`
@@ -77,9 +77,9 @@ hubds_stop() {
 }
 
 hubds_start() {
-  mkdir -p ${CONF_DIR}/ls2/roles
-  mkdir -p ${CONF_DIR}/ls2/services
-  mkdir -p ${CONF_DIR}/ls2/system-services
+  #mkdir -p ${CONF_DIR}/ls2/roles
+  #mkdir -p ${CONF_DIR}/ls2/services
+  #mkdir -p ${CONF_DIR}/ls2/system-services
   ls-hubd --conf ${CONF_DIR}/ls2/ls-private.conf ${LOGGING} 2>&1 &
   ls-hubd --public --conf ${CONF_DIR}/ls2/ls-public.conf ${LOGGING} 2>&1 &
   sleep 1
