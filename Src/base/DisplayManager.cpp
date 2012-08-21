@@ -43,15 +43,7 @@
 #include <QGLContext>
 #endif
 
-#if !defined(HAVE_QPA)
-#include <QWSServer>
-#endif
-
 #include <cjson/json.h>
-
-#ifdef HAVE_QPA
-#include <dlfcn.h>
-#endif
 
 #include <glib.h>
 #include <lunaservice.h>
@@ -146,7 +138,7 @@
 #define DISPLAY_EVENT_OFF_CALL                       115
 #define DISPLAY_EVENT_HOME_BUTTON_UP                 116
 
-#ifdef HAVE_QPA
+#ifdef TARGET_DEVICE
 extern "C" void setEglSwapInterval(int);
 #endif
 
@@ -2327,9 +2319,6 @@ bool DisplayManager::slider()
     {
         g_warning("%s: optical sensor timeout", __FUNCTION__);
         m_slidingNow = NOT_SLIDING;
-#if defined (TARGET_DEVICE) && !defined(HAVE_QPA)
-	QWSServer::instance()->resumeMouse();
-#endif
     }
 
     return false;
@@ -2418,17 +2407,20 @@ void DisplayManager::setAlsDisabled (bool disable)
 
 bool DisplayManager::touchPanelOn ()
 {
+#if defined (TARGET_DEVICE)
     InputControl* ic = HostBase::instance()->getInputControlTouchpanel();
     if (NULL != ic)
     {
         m_touchpanelIsOn = true;
         return ic->on();
     }
+#endif
     return true;
 }
 
 bool DisplayManager::touchPanelOff ()
 {
+#if defined (TARGET_DEVICE)
     InputControl* ic = HostBase::instance()->getInputControlTouchpanel();
     if (NULL != ic)
     {
@@ -2436,6 +2428,7 @@ bool DisplayManager::touchPanelOff ()
         ic->off();
         touchPanelOffCallback (NULL, NULL, this);
     }
+#endif
     return true;
 }
 
@@ -2822,9 +2815,6 @@ bool DisplayManager::handleEvent(QEvent *event)
 
     if (m_slidingNow == SLIDING_WAIT && m_slidingStart + SLIDER_MINTIME < Time::curTimeMs()) {
 		m_slidingNow = NOT_SLIDING;
-#if defined (TARGET_DEVICE) && !defined(HAVE_QPA)
-	QWSServer::instance()->resumeMouse();
-#endif
 	}
 
 	if (!m_service) {
@@ -2892,10 +2882,6 @@ bool DisplayManager::handleEvent(QEvent *event)
 			m_slidingNow = SLIDING_NOW;
 			m_slidingStart = Time::curTimeMs();
 			
-#if defined (TARGET_DEVICE) && !defined(HAVE_QPA)
-			QWSServer::instance()->suspendMouse();
-#endif
-
 			// fire a timer to cancel m_slidingNow
 			m_slider->start(SLIDER_TIMEOUT);
 
@@ -2911,9 +2897,6 @@ bool DisplayManager::handleEvent(QEvent *event)
 				g_debug("%s: optical down", __FUNCTION__);
 				if (m_slidingStart + SLIDER_MINTIME < Time::curTimeMs()) {
 					m_slidingNow = NOT_SLIDING;
-#if defined (TARGET_DEVICE) && !defined(HAVE_QPA)
-					QWSServer::instance()->resumeMouse();
-#endif
 				} else {
 					m_slidingNow = SLIDING_WAIT;
 				}
@@ -3213,9 +3196,6 @@ void DisplayManager::displayOn(bool als)
 			notifySubscribers (DISPLAY_EVENT_ON);
 	}
 
-#if defined (TARGET_DEVICE) && !defined(HAVE_QPA)
-    QWSServer::instance()->resumeMouse();
-#endif
     // backlight has to be turned on first, On completion,
     // the callback will turn on the touchpanel
     backlightOn (getDisplayBrightness(), getKeypadBrightness(), als);
@@ -3235,9 +3215,6 @@ void DisplayManager::displayDim()
     if (b < MINIMUM_DIMMED_BRIGHTNESS)
 	b = MINIMUM_DIMMED_BRIGHTNESS;
 
-#if defined (TARGET_DEVICE) && !defined(HAVE_QPA)
-    QWSServer::instance()->resumeMouse();
-#endif
     // backlight has to be turned on first, On completion,
     // the callback will turn on the touchpanel
     backlightOn (b, 0, false);
@@ -3260,10 +3237,7 @@ void DisplayManager::displayOff()
     notifySubscribers (DISPLAY_EVENT_OFF);
 
     if (m_penDown) {
-#if defined (TARGET_DEVICE) && !defined(HAVE_QPA)
-	QWSServer::instance()->suspendMouse();
-#endif
-	m_drop_pen = true;
+	    m_drop_pen = true;
     }
 
     touchPanelOff();
@@ -3333,11 +3307,7 @@ void DisplayManager::changeVsyncControl(bool enable)
 #if defined(TARGET_DEVICE) && defined(HAVE_OPENGL)
 	QGLContext* gc = (QGLContext*) QGLContext::currentContext();
 	if (gc) {
-#ifndef HAVE_QPA
-		gc->setEglSwapInterval(enable ? 1 : 0);
-#else
 		setEglSwapInterval(enable ? 1 : 0);
-#endif
         g_message("Turned vsync %s", enable ? "on" : "off");
 	}
 #endif

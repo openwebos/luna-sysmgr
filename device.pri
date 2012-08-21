@@ -34,38 +34,24 @@ MACHINE_NAME = $$(MACHINE)
 contains(MACHINE_NAME, "chile") {
 	DEFINES += MACHINE_CHILE
 	CONFIG_BUILD += opengl
-}
-contains(MACHINE_NAME, "castle") {
-	DEFINES += MACHINE_CASTLE
-	CONFIG_BUILD += opengl texturesharing fb1poweroptimization directrendering
-	CONFIG_BUILD += haptics
-}
-contains(MACHINE_NAME, "roadrunner") {
-	DEFINES += MACHINE_CASTLE MACHINE_ROADRUNNER
-	CONFIG_BUILD += opengl texturesharing fb1poweroptimization directrendering 
-	CONFIG_BUILD += haptics
-}
-contains(MACHINE_NAME, "pixie") {
-	DEFINES += MACHINE_PIXIE
-	CONFIG_BUILD += opengl texturesharing fb1poweroptimization directrendering
-	CONFIG_BUILD += haptics
+    LIBS += -lqpalm
 }
 contains(MACHINE_NAME, "broadway") {
 	DEFINES += MACHINE_BROADWAY
 	CONFIG_BUILD += opengl texturesharing directrendering
 	CONFIG_BUILD += haptics
-	CONFIG_BUILD += qpa
+    LIBS += -lqpalm
 }
 contains(MACHINE_NAME, "mantaray") {
 	DEFINES += MACHINE_MANTARAY
 	CONFIG_BUILD += opengl openglcomposited directrendering
-	CONFIG_BUILD += qpa
 	CONFIG_BUILD += haptics
+    LIBS += -lqpalm
 }
 contains(MACHINE_NAME, "windsornot") {
 	DEFINES += MACHINE_WINDSORNOT
 	CONFIG_BUILD += opengl openglcomposited directrendering
-	CONFIG_BUILD += qpa
+    LIBS += -lqpalm
 }
 contains(MACHINE_NAME, "topaz") {
 	DEFINES += MACHINE_TOPAZ
@@ -85,20 +71,20 @@ contains(MACHINE_NAME, "topaz") {
 ############
 
 	CONFIG_BUILD += opengl # texturesharing fb1poweroptimization directrendering 
-	CONFIG_BUILD += qpa
 	CONFIG_BUILD += haptics
+    LIBS += -lqpalm
 }
 contains(MACHINE_NAME, "opal") {
 	DEFINES += MACHINE_OPAL
 	CONFIG_BUILD += opengl texturesharing directrendering
-	CONFIG_BUILD += qpa
 	CONFIG_BUILD += haptics
+    LIBS += -lqpalm
 }
 contains(MACHINE_NAME, "pyramid") {
 	DEFINES += MACHINE_PYRAMID
 	CONFIG_BUILD += opengl 
-	CONFIG_BUILD += qpa
 	CONFIG_BUILD += haptics
+    LIBS += -lqpalm
 }
 contains(MACHINE_NAME, "qemux86") {
     DEFINES += MACHINE_QEMUX86
@@ -114,21 +100,7 @@ contains(MACHINE_NAME, "qemux86") {
 
 DEFINES += $$TARGET_TYPE HAVE_LUNA_PREF=1 PALM_DEVICE QT_PLUGIN QT_STATICPLUGIN
 
-contains(CONFIG_BUILD, qpa) {
-    DEFINES += HAVE_QPA
-    LIBS += -lqpalm
-}
-else {
-    HEADERS += 		hiddkbd_qws.h \
-			hiddtp_qws.h \
-			
-    SOURCES +=  	hiddkbd_qws.cpp \
-			hiddtp_qws.cpp \
-			hiddkbd.cpp \
-			hiddtp.cpp
-    LIBS += -lnyx
-}
-
+DEFINES += HAVE_QPA
 
 HEADERS +=  HostArm.h \
             NyxInputControl.h \

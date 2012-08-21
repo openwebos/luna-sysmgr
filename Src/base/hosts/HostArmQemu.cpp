@@ -201,8 +201,11 @@ HostArmQemu::~HostArmQemu()
 
 void HostArmQemu::setCentralWidget(QWidget* view)
 {
-	m_keyFilter = new HostArmQemuKeyFilter;
-	view->installEventFilter(m_keyFilter);
-	view->show();
+    // We need to set the active window here as well so that the
+    // event get delivered properly.
+    QApplication::setActiveWindow(view);
+    m_keyFilter = new HostArmQemuKeyFilter;
+    view->installEventFilter(m_keyFilter);
+    view->show();
 }
 

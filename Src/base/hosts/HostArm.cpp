@@ -73,14 +73,14 @@
 // TODO: these should come from hidd headers
 #define MAX_HIDD_EVENTS 100 
 
-#ifdef HAVE_QPA
+#if defined(TARGET_DEVICE)
 //TODO: Move me to a header!
 extern "C" void setTransform(QTransform*);
 extern "C" InputControl* getTouchpanel(void);
 extern "C" void setBluetoothCallback(void (*fun)(bool));
 #endif
 
-#ifdef HAVE_QPA
+#if defined(TARGET_DEVICE)
 static void bluetoothCallback(bool enable)
 {
     HostBase::instance()->setBluetoothKeyboardActive(enable);
@@ -113,8 +113,6 @@ HostArm::HostArm() :
 #if defined(TARGET_DEVICE)
 	m_hwRev = HidGetHardwareRevision();
 	m_hwPlatform = HidGetHardwarePlatform();
-#endif
-#ifdef HAVE_QPA
 	setBluetoothCallback(&bluetoothCallback);
 #endif
 }
@@ -218,7 +216,7 @@ void HostArm::init(int w, int h)
 	m_fb1NumBuffers = fixinfo.smem_len / (rowBytes * varinfo.yres);
 
 	printf("Linux Fb0: Num Buffers: %d, Fb1: Num Buffers: %d\n", m_fb0NumBuffers, m_fb1NumBuffers);
-#ifdef HAVE_QPA
+#ifdef TARGET_DEVICE
 	setTransform(&m_trans);
 #endif
 }
@@ -777,15 +775,11 @@ InputControl* HostArm::getInputControlTouchpanel()
 {
     if (m_nyxInputControlTouchpanel)
         return m_nyxInputControlTouchpanel;
-    
-#ifndef HAVE_QPA
-    m_nyxInputControlTouchpanel = new NyxInputControl(NYX_DEVICE_TOUCHPANEL, "Main");
-#else
+#if defined(TARGET_DEVICE)
     m_nyxInputControlTouchpanel = getTouchpanel();
 #endif
-    if (NULL == m_nyxInputControlTouchpanel)
+    if (!m_nyxInputControlTouchpanel)
         g_critical("Unable to obtain m_nyxInputControlTouchpanel");
-
     return m_nyxInputControlTouchpanel;
 }
 

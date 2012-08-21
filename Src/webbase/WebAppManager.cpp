@@ -209,13 +209,14 @@ WebAppManager::WebAppManager()
 	, m_inSimulatedMouseEvent(false)
 {
     setenv("QT_PLUGIN_PATH", "/usr/plugins", 1);
-    setenv("QT_QPA_PLATFORM", "webos", 1);
     setenv("QT_DEBUG_PLUGINS", "1", 1);
-#if defined (TARGET_DEVICE)
+
+#if defined(TARGET_DEVICE)
     static const char *argv[] = { "./WebAppManager", "-platform", "webos", NULL };
 #else
     static const char *argv[] = { "./WebAppManager", "-platform", "minimal", NULL };
 #endif
+
     static int argc = 3;
 
     m_Application = new QApplication(argc, (char **)argv);

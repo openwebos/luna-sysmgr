@@ -66,12 +66,6 @@
 #include <QtGui>
 #include <QtGlobal> 
 
-#if !defined(TARGET_DESKTOP) && !defined(HAVE_QPA)
-#include <QWSServer>
-Q_IMPORT_PLUGIN (hiddtp)
-Q_IMPORT_PLUGIN (hiddkbd)
-#endif
-
 /* Convenience macro for simulating crashes for debugging purposes only:
 #define crash() {                               \
         volatile int *ip = (volatile int *)0;   \
@@ -692,10 +686,12 @@ int main( int argc, char** argv)
 	}
 #endif
 
-#if defined(TARGET_DEVICE) && defined(HAVE_OPENGL) && defined(HAVE_QPA)
+#if defined(TARGET_DEVICE) && defined(HAVE_OPENGL)
 	if (settings->forceSoftwareRendering)
 		::setenv("QT_QPA_PLATFORM", "palm-soft", 1);
 	else
+		::setenv("QT_QPA_PLATFORM", "palm", 1);
+#else
 		::setenv("QT_QPA_PLATFORM", "palm", 1);
 #endif
 	
@@ -732,12 +728,6 @@ int main( int argc, char** argv)
 #if !defined(TARGET_DESKTOP)
 	// Set "nice" property
 	setpriority(PRIO_PROCESS,getpid(),-1);
-#endif
-
-#if !defined(TARGET_DESKTOP) && !defined(HAVE_QPA)
-	QWSServer::setDefaultMouse("HiddTp");
-	QWSServer::setDefaultKeyboard("HiddKbd");
-	::setenv("QWS_DBLCLICK_DISTANCE", QString("%0").arg(Settings::LunaSettings()->tapRadius).toAscii().constData(), 1);
 #endif
 
 	qInstallMsgHandler(qtMsgHandler);
