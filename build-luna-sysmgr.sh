@@ -17,13 +17,30 @@
 #
 # LICENSE@@@
 
-############################
-# To force a rebuild of components pass the parameter clean to the script.
-############################
+export LSM_TAG="0.824"
+export ARCH=`uname -m`
 
 if [ "$1" = "clean" ] ; then
   export SKIPSTUFF=0
   set -e
+elif [ "$1" = "--help" ] ; then
+    echo "Usage:  ./build-luna-sysmgr.sh [OPTION]"
+    echo "Builds the luna-sysmgr component and its dependencies."
+    echo "    The script loads about 350MB of source code from GitHub, as needed."
+    echo "    NOTE: This script creates about 2.5GB of disk space"
+    echo " "
+    echo "Optional arguments:"
+    echo "    clean   force a rebuild of components"
+    echo "    --help  display this help and exit"
+    echo "    --version  display version information and exit"
+    echo " "
+    exit
+elif [ "$1" = "--version" ] ; then
+    echo "Desktop build script for luna-sysmgr ${LSM_TAG}"
+    exit
+elif  [ -n "$1" ] ; then
+    echo "Parameter $1 not recognized"
+    exit
 else
   export SKIPSTUFF=1
   set -e
@@ -90,7 +107,7 @@ do_fetch() {
     fi
     if [ ! -e ${ZIPFILE} ] ; then
         if [ -e ~/tarballs/`basename ${1}`_${2}.zip ] ; then
-            cp ~/tarballs/`basename ${1}`_${2}.zip ${ZIPFILE}
+            cp -f ~/tarballs/`basename ${1}`_${2}.zip ${ZIPFILE}
             if [ $? != 0 ] ; then
                 echo error
                 rm -f ${ZIPFILE}
@@ -127,7 +144,7 @@ function build_cjson
     mkdir -p build
     cd build
     PKG_CONFIG_PATH=$LUNA_STAGING/lib/pkgconfig \
-        ../configure --prefix=$LUNA_STAGING --enable-shared --disable-static
+    ../configure --prefix=$LUNA_STAGING --enable-shared --disable-static
     make $JOBS all
     make install
 }
@@ -144,6 +161,7 @@ function build_pbnjson
     sed -i 's/set(EXTERNAL_YAJL TRUE)/set(EXTERNAL_YAJL FALSE)/' ../src/CMakeLists.txt
     sed -i 's/add_subdirectory(pjson_engine\//add_subdirectory(deps\//' ../src/CMakeLists.txt
     sed -i 's/-Werror//' ../src/CMakeLists.txt
+    sed -i 's/#include <stdint.h>/#include <stdint.h>\n#include <stdlib.h>/' ../src/api/pbnjson/cxx/JValue.h
     cmake ../src -DCMAKE_FIND_ROOT_PATH=${LUNA_STAGING} -DYAJL_INSTALL_DIR=${LUNA_STAGING} -DWITH_TESTS=False -DWITH_DOCS=False -DCMAKE_INSTALL_PREFIX=${LUNA_STAGING} -DCMAKE_BUILD_TYPE=Release
     make $JOBS install
 }
@@ -190,10 +208,13 @@ function build_qt4
       mkdir -p $BASE/qt-build-desktop
       cd $BASE/qt-build-desktop
       if [ ! -e ../qt4/palm-desktop-configure.orig ] ; then
-        cp ../qt4/palm-desktop-configure ../qt4/palm-desktop-configure.orig
-        sed -i 's/-opensource/-opensource -fast -qconfig palm -no-dbus/' ../qt4/palm-desktop-configure
+        cp -f ../qt4/palm-desktop-configure ../qt4/palm-desktop-configure.orig
+        #sed -i 's/-opensource/-opensource -fast -qconfig palm -no-dbus/' ../qt4/palm-desktop-configure
+        sed -i 's/-opensource/-opensource -arch '${ARCH}' -fast -qconfig palm -no-dbus/' ../qt4/palm-desktop-configure
         sed -i 's/libs tools/libs/' ../qt4/palm-desktop-configure
       fi
+      sed -i '/^# --> Palm$/,/^# <-- Palm$/d' ../qt4/mkspecs/linux-g++-64/qmake.conf
+      sed -i 's/#include "qdrawutil.h"/#include "qdrawutil.h"\n#include "qplatformdefs.h"/' ../qt4/src/gui/painting/qpixmapatlas.cpp
       ../qt4/palm-desktop-configure
     fi
     cd $BASE/qt-build-desktop
@@ -214,8 +235,8 @@ function build_luna-service2
     make $JOBS
     make install
 
-    cp ${LUNA_STAGING}/include/luna-service2/lunaservice.h ${LUNA_STAGING}/include/
-    cp ${LUNA_STAGING}/include/luna-service2/lunaservice-errors.h ${LUNA_STAGING}/include/
+    cp -f ${LUNA_STAGING}/include/luna-service2/lunaservice.h ${LUNA_STAGING}/include/
+    cp -f ${LUNA_STAGING}/include/luna-service2/lunaservice-errors.h ${LUNA_STAGING}/include/
 
     cd $LUNA_STAGING/lib
     ln -sf libluna-service2.so liblunaservice.so
@@ -229,7 +250,7 @@ function build_npapi-headers
     do_fetch isis-project/npapi-headers $1 npapi-headers
     cd $BASE/npapi-headers
     mkdir -p $LUNA_STAGING/include/webkit/npapi
-    cp *.h $LUNA_STAGING/include/webkit/npapi
+    cp -f *.h $LUNA_STAGING/include/webkit/npapi
 }
 
 ##################################
@@ -240,7 +261,11 @@ function build_luna-webkit-api
     do_fetch openwebos/luna-webkit-api $1 luna-webkit-api
     cd $BASE/luna-webkit-api
     mkdir -p $LUNA_STAGING/include/ime
-    cp *.h $LUNA_STAGING/include/ime
+    if [ -d include/public/ime ] ; then
+        cp -f include/public/ime/*.h $LUNA_STAGING/include/ime
+    else
+        cp -f *.h $LUNA_STAGING/include/ime
+    fi
 }
 
 ##################################
@@ -265,7 +290,13 @@ function build_webkit
     export QTDIR=$BASE/qt4
     export QMAKE=$LUNA_STAGING/bin/qmake-palm
     export QMAKEPATH=$WEBKIT_DIR/Tools/qmake
-    export WEBKITOUTPUTDIR="WebKitBuild/isis-x86"
+    export WEBKITOUTPUTDIR="WebKitBuild/isis-${ARCH}"
+    sed -i 's/\-fuse\-ld=gold//' Tools/qmake/mkspecs/features/unix/default_post.prf
+    sed -i 's/\-Werror//' Tools/qmake/mkspecs/features/unix/default_post.prf
+    sed -i 's/namespace WebCore {/using namespace WebCore;/' Source/WebCore/xml/XPathParser.cpp
+    sed -i 's/namespace XPath {/using namespace XPath;/' Source/WebCore/xml/XPathParser.cpp
+    sed -i 'N;$!P;$!D;$d' Source/WebCore/xml/XPathParser.cpp
+    sed -i 's/#include <stdlib.h>/#include <stdlib.h>\n#include <unistd.h>/' Source/WebCore/platform/webos/LunaServiceMgr.cpp
 
     ./Tools/Scripts/build-webkit --qt \
         --release \
@@ -313,7 +344,23 @@ function build_luna-sysmgr-ipc-messages
 {
     do_fetch openwebos/luna-sysmgr-ipc-messages $1 luna-sysmgr-ipc-messages
     cd $BASE/luna-sysmgr-ipc-messages
-    make -e PREFIX=$LUNA_STAGING -f Makefile.Ubuntu install BUILD_TYPE=release
+    if [ -d include/public/messages ] ; then
+        mkdir -p $LUNA_STAGING/include/sysmgr_ipc
+        cp -f include/public/messages/*.h $LUNA_STAGING/include/sysmgr_ipc
+    else
+        make -e PREFIX=$LUNA_STAGING -f Makefile.Ubuntu install BUILD_TYPE=release
+    fi
+}
+
+###########################################
+#  Fetch and build enyo 1.0
+###########################################
+function build_enyo
+{
+    do_fetch enyojs/enyo-1.0 $1 enyo-1.0 submissions/
+    cd $BASE/enyo-1.0
+    mkdir -p $BASE/usr/palm/frameworks/enyo/0.10/framework
+    cp -rf framework/* $BASE/usr/palm/frameworks/enyo/0.10/framework
 }
 
 ##############################
@@ -321,30 +368,83 @@ function build_luna-sysmgr-ipc-messages
 ##############################
 function build_luna-sysmgr
 {
-    if [ ! -d $BASE/luna-sysmgr ] ; then
-      do_fetch openwebos/luna-sysmgr $1 luna-sysmgr
+    if [ ! -d $BASE/luna-sysmgr ] || [ ! -e $BASE/luna-sysmgr/desktop-support/com.palm.luna.json.prv ] ; then
+        do_fetch openwebos/luna-sysmgr $1 luna-sysmgr
     fi
+    ##### To build from your local clone of luna-sysmgr, change the following line to "cd" to your clone's location
     cd $BASE/luna-sysmgr
+    sed -i 's/x86/$$system(uname -m)/' desktop.pri
     if [ ! -e luna-desktop-build.stamp ] ; then
+        if [ $SKIPSTUFF -eq 0 ] && [ -e debug-${ARCH} ] && [ -e debug-${ARCH}/.obj ] ; then
+            rm -f debug-${ARCH}/LunaSysMgr
+            rm -rf debug-${ARCH}/.obj/*
+            rm -rf debug-${ARCH}/.moc/moc_*.cpp
+            rm -rf debug-${ARCH}/.moc/*.moc
+        fi
         $LUNA_STAGING/bin/qmake-palm
     fi
+    sed -i 's/#ifdef __i386__/#if (defined(__i386__) || defined(__amd64__))/' Src/Main.cpp
+    sed -i 's/#include <stdio.h>/#include <stdio.h>\n#include <unistd.h>/' Src/base/application/MimeSystem.cpp
+    sed -i 's/#include "Logging.h"/#include "Logging.h"\n#include <unistd.h>/' Src/ime/PalmIMEHelpers.cpp
+    sed -i 's/#include <fcntl.h>/#include <fcntl.h>\n#include <unistd.h>/' Src/lunaui/launcher/systeminterface/util/safefileops.cpp
+
     make $JOBS -f Makefile.Ubuntu
     mkdir -p $LUNA_STAGING/lib/sysmgr-images
     cp -frad images/* $LUNA_STAGING/lib/sysmgr-images
-    cp debug-x86/LunaSysMgr $LUNA_STAGING/lib
+    cp -f debug-${ARCH}/LunaSysMgr $LUNA_STAGING/lib
+    cp -fs $LUNA_STAGING/lib/LunaSysMgr $BASE/usr/lib/luna/LunaSysMgr
 
-    cp desktop-support/service-bus.sh  ../service-bus.sh
-    cp desktop-support/run-luna-sysmgr.sh  ../run-luna-sysmgr.sh
-    cp desktop-support/install-luna-sysmgr.sh ../install-luna-sysmgr.sh
-    mkdir -p ../ls2
-    cp desktop-support/ls*.conf ../ls2
+    cp -f desktop-support/service-bus.sh  $BASE/service-bus.sh
+    cp -f desktop-support/run-luna-sysmgr.sh  $BASE/run-luna-sysmgr.sh
+    cp -f desktop-support/install-luna-sysmgr.sh $BASE/install-luna-sysmgr.sh
+    cp -f desktop-support/ls*.conf $BASE/ls2
 
-    mkdir -p ../ls2/roles/prv
-    cp -f service/com.palm.luna.json.prv ../ls2/roles/prv/com.palm.luna.json
-    mkdir -p ../ls2/roles/pub
-    cp -f service/com.palm.luna.json.pub ../ls2/roles/pub/com.palm.luna.json
-    mkdir -p ../pubsub_handlers
-    cp -f service/com.palm.appinstaller.pubsub ../pubsub_handlers/com.palm.appinstaller
+    mkdir -p $BASE/usr/lib/luna/system/luna-applauncher
+    cp -f desktop-support/appinfo.json $BASE/usr/lib/luna/system/luna-applauncher/appinfo.json
+
+    cp -f desktop-support/com.palm.luna.json.prv $BASE/ls2/roles/prv/com.palm.luna.json
+    cp -f desktop-support/com.palm.luna.json.pub $BASE/ls2/roles/pub/com.palm.luna.json
+    cp -f desktop-support/com.palm.luna.service.prv $BASE/share/dbus-1/system-services/com.palm.luna.service
+    cp -f desktop-support/com.palm.luna.service.pub $BASE/share/dbus-1/services/com.palm.luna.service
+    mkdir -p $BASE/etc/palm/pubsub_handlers
+    cp -f service/com.palm.appinstaller.pubsub $BASE/etc/palm/pubsub_handlers/com.palm.appinstaller
+
+    cp -f conf/default-exhibition-apps.json $BASE/etc/palm/default-exhibition-apps.json
+    cp -f conf/default-launcher-page-layout.json $BASE/etc/palm/default-launcher-page-layout.json
+    cp -f conf/defaultPreferences.txt $BASE/etc/palm/defaultPreferences.txt
+    cp -f conf/luna.conf $BASE/etc/palm/luna.conf
+    cp -f conf/luna-desktop.conf $BASE/etc/palm/luna-platform.conf
+    cp -f conf/lunaAnimations.conf $BASE/etc/palm/lunaAnimations.conf
+    cp -f conf/notificationPolicy.conf $BASE/etc/palm//notificationPolicy.conf
+
+    mkdir -p $BASE/usr/lib/luna/customization
+    cp -f conf/default-exhibition-apps.json $BASE/usr/lib/luna/customization/default-exhibition-apps.json
+
+    mkdir -p $BASE/usr/palm/sounds
+    cp -f sounds/* $BASE/usr/palm/sounds
+
+    mkdir -p $BASE/etc/palm/luna-applauncher
+    cp -f desktop-support/appinfo.json $BASE/etc/palm/luna-applauncher
+
+    mkdir -p $BASE/etc/palm/launcher3
+    cp -rf conf/launcher3/* $BASE/etc/palm/launcher3
+
+    mkdir -p $BASE/etc/palm/schemas
+    cp -rf conf/*.schema $BASE/etc/palm/schemas
+
+    mkdir -p $BASE/etc/palm/db-kinds
+    cp -f mojodb/com.palm.securitypolicy $BASE/etc/palm/db-kinds
+    cp -f mojodb/com.palm.securitypolicy.device $BASE/etc/palm/db-kinds
+    mkdir -p $BASE/etc/palm/db/permissions
+    cp -f mojodb/com.palm.securitypolicy.permissions $BASE/etc/palm/db/permissions/com.palm.securitypolicy
+
+    mkdir -p $BASE/usr/palm/sysmgr/images
+    cp -fr images/* $BASE/usr/palm/sysmgr/images
+    mkdir -p $BASE/usr/palm/sysmgr/localization
+    mkdir -p $BASE/usr/palm/sysmgr/low-memory
+    cp -frad low-memory/* $BASE/usr/palm/sysmgr/low-memory
+    mkdir -p $BASE/usr/palm/sysmgr/uiComponents
+    cp -frad uiComponents/* $BASE/usr/palm/sysmgr/uiComponents
 
 }
 
@@ -368,7 +468,7 @@ function build
         if [ -d $BASE/$BUILD_DIR ] ; then
             touch $BASE/$BUILD_DIR/luna-desktop-build.stamp
         fi
-    return
+        return
     fi
     echo
     echo "Skipping $1 ..."
@@ -391,15 +491,29 @@ mkdir -p $BASE
 mkdir -p $LUNA_STAGING/lib
 mkdir -p $LUNA_STAGING/bin
 mkdir -p $LUNA_STAGING/include
-mkdir -p $LUNA_STAGING/share/dbus-1/system-services
-set -x
 
-export LSM_TAG="0.822"
+mkdir -p $BASE/etc/palm
+mkdir -p $BASE/ls2/roles/prv
+mkdir -p $BASE/ls2/roles/pub
+mkdir -p $BASE/share/dbus-1/system-services
+mkdir -p $BASE/share/dbus-1/services
+mkdir -p $BASE/usr/lib/luna/system/luna-systemui
+mkdir -p $BASE/usr/palm/public/accounts
+mkdir -p $BASE/usr/palm/applications
+mkdir -p $BASE/usr/palm/data
+mkdir -p $BASE/usr/palm/services
+mkdir -p $BASE/usr/palm/smartkey
+mkdir -p $BASE/var/luna
+mkdir -p $BASE/var/palm
+mkdir -p $BASE/var/usr/palm
+set -x
 
 if [ ! -d "$BASE/luna-sysmgr" ] || [ ! -d "$BASE/tarballs" ] || [ ! -e "$BASE/tarballs/luna-sysmgr_${LSM_TAG}.zip" ] ; then
     do_fetch openwebos/luna-sysmgr ${LSM_TAG} luna-sysmgr
 fi
-rm -f $BASE/luna-sysmgr/luna-desktop-build.stamp
+if [ -d $BASE/luna-sysmgr ] ; then
+    rm -f $BASE/luna-sysmgr/luna-desktop-build.stamp
+fi
 
 
 build cjson 35
@@ -413,7 +527,8 @@ build luna-webkit-api 0.90
 build webkit 0.3
 build luna-sysmgr-ipc 0.90
 build luna-sysmgr-ipc-messages 0.90
-build luna-sysmgr ${LSM_TAG}
+build enyo 128.2
+build luna-sysmgr $LSM_TAG
 
 echo ""
 echo "Complete. "
