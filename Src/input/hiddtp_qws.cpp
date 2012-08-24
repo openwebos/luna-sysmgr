@@ -34,7 +34,6 @@
 
 #include <QtGui/qmouse_qws.h>
 #include "hiddtp_qws.h"
-#include "HidLib.h"
 #include "Time.h"
 #include "Preferences.h"
 #include "Settings.h"

@@ -33,7 +33,9 @@
 #include "NyxInputControl.h"
 #include "NyxLedControl.h"
 
+#if defined(TARGET_DEVICE)
 #include "HidLib.h"
+#endif
 #include "lunaservice.h"
 
 #include <qsocketnotifier.h>
@@ -108,8 +110,9 @@ public:
 	virtual void show();
 
 	virtual int getNumberOfSwitches() const;
+#if defined(TARGET_DEVICE)
 	virtual void getInitialSwitchStates(void);
-
+#endif
 	int readHidEvents(int fd, struct input_event* eventBuf, int bufSize);
 
 	virtual const char* hardwareName() const;
@@ -142,9 +145,10 @@ protected:
 
 	virtual void setCentralWidget(QWidget* view);
 
+#if defined(TARGET_DEVICE)
 	HidHardwareRevision_t m_hwRev;
 	HidHardwarePlatform_t m_hwPlatform;
-
+#endif
 	int m_fb0Fd;
 	int m_fb1Fd;
 	void* m_fb0Buffer;
@@ -182,8 +186,9 @@ protected:
 	virtual void setRenderingLayerEnabled(bool enable);
 
 	static bool getMsgValueInt(LSMessage* msg, int& value);
+#if defined(TARGET_DEVICE)
 	static bool switchStateCallback(LSHandle* handle, LSMessage* msg, void* data);
-
+#endif
     /**
      * Function gets called whenever there is some data
      * available from NYX.

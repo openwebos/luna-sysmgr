@@ -24,7 +24,12 @@ end script
 script
 
 	# Choose our malloc
-	export LD_PRELOAD="/usr/lib/libptmalloc3.so /usr/lib/libmemcpy.so"
+    if grep -qs "qemux86" /etc/hostname ; then
+        export LD_PRELOAD="/usr/lib/libptmalloc3.so"
+        export HOME=/var/home/root
+    else
+        export LD_PRELOAD="/usr/lib/libptmalloc3.so /usr/lib/libmemcpy.so"
+    fi
 
 	#check for MFTboot flag and attempt to launch MFT if present
 	if [ `grep -c MFTboot /proc/cmdline` == "1" ]
@@ -37,9 +42,9 @@ script
 			exec /usr/bin/LunaSysMgr -s `cat /var/luna/preferences/sysmgr-args`
 		fi
 	fi
-	if grep -qs "qemux86" /etc/hostname ; then
-		export HOME=/var/home/root
-	fi
+	#if grep -qs "qemux86" /etc/hostname ; then
+	#	export HOME=/var/home/root
+	#fi
 	exec ionice -c 2 -n 0 /usr/bin/LunaSysMgr -s `cat /var/luna/preferences/sysmgr-args`
 end script
 

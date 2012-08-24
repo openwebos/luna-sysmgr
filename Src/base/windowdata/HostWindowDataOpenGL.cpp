@@ -99,14 +99,12 @@ QPixmap* HostWindowDataOpenGL::acquirePixmap(QPixmap& screenPixmap)
 
 		QGLContext* gc = (QGLContext*) QGLContext::currentContext();
 		if (gc) {
-
-			m_textureId = gc->bindTexture(screenPixmap, GL_TEXTURE_2D, kGLInternalFormat,
-										  QGLContext::PremultipliedAlphaBindOption);
-			if (m_textureId) {
-			  	glTexImage2D(GL_TEXTURE_2D, 0, kGLInternalFormat,
-							 m_width, m_height, 0,
-							 kGLExternalFormat, GL_UNSIGNED_BYTE, m_ipcBuffer->data());
-			}
+            QImage data((uchar*) m_ipcBuffer->data(), m_width, m_height, QImage::Format_ARGB32_Premultiplied);
+            screenPixmap = QPixmap::fromImage(data);
+            // FIXME: is it really necessary to bind it here? Qt will bind it through
+            // QGL2PaintEngineEx::drawPixmap -> QGLContextPrivate::bindTexture anyways
+            m_textureId = gc->bindTexture(screenPixmap, GL_TEXTURE_2D, kGLInternalFormat,
+                                          QGLContext::PremultipliedAlphaBindOption);
 		}
 
 		m_ipcBuffer->unlock();
