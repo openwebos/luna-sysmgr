@@ -939,11 +939,16 @@ bool DisplayOn::timeoutInternal()
     }
     else
     {
+#if (defined(TARGET_DESKTOP) || defined (TARGET_EMULATOR))
+    g_warning("%s: not turning off display on emulator or desktop", __PRETTY_FUNCTION__);
+    changeDisplayState (DisplayStateOnLocked, DisplayEventTimeout, NULL);
+#else
 	g_message ("%s: change to dim in on", __PRETTY_FUNCTION__);
 	if (isOnCall())
 	    changeDisplayState (DisplayStateOffOnCall, DisplayEventTimeout, NULL);
 	else 
 	    changeDisplayState (DisplayStateOff, DisplayEventTimeout, NULL);
+#endif
     }
     return false;
 }
@@ -1144,11 +1149,15 @@ bool DisplayOnLocked::timeout()
     }
     else
     {
+#if (defined(TARGET_DESKTOP) || defined (TARGET_EMULATOR))
+    g_warning ("%s: not turning off display on emulator or desktop", __PRETTY_FUNCTION__);
+#else
 	g_message ("%s: going to off from onlocked state", __FUNCTION__);
 	if (isOnCall())
 	    changeDisplayState (DisplayStateOffOnCall, DisplayEventTimeout, NULL);
 	else
 	    changeDisplayState (DisplayStateOff, DisplayEventTimeout, NULL);
+#endif
     }
     return false;
 }
