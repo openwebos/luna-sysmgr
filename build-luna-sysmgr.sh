@@ -18,6 +18,7 @@
 # LICENSE@@@
 
 export LSM_TAG="0.824"
+export ARCH=`uname -m`
 
 if [ "$1" = "clean" ] ; then
   export SKIPSTUFF=0
@@ -160,6 +161,7 @@ function build_pbnjson
     sed -i 's/set(EXTERNAL_YAJL TRUE)/set(EXTERNAL_YAJL FALSE)/' ../src/CMakeLists.txt
     sed -i 's/add_subdirectory(pjson_engine\//add_subdirectory(deps\//' ../src/CMakeLists.txt
     sed -i 's/-Werror//' ../src/CMakeLists.txt
+    sed -i 's/#include <stdint.h>/#include <stdint.h>\n#include <stdlib.h>/' ../src/api/pbnjson/cxx/JValue.h
     cmake ../src -DCMAKE_FIND_ROOT_PATH=${LUNA_STAGING} -DYAJL_INSTALL_DIR=${LUNA_STAGING} -DWITH_TESTS=False -DWITH_DOCS=False -DCMAKE_INSTALL_PREFIX=${LUNA_STAGING} -DCMAKE_BUILD_TYPE=Release
     make $JOBS install
 }
@@ -207,9 +209,12 @@ function build_qt4
       cd $BASE/qt-build-desktop
       if [ ! -e ../qt4/palm-desktop-configure.orig ] ; then
         cp -f ../qt4/palm-desktop-configure ../qt4/palm-desktop-configure.orig
-        sed -i 's/-opensource/-opensource -fast -qconfig palm -no-dbus/' ../qt4/palm-desktop-configure
+        #sed -i 's/-opensource/-opensource -fast -qconfig palm -no-dbus/' ../qt4/palm-desktop-configure
+        sed -i 's/-opensource/-opensource -arch '${ARCH}' -fast -qconfig palm -no-dbus/' ../qt4/palm-desktop-configure
         sed -i 's/libs tools/libs/' ../qt4/palm-desktop-configure
       fi
+      sed -i '/^# --> Palm$/,/^# <-- Palm$/d' ../qt4/mkspecs/linux-g++-64/qmake.conf
+      sed -i 's/#include "qdrawutil.h"/#include "qdrawutil.h"\n#include "qplatformdefs.h"/' ../qt4/src/gui/painting/qpixmapatlas.cpp
       ../qt4/palm-desktop-configure
     fi
     cd $BASE/qt-build-desktop
@@ -285,7 +290,13 @@ function build_webkit
     export QTDIR=$BASE/qt4
     export QMAKE=$LUNA_STAGING/bin/qmake-palm
     export QMAKEPATH=$WEBKIT_DIR/Tools/qmake
-    export WEBKITOUTPUTDIR="WebKitBuild/isis-x86"
+    export WEBKITOUTPUTDIR="WebKitBuild/isis-${ARCH}"
+    sed -i 's/\-fuse\-ld=gold//' Tools/qmake/mkspecs/features/unix/default_post.prf
+    sed -i 's/\-Werror//' Tools/qmake/mkspecs/features/unix/default_post.prf
+    sed -i 's/namespace WebCore {/using namespace WebCore;/' Source/WebCore/xml/XPathParser.cpp
+    sed -i 's/namespace XPath {/using namespace XPath;/' Source/WebCore/xml/XPathParser.cpp
+    sed -i 'N;$!P;$!D;$d' Source/WebCore/xml/XPathParser.cpp
+    sed -i 's/#include <stdlib.h>/#include <stdlib.h>\n#include <unistd.h>/' Source/WebCore/platform/webos/LunaServiceMgr.cpp
 
     ./Tools/Scripts/build-webkit --qt \
         --release \
@@ -362,20 +373,25 @@ function build_luna-sysmgr
     fi
     ##### To build from your local clone of luna-sysmgr, change the following line to "cd" to your clone's location
     cd $BASE/luna-sysmgr
-
+    sed -i 's/x86/$$system(uname -m)/' desktop.pri
     if [ ! -e luna-desktop-build.stamp ] ; then
-        if [ $SKIPSTUFF -eq 0 ] && [ -e debug-x86 ] && [ -e debug-x86/.obj ] ; then
-            rm -f debug-x86/LunaSysMgr
-            rm -rf debug-x86/.obj/*
-            rm -rf debug-x86/.moc/moc_*.cpp
-            rm -rf debug-x86/.moc/*.moc
+        if [ $SKIPSTUFF -eq 0 ] && [ -e debug-${ARCH} ] && [ -e debug-${ARCH}/.obj ] ; then
+            rm -f debug-${ARCH}/LunaSysMgr
+            rm -rf debug-${ARCH}/.obj/*
+            rm -rf debug-${ARCH}/.moc/moc_*.cpp
+            rm -rf debug-${ARCH}/.moc/*.moc
         fi
         $LUNA_STAGING/bin/qmake-palm
     fi
+    sed -i 's/#ifdef __i386__/#if (defined(__i386__) || defined(__amd64__))/' Src/Main.cpp
+    sed -i 's/#include <stdio.h>/#include <stdio.h>\n#include <unistd.h>/' Src/base/application/MimeSystem.cpp
+    sed -i 's/#include "Logging.h"/#include "Logging.h"\n#include <unistd.h>/' Src/ime/PalmIMEHelpers.cpp
+    sed -i 's/#include <fcntl.h>/#include <fcntl.h>\n#include <unistd.h>/' Src/lunaui/launcher/systeminterface/util/safefileops.cpp
+
     make $JOBS -f Makefile.Ubuntu
     mkdir -p $LUNA_STAGING/lib/sysmgr-images
     cp -frad images/* $LUNA_STAGING/lib/sysmgr-images
-    cp -f debug-x86/LunaSysMgr $LUNA_STAGING/lib
+    cp -f debug-${ARCH}/LunaSysMgr $LUNA_STAGING/lib
     cp -fs $LUNA_STAGING/lib/LunaSysMgr $BASE/usr/lib/luna/LunaSysMgr
 
     cp -f desktop-support/service-bus.sh  $BASE/service-bus.sh
@@ -413,7 +429,7 @@ function build_luna-sysmgr
     mkdir -p $BASE/etc/palm/launcher3
     cp -rf conf/launcher3/* $BASE/etc/palm/launcher3
 
-     mkdir -p $BASE/etc/palm/schemas
+    mkdir -p $BASE/etc/palm/schemas
     cp -rf conf/*.schema $BASE/etc/palm/schemas
 
     mkdir -p $BASE/etc/palm/db-kinds
