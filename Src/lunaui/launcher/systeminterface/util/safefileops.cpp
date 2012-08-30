@@ -27,6 +27,7 @@
 #include <cerrno>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #include <QDebug>
 

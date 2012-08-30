@@ -135,7 +135,7 @@ static void crash_flush() {
     fsync(crashLogFD);
 }
 
-#ifdef __i386__
+#if (defined(__i386__) || defined(__amd64__))
 
 // Register context dumper for ia32 / x64:
 #if __WORDSIZE == 64
