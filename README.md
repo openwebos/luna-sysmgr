@@ -91,33 +91,33 @@ This component supports the following methods, which are described in detail in 
 *  com.palm.keys/media/status
 *  com.palm.keys/switches/status
 
-*..com.palm.systemmanager/applicationHasBeenTerminated
-*..com.palm.systemmanager/clearCache
-*..com.palm.systemmanager/dismissModalApp
-*..com.palm.systemmanager/getAnimationValues
-*..com.palm.systemmanager/getAppRestoreNeeded
-*..com.palm.systemmanager/getBootStatus
-*..com.palm.systemmanager/getDeviceLockMode
-*..com.palm.systemmanager/getDockModeStatus
-*..com.palm.systemmanager/getForegroundApplication
-*..com.palm.systemmanager/getLockStatus
-*..com.palm.systemmanager/getSecurityPolicy
-*..com.palm.systemmanager/getSystemStatus
-*..com.palm.systemmanager/launchModalApp
-*..com.palm.systemmanager/lockButtonTriggered
-*..com.palm.systemmanager/matchDevicePasscode
-*..com.palm.systemmanager/publishToSystemUI
-*..com.palm.systemmanager/runProgressAnimation
-*..com.palm.systemmanager/setAnimationValues
-*..com.palm.systemmanager/setDevicePasscode
-*..com.palm.systemmanager/setJavascriptFlags
-*..com.palm.systemmanager/subscribeToSystemUI
-*..com.palm.systemmanager/subscribeTurboMode
-*..com.palm.systemmanager/systemUi
-*..com.palm.systemmanager/takeScreenShot
-*..com.palm.systemmanager/touchToShareAppUrlTransferred
-*..com.palm.systemmanager/touchToShareDeviceInRange
-*..com.palm.systemmanager/updatePinAppState
+*  com.palm.systemmanager/applicationHasBeenTerminated
+*  com.palm.systemmanager/clearCache
+*  com.palm.systemmanager/dismissModalApp
+*  com.palm.systemmanager/getAnimationValues
+*  com.palm.systemmanager/getAppRestoreNeeded
+*  com.palm.systemmanager/getBootStatus
+*  com.palm.systemmanager/getDeviceLockMode
+*  com.palm.systemmanager/getDockModeStatus
+*  com.palm.systemmanager/getForegroundApplication
+*  com.palm.systemmanager/getLockStatus
+*  com.palm.systemmanager/getSecurityPolicy
+*  com.palm.systemmanager/getSystemStatus
+*  com.palm.systemmanager/launchModalApp
+*  com.palm.systemmanager/lockButtonTriggered
+*  com.palm.systemmanager/matchDevicePasscode
+*  com.palm.systemmanager/publishToSystemUI
+*  com.palm.systemmanager/runProgressAnimation
+*  com.palm.systemmanager/setAnimationValues
+*  com.palm.systemmanager/setDevicePasscode
+*  com.palm.systemmanager/setJavascriptFlags
+*  com.palm.systemmanager/subscribeToSystemUI
+*  com.palm.systemmanager/subscribeTurboMode
+*  com.palm.systemmanager/systemUi
+*  com.palm.systemmanager/takeScreenShot
+*  com.palm.systemmanager/touchToShareAppUrlTransferred
+*  com.palm.systemmanager/touchToShareDeviceInRange
+* com.palm.systemmanager/updatePinAppState
 
 *  com.palm.vibrate/vibrate
 *  com.palm.vibrate/vibrateNamedEffect
@@ -137,7 +137,7 @@ First follow the directions to build the latest "stable" version.
 To build your local clone of luna-sysmgr instead of the "stable" version installed with the build-webos-desktop script:  
 * Open the build-webos-desktop.sh script with a text editor
 * Locate the function build_luna-sysmgr
-* Change the line "cd $BASE/luna-sysmgr" to use your the folder with your clone, for example "cd ~/github/luna-sysmgr"
+* Change the line "cd $BASE/luna-sysmgr" to use the folder containing your clone, for example "cd ~/github/luna-sysmgr"
 * Close the text editor
 * Remove the file ~/luna-desktop-binaries/luna-sysmgr/luna-desktop-build.stamp
 * Start the build
