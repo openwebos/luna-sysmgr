@@ -1,88 +1,151 @@
+Summary
+========
+This renders webOS Card View, Launcher, Lock Screen, Status Bar and Status Menus, in addition to other system management features that are viewable in the System Manager User Interface.  
 
-luna-sysmgr
-============
+This is also responsible for hosting a WebKit shared library, WebApp Management, for rendering of Enyo applications.  
 
-luna-sysmgr is responsible for rendering webOS Card View, Launcher, Lock Screen, Status Bar and Status Menus, in addition to other system management features that are viewable in the System Manager User Interface.
+This is the current active development repository for LunaSysMgr.  
 
-luna-sysmgr is also responsible for hosting a WebKit shared library, WebApp Management, for rendering of Enyo applications.
+LunaSysmgr
+==========
 
-This is the current active development repository for luna-sysmgr.
+This component supports the following methods, which are described in detail in the generated documentation:  
+
+*  com.palm.ambientLightSensor/control/status
+
+*  com.palm.appDataBackup/postRestore
+*  com.palm.appDataBackup/preBackup
+
+*  com.palm.appinstaller/getUserInstalledAppSizes
+*  com.palm.appinstaller/queryInstallCapacity
+*  com.palm.appinstaller/install
+*  com.palm.appinstaller/installNoVerify
+*  com.palm.appinstaller/installProgressQuery
+*  com.palm.appinstaller/isInstalled
+*  com.palm.appinstaller/notifyOnChange
+*  com.palm.appinstaller/remove
+*  com.palm.appinstaller/revoke
+
+*  com.palm.applicationManager/addDockModeLaunchPoint
+*  com.palm.applicationManager/addLaunchPoint
+*  com.palm.applicationManager/addRedirectHandler
+*  com.palm.applicationManager/addResourceHandler
+*  com.palm.applicationManager/clearMimeTable
+*  com.palm.applicationManager/close
+*  com.palm.applicationManager/dumpMimeTable
+*  com.palm.applicationManager/forceSingleAppScan
+*  com.palm.applicationManager/getAppBasePath
+*  com.palm.applicationManager/getAppInfo
+*  com.palm.applicationManager/getHandlerForExtension
+*  com.palm.applicationManager/getHandlerForMimeType
+*  com.palm.applicationManager/getHandlerForMimeTypeByVerb
+*  com.palm.applicationManager/getHandlerForUrl
+*  com.palm.applicationManager/getHandlerForUrlByVerb
+*  com.palm.applicationManager/getResourceInfo
+*  com.palm.applicationManager/getSizeOfApps
+*  com.palm.applicationManager/inspect
+*  com.palm.applicationManager/install
+*  com.palm.applicationManager/launch
+*  com.palm.applicationManager/launchPointChanges
+*  com.palm.applicationManager/listAllHandlersForMime
+*  com.palm.applicationManager/listAllHandlersForMimeByVerb
+*  com.palm.applicationManager/listAllHandlersForMultipleMime
+*  com.palm.applicationManager/listAllHandlersForMultipleUrlPattern
+*  com.palm.applicationManager/listAllHandlersForUrl
+*  com.palm.applicationManager/listAllHandlersForUrlByVerb
+*  com.palm.applicationManager/listAllHandlersForUrlPattern
+*  com.palm.applicationManager/listApps
+*  com.palm.applicationManager/listDockModeLaunchPoints
+*  com.palm.applicationManager/listDockPoints
+*  com.palm.applicationManager/listExtensionMap
+*  com.palm.applicationManager/listLaunchPoints
+*  com.palm.applicationManager/listPackages
+*  com.palm.applicationManager/listPendingLaunchPoints
+*  com.palm.applicationManager/listRedirectHandlers
+*  com.palm.applicationManager/listResourceHandlers
+*  com.palm.applicationManager/mimeTypeForExtension
+*  com.palm.applicationManager/open
+*  com.palm.applicationManager/registerVerbsForRedirect
+*  com.palm.applicationManager/registerVerbsForResource
+*  com.palm.applicationManager/removeDockModeLaunchPoint
+*  com.palm.applicationManager/removeHandlersForAppId
+*  com.palm.applicationManager/removeLaunchPoint
+*  com.palm.applicationManager/rescan
+*  com.palm.applicationManager/resetToMimeDefaults
+*  com.palm.applicationManager/restoreMimeTable
+*  com.palm.applicationManager/running
+*  com.palm.applicationManager/saveMimeTable
+*  com.palm.applicationManager/searchApps
+*  com.palm.applicationManager/swapRedirectHandler
+*  com.palm.applicationManager/swapResourceHandler
+*  com.palm.applicationManager/updateLaunchPointIcon
+
+*  com.palm.display/status
+*  com.palm.display/control/getProperty
+*  com.palm.display/control/setProperty
+*  com.palm.display/control/setState
+*  com.palm.display/control/status
+
+*  com.palm.keys/audio/status
+*  com.palm.keys/headset/status
+*  com.palm.keys/media/status
+*  com.palm.keys/switches/status
+
+*..com.palm.systemmanager/applicationHasBeenTerminated
+*..com.palm.systemmanager/clearCache
+*..com.palm.systemmanager/dismissModalApp
+*..com.palm.systemmanager/getAnimationValues
+*..com.palm.systemmanager/getAppRestoreNeeded
+*..com.palm.systemmanager/getBootStatus
+*..com.palm.systemmanager/getDeviceLockMode
+*..com.palm.systemmanager/getDockModeStatus
+*..com.palm.systemmanager/getForegroundApplication
+*..com.palm.systemmanager/getLockStatus
+*..com.palm.systemmanager/getSecurityPolicy
+*..com.palm.systemmanager/getSystemStatus
+*..com.palm.systemmanager/launchModalApp
+*..com.palm.systemmanager/lockButtonTriggered
+*..com.palm.systemmanager/matchDevicePasscode
+*..com.palm.systemmanager/publishToSystemUI
+*..com.palm.systemmanager/runProgressAnimation
+*..com.palm.systemmanager/setAnimationValues
+*..com.palm.systemmanager/setDevicePasscode
+*..com.palm.systemmanager/setJavascriptFlags
+*..com.palm.systemmanager/subscribeToSystemUI
+*..com.palm.systemmanager/subscribeTurboMode
+*..com.palm.systemmanager/systemUi
+*..com.palm.systemmanager/takeScreenShot
+*..com.palm.systemmanager/touchToShareAppUrlTransferred
+*..com.palm.systemmanager/touchToShareDeviceInRange
+*..com.palm.systemmanager/updatePinAppState
+
+*  com.palm.vibrate/vibrate
+*  com.palm.vibrate/vibrateNamedEffect
 
 
 How to Build on Linux
 =====================
 
-Note:  The build script has been successfully tested on both Ubuntu 11.04 and 12.04 in 32bit mode.
+### Building the latest "stable" version
 
-a) Prerequisites
-----------------
+Clone the repository openwebos/build-desktop and follow the instructions in the README file.
 
-Install components needed to build luna-sysmgr by typing the following:
+### Building your local clone
 
-        sudo apt-get update
+First follow the directions to build the latest "stable" version.
 
-        sudo apt-get install git git-core pkg-config cmake make autoconf libtool g++ tcl unzip libyajl-dev libyajl1 qt4-qmake libsqlite3-dev curl
+To build your local clone of luna-sysmgr instead of the "stable" version installed with the build-webos-desktop script:  
+* Open the build-webos-desktop.sh script with a text editor
+* Locate the function build_luna-sysmgr
+* Change the line "cd $BASE/luna-sysmgr" to use your the folder with your clone, for example "cd ~/github/luna-sysmgr"
+* Close the text editor
+* Remove the file ~/luna-desktop-binaries/luna-sysmgr/luna-desktop-build.stamp
+* Start the build
 
-        sudo apt-get install gperf bison libglib2.0-dev libssl-dev libxi-dev libxrandr-dev libxfixes-dev libxcursor-dev libfreetype6-dev libxinerama-dev libgl1-mesa-dev libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev flex libicu-dev
-
-        sudo apt-get build-dep qt4-qmake
-
-  * Ensure you have a fast and reliable internet connection since you'll be downloading about 310MB
-  
-  * Ensure you have at least 3GB of available disk space
-
-b) Getting the code
--------------------
-
-Get the zip file and unzip it into a known directory.
-  
-c) Building luna-sysmgr
------------------------
- 
-Change to the folder where you downloaded the build script and run it:
-
-
-        ./build-luna-sysmgr.sh
-
-Note: This will typically take one to three hours, depending on the speed of your system and of your internet connection.
-
-d) Installing luna-sysmgr
--------------------------
-
-1) Change to the folder where the files are located:
-
-        cd ~/luna-desktop-binaries
-
-2) Install expected folders and links into /etc/palm:
-
-        sudo ./install-luna-sysmgr.sh
-
-How to Run on Linux
-===================
-
-Please note that this version of the build provides minimal runtime functionality.
-
-1) Change to the folder where the files are located:
-
-        cd ~/luna-desktop-binaries
-
-2) Start up the service bus:
-
-        ./service-bus.sh  start
-
-3) Run luna-sysmgr   (ignore the messages from LunaService):
-
-        ./run-luna-sysmgr.sh
-
-
-When you are finished running luna-sysmgr, stop the service bus:
-
-       ./service-bus.sh  stop
-
-# Known Issues
-
-1) Error messages are generated in the LunaService log file, which can be ignored.  
-2) Since the components supporting "Just Type" have not yet been released, attempting to enter text in the "Just Type" field will not work as expected.  
+Cautions:
+* When you re-clone openwebos/build-desktop, you'll have to overwrite your changes and reapply them
+* Components often advance in parallel with each other, so be prepared to keep your cloned repositories updated
+* Fetch and rebase frequently
 
 # Copyright and License Information
 
