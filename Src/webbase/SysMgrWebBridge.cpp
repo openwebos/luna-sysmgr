@@ -299,6 +299,8 @@ void SysMgrWebBridge::commitComposingText()
 
 void SysMgrWebBridge::commitText(const char* text)
 {
+    QKeyEvent fEvent(QEvent::KeyPress, 0, Qt::NoModifier, QString(text));
+    page()->event(&fEvent);
 }
 
 void SysMgrWebBridge::performEditorAction(PalmIME::FieldAction action)
