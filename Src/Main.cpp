@@ -692,7 +692,8 @@ int main( int argc, char** argv)
 	else
 		::setenv("QT_QPA_PLATFORM", "palm", 1);
 #else
-		::setenv("QT_QPA_PLATFORM", "palm", 1);
+    // Do not override the value if the variable exists
+    ::setenv("QT_QPA_PLATFORM", "palm", 0);
 #endif
 	
 	
