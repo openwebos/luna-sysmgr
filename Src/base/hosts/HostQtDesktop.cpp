@@ -27,6 +27,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGestureEvent>
+#include <QDesktopWidget>
 #include <QWidget>
 #include <QPushButton>
 #include <QTimer>
@@ -48,6 +49,37 @@ static QWidget *viewport(QWidget *widget)
 		return gView->viewport();
 	return widget;
 }
+
+// This is a temporary widget that allows as to query the current geometry
+// for a widget that has been maximized. This value will be used by
+// HostQtDesktop::init to go to fullscreen when width or height configured
+// as negative value
+class InspectorWidget : public QWidget
+{
+public:
+    InspectorWidget(QWidget* parent = 0) : QWidget(parent)
+    {
+        showMaximized();
+        installEventFilter(this);
+        setAttribute(Qt::WA_TranslucentBackground);
+    }
+
+    ~InspectorWidget() { }
+
+    bool eventFilter(QObject *object, QEvent *event)
+    {
+        if (object == this && event->type() == QEvent::Resize) {
+            maxGeometry = geometry();
+            QApplication::closeAllWindows();
+        }
+
+        return QWidget::eventFilter(object, event);
+    }
+
+public:
+    QRect maxGeometry;
+};
+
 
 class GestureStrip : public QWidget
 {
@@ -420,10 +452,26 @@ HostQtDesktop::~HostQtDesktop()
 
 void HostQtDesktop::init(int w, int h)
 {
-	m_info.displayBuffer = 0;
-	m_info.displayWidth = w;
-	m_info.displayHeight = h;
-	m_info.displayDepth = 32;
+    int windowWidth = w;
+    int windowHeight = h;
+    if (windowWidth < 0 || windowHeight < 0) {
+        int argc = 0;
+        char** argv = 0;
+        QApplication a(argc, argv);
+        InspectorWidget tmp;
+
+        tmp.show();
+        a.exec();
+
+        windowWidth = tmp.maxGeometry.width();
+        windowHeight = tmp.maxGeometry.height();
+        qDebug() << __PRETTY_FUNCTION__ << "Going fullscreen with width" << windowWidth << "height" << (windowHeight - GESTURE_AREA_HEIGHT);
+    }
+
+    m_info.displayBuffer = 0;
+    m_info.displayWidth = windowWidth;
+    m_info.displayHeight = windowHeight - GESTURE_AREA_HEIGHT;
+    m_info.displayDepth = 32;
 }
 
 void HostQtDesktop::show()
@@ -436,6 +484,7 @@ void HostQtDesktop::show()
 							 Qt::WindowCloseButtonHint);
 
 	m_widget->setAttribute(Qt::WA_AcceptTouchEvents);
+    m_widget->setWindowTitle("HP webOS");
 
 	m_widget->setFixedSize(m_info.displayWidth, m_info.displayHeight + GESTURE_AREA_HEIGHT);
 	m_widget->show();
