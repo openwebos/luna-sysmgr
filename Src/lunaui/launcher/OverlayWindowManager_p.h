@@ -1,3 +1,4 @@
+
 /* @@@LICENSE
 *
 *      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
@@ -50,7 +51,10 @@ public:
 	, m_qp_iconPmo(p_iconPixmap)
 	, m_noResize(true)
 	{
-		m_geom = geom;
+		// Cache the SearchPill in the QPixmapCache
+		// to improve speed during animations and panning
+                setCacheMode(QGraphicsItem::DeviceCoordinateCache);
+                m_geom = geom;
 		m_boundingRect = m_geom.adjusted(-0.5,-0.5,0.5,0.5);
 		if (m_qp_pillPmo)
 		{

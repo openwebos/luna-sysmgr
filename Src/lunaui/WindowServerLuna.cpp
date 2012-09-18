@@ -90,6 +90,9 @@ WindowServerLuna::WindowServerLuna()
 	, m_inDockModeTransition(false)
 	, m_dockModeTransitionDirection(false)
 {
+	// Cache the wallpaper in a QPixmapCache to improve speed
+        setCacheMode(QGraphicsView::CacheBackground);
+
 	m_qmlEngine = new QDeclarativeEngine;
 	m_qmlEngine->rootContext()->setContextProperty("runtime", Runtime::instance());
 
@@ -1012,6 +1015,7 @@ void WindowServerLuna::slotWallPaperChanged(const char* filePath)
 
 	m_wallpaperFileName = filePath;
 
+        resetCachedContent(); // Reset wallpaper cache
 	generateWallpaperImages();
 
 	update();
