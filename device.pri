@@ -23,10 +23,7 @@ BUILD_TYPE = release
 CONFIG -= debug
 CONFIG += release
 
-LIBS += \
-        -lluna-prefs -lPmLogLib -lhid \
-        -lmemchute \
-        -lmedia-api -lrolegen -lserviceinstall -laffinity \
+LIBS += -lluna-prefs -lPmLogLib -lrolegen 
 
 
 MACHINE_NAME = $$(MACHINE)
@@ -92,7 +89,7 @@ contains(MACHINE_NAME, "qemux86") {
     TARGET_TYPE = TARGET_EMULATOR
 
     # emulator doesn't support these libraries
-    LIBS -= -ljemalloc_mt -lpowerd -lmemchute -lhid -lmedia-api
+    LIBS -= -ljemalloc_mt -lpowerd 
     LIBS += -Wl,-rpath $$(STAGING_LIBDIR)
     SOURCES += SoundPlayerDummy.cpp
     HEADERS += SoundPlayerDummy.h
@@ -114,7 +111,8 @@ SOURCES += NyxInputControl.cpp \
 INCLUDEPATH += \
 		$$(STAGING_INCDIR)/glib-2.0 \
 		$$(STAGING_INCDIR)/webkit \
-		$$(STAGING_INCDIR)/webkit/npapi \
+        $$(STAGING_INCDIR)/QtWebKit \
+        $$(STAGING_INCDIR)/webkit/npapi \
 		$$(STAGING_INCDIR)/sysmgr-ipc \
 		$$(STAGING_INCDIR)/freetype2 \
 		$$(STAGING_INCDIR)/PmLogLib/IncsPublic \
@@ -125,4 +123,5 @@ contains(TARGET_TYPE, TARGET_DEVICE) {
         INCLUDEPATH +=  $$(STAGING_INCDIR)/hid/IncsPublic
         SOURCES += SoundPlayer.cpp
         HEADERS += SoundPlayer.h
+        LIBS += -lmedia-api  -lserviceinstall -laffinity -lhid -lmemchute
 }

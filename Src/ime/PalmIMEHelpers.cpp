@@ -22,6 +22,7 @@
 #include "PalmIMEHelpers.h"
 #include "Logging.h"
 #include <sys/times.h>
+#include <unistd.h>
 
 quint64 currentTime()
 {

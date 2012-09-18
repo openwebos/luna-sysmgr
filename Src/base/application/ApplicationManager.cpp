@@ -45,7 +45,8 @@
 #include "dimensionsmain.h"
 #include "WindowServerLuna.h"
 
-#if !defined(TARGET_DESKTOP)
+#if !(defined(TARGET_DESKTOP) || defined(TARGET_EMULATOR))
+// TODO:  Reactivate ServiceInstaller
 #include <serviceinstall.h>
 #endif
 
@@ -731,14 +732,16 @@ void ApplicationManager::createOrUpdatePackageManifest(PackageDescription* packa
 
 void ApplicationManager::serviceInstallerInstallApp(const std::string& id, const std::string& type, const std::string& root)
 {
-#if !defined(TARGET_DESKTOP)
+#if !(defined(TARGET_DESKTOP) || defined(TARGET_EMULATOR))
+// TODO:  Reactivate ServiceInstaller
 	::installApp(id, type, root);
 #endif
 }
 
 void ApplicationManager::serviceInstallerUninstallApp(const std::string& id, const std::string& type, const std::string& root)
 {
-#if !defined(TARGET_DESKTOP)
+#if !(defined(TARGET_DESKTOP) || defined(TARGET_EMULATOR))
+// TODO:  Reactivate ServiceInstaller
 	::uninstallApp(id, type, root);
 #endif
 }
