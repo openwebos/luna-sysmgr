@@ -2283,11 +2283,15 @@ bool DisplayManager::updateState (int eventType)
                 m_currentState->handleEvent (DisplayEventOffCall);
             }
             break;
-	case DISPLAY_EVENT_HOME_BUTTON_UP:
-	    {
-		m_currentState->handleEvent (DisplayEventHomeKeyPress);
-	    }
-	    break;
+        case DISPLAY_EVENT_HOME_BUTTON_UP:
+            {
+                if(HostBase::instance()->homeButtonWakesUpScreen())
+                {
+                    m_lastEvent = Time::curTimeMs();
+                }
+                m_currentState->handleEvent (DisplayEventHomeKeyPress);
+            }
+            break;
         default:
             g_warning("%s: unhandled eventType (%i)", __PRETTY_FUNCTION__, eventType);
     }
