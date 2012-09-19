@@ -880,11 +880,11 @@ static bool servicecallback_launch( LSHandle* lshandle, LSMessage *message,
 	std::string callerProcessId;
 	bool success=false;
 
-    // {"id": object { "lable" :string }, "params": [ string, object ]}
+    // {"id": object { "label" :string }, "params": [ string, object ]}
 
     VALIDATE_SCHEMA_AND_RETURN(lshandle,
                                message,
-                               SCHEMA_2(OBJECT_REQUIRED_1(id, label, string), REQUIRED_UNION_2(params, object, string)));
+                               SCHEMA_2(NAKED_OBJECT_REQUIRED_1(id, label, string), REQUIRED_UNION_2(params, object, string)));
 	const char* str = LSMessageGetPayload( message );
 	if (!str) {
 		errMsg = "No payload provided";

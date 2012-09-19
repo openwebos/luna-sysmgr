@@ -66,7 +66,7 @@ extern const char * STANDARD_JSON_SUCCESS;
 #define OPTIONAL(name, type) "\"" #name "\":{\"type\":\"" #type "\",\"optional\":true}"
 
 // Build a Union Schema
-#define REQUIRED_UNION_2(name, type1, type2) "\"" #name "\":{\"type\":[{\"type\":\"" #type1 "\"},{\"type\":\"" #type2 "\"}]\"}"
+#define REQUIRED_UNION_2(name, type1, type2) "\"" #name "\":{\"type\":[{\"type\":\"" #type1 "\"},{\"type\":\"" #type2 "\"}]}"
 
 // Build an Object Schema as a const char * string
 #define NAKED_OBJECT_EMPTY(objName)                                          "\"" #objName "\":{\"type\":\"object\",\"properties\":{" SYSTEM_PARAMETERS "},\"additionalProperties\":false}"
