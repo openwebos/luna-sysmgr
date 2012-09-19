@@ -2285,6 +2285,9 @@ bool DisplayManager::updateState (int eventType)
             break;
 	case DISPLAY_EVENT_HOME_BUTTON_UP:
 	    {
+		if(HostBase::instance()->homeButtonWakesUpScreen()) {
+			m_lastEvent = Time::curTimeMs();
+		}
 		m_currentState->handleEvent (DisplayEventHomeKeyPress);
 	    }
 	    break;
