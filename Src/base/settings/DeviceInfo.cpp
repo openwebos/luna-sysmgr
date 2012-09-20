@@ -111,12 +111,26 @@ void DeviceInfo::gatherInfo()
 	getLunaPrefSystemValue("com.palm.properties.ProdSN", m_serialNumber);
 	getLunaPrefSystemValue("com.palm.properties.DMCARRIER", m_carrierName);
 
-	getLunaPrefSystemValue("com.palm.properties.version", m_platformVersion);
-	if (m_platformVersion.find("Palm webOS ", 0) != std::string::npos) {
-		m_platformVersion = m_platformVersion.substr(11);
-	} else if (m_platformVersion.find("HP webOS ", 0) != std::string::npos) {
-		m_platformVersion = m_platformVersion.substr(9);
-	}
+	// If getLunaPrefSystemValue fails, such as luna-prefs not yet built for the platform, return
+        // a sane version number for applications
+        if(!getLunaPrefSystemValue("com.palm.properties.version", m_platformVersion))
+        {
+            // This should only be returned if the luna-prefs package is not working, or
+            // the luna-prefs system version has not been set.
+            m_platformVersion = "3.5.0";
+        }
+        else if (m_platformVersion.find("Palm webOS ", 0) != std::string::npos)
+        {
+            m_platformVersion = m_platformVersion.substr(11);
+        }
+        else if (m_platformVersion.find("HP webOS ", 0) != std::string::npos)
+        {
+            m_platformVersion = m_platformVersion.substr(9);
+        } 
+        else if (m_platformVersion.find("Open webOS ", 0) != std::string::npos)
+        {
+            m_platformVersion = m_platformVersion.substr(11);
+        }
 
         std::string platformVersion = m_platformVersion;
 
@@ -176,18 +190,17 @@ void DeviceInfo::gatherInfo()
 	// Keyboard configration -----------------------------------------------------
 
 	std::string hwName = HostBase::instance()->hardwareName();
-	if (hwName == "Desktop") {
-
-		m_keyboardAvailable = true;
-		m_keyboardSlider = false;
-        m_coreNaviButton = true;
-		m_keyboardType = "QWERTY";
-		m_swappableBattery = false;
-	}
-	else {
-
-		if (!getLunaPrefSystemValue("com.palm.properties.deviceNameShortBranded", m_modelName))
-			m_modelName = "webOS smartphone";
+        if (hwName == "Desktop") {
+            m_modelName = "Desktop";
+            m_modelNameAscii = "Desktop";
+            m_keyboardAvailable = true;
+            m_keyboardSlider = false;
+            m_coreNaviButton = true;
+            m_keyboardType = "QWERTY";
+            m_swappableBattery = false;
+        } else {
+            if (!getLunaPrefSystemValue("com.palm.properties.deviceNameShortBranded", m_modelName))
+                m_modelName = "webOS smartphone";
 
 		if (!getLunaPrefSystemValue("com.palm.properties.deviceNameShort", m_modelNameAscii))
 			m_modelNameAscii = "webOS smartphone";
