@@ -94,6 +94,17 @@ contains(MACHINE_NAME, "qemux86") {
     SOURCES += SoundPlayerDummy.cpp
     HEADERS += SoundPlayerDummy.h
 }
+contains(MACHINE_NAME, "qemuarm") {
+    DEFINES += MACHINE_QEMUARM
+    #DEFINES += ENABLE_JS_DEBUG_VERBOSE
+    TARGET_TYPE = TARGET_EMULATOR
+
+    # emulator doesn't support these libraries
+    LIBS -= -ljemalloc_mt -lpowerd 
+    LIBS += -Wl,-rpath $$(STAGING_LIBDIR)
+    SOURCES += SoundPlayerDummy.cpp
+    HEADERS += SoundPlayerDummy.h
+}
 
 DEFINES += $$TARGET_TYPE HAVE_LUNA_PREF=1 PALM_DEVICE QT_PLUGIN QT_STATICPLUGIN
 

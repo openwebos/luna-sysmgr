@@ -1266,7 +1266,7 @@ bool QuickLaunchBar::touchUpdateEvent(QTouchEvent *event)
 				else
 				{
 					RedirectContext nullContext;
-					//bypass the stupid qemux86 toolchain issue
+					//bypass the qemuXXX toolchain issue
 					pRedirectTarget->redirectedTouchTrackedPointMoved(this,it->id(),it->scenePos(),it->lastScenePos(),it->startScenePos(),nullContext);
 				}
 			}

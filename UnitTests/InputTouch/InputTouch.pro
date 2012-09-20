@@ -73,6 +73,11 @@ linux-qemux86-g++ {
 	QMAKE_CXXFLAGS += -fno-strict-aliasing
 }
 
+linux-qemuarm-g++ {
+    include(../../device.pri)
+    QMAKE_CXXFLAGS += -fno-strict-aliasing
+}
+
 linux-armv7-g++ {
 	include(../../device.pri)
 }
