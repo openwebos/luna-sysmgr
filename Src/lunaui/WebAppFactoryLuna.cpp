@@ -38,7 +38,7 @@ static const int kTableUiAlertWidth = 320;
 WebAppFactoryLuna::WebAppFactoryLuna()
 {
 	// If we are running on a tablet, update to use a different height
-	m_dashboardOwnsNegativeSpace = (!Settings::LunaSettings()->virtualKeyboardEnabled);
+	m_dashboardOwnsNegativeSpace = (Settings::LunaSettings()->virtualKeyboardEnabled ? false : (Settings::LunaSettings()->showNotificationsAtTop ? false : true));
 }
 
 WebAppBase* WebAppFactoryLuna::createWebApp(Window::Type winType, PIpcChannel* channel, ApplicationDescription* desc)
