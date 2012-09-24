@@ -367,6 +367,7 @@ void WindowedWebApp::paint()
 
     QPainter* ctxt = m_data->qtRenderingContext();
     m_data->beginPaint();
+    ctxt->setCompositionMode(QPainter::CompositionMode_Source);
 
     int px = m_paintRect.x();
     int py = m_paintRect.y();
@@ -374,6 +375,7 @@ void WindowedWebApp::paint()
     int ph = m_paintRect.height();
 
     ctxt->setClipRect(px, py, pw, ph);
+    ctxt->fillRect(m_paintRect,  Qt::transparent);
 
     page()->page()->mainFrame()->render(ctxt, QWebFrame::ContentsLayer, m_paintRect);
 
