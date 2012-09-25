@@ -484,7 +484,7 @@ void HostQtDesktop::show()
 							 Qt::WindowCloseButtonHint);
 
 	m_widget->setAttribute(Qt::WA_AcceptTouchEvents);
-    m_widget->setWindowTitle("HP webOS");
+    m_widget->setWindowTitle("Open webOS");
 
 	m_widget->setFixedSize(m_info.displayWidth, m_info.displayHeight + GESTURE_AREA_HEIGHT);
 	m_widget->show();

@@ -921,7 +921,7 @@ void StatusBarServicesConnector::handlePowerStatus(const char* radioState, bool 
 		}
 		m_phoneRadioState = true;
 		if (m_phoneType == PHONE_TYPE_NONE) {
-			sprintf(m_carrierText, "HP webOS");
+			sprintf(m_carrierText, "Open webOS");
 		}
 		else if (m_phoneType == PHONE_TYPE_GSM) {
 			sprintf(m_carrierText, "%s", LOCALIZED("Network search...").c_str());
@@ -1053,7 +1053,7 @@ void StatusBarServicesConnector::handleNetworkStatus(const char* networkState, s
 
 	//If it is wifi only device, update the status bar with default carrier text and return.
 	if (m_phoneType == PHONE_TYPE_NONE) {
-		sprintf(m_carrierText, "HP webOS");
+		sprintf(m_carrierText, "Open webOS");
 		Q_EMIT signalCarrierTextChanged(m_carrierText);
 		return;
 	}

@@ -45,7 +45,7 @@
 #include <QGestureEvent>
 
 QColor StatusBar::s_defaultColor = QColor(0x51, 0x55, 0x58, 0xFF);
-static const std::string kDefaultCarrierName = "HP webOS";
+static const std::string kDefaultCarrierName = "Open webOS";
 
 StatusBar::StatusBar(StatusBarType type, int width, int height)
 	: m_type(type)
