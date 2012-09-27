@@ -8,7 +8,7 @@
 		"ringtone":				{ "fullPath":"/usr/lib/luna/customization/copy_binaries/media/internal/ringtones/Pre.mp3" , "name":"Prē" },
 		"alerttone":			{ "fullPath":"/usr/palm/sounds/alert.wav" , "name":"alert.wav" },
 		"notificationtone":		{ "fullPath":"/usr/palm/sounds/notification.wav" , "name":"notification.wav" },
-		"wallpaper":			{ "wallpaperName":"flowers.png" , "wallpaperFile":"/usr/lib/luna/system/luna-systemui/images/flowers.png" , "wallpaperThumbFile":""},
+		"wallpaper":			{ "wallpaperName":"bluerocks.png" , "wallpaperFile":"/usr/lib/luna/system/luna-systemui/images/bluerocks.png" , "wallpaperThumbFile":""},
 		"airplaneMode":			false,
 		"showAlertsWhenLocked":	true,
 		"LEDThrobberEnabled":	true,
