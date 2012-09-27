@@ -2035,6 +2035,7 @@ void WindowServer::slotRotationAnimFinished()
 		rotatePendingWindows();
 	}
 	g_message("ROTATION: [%s]: ROTATION DONE ", __PRETTY_FUNCTION__);
+        resetCachedContent(); // Reset wallpaper cache
 }
 
 bool WindowServer::enqueueWindowForFlip(Window* window, QRect& windowScreenBoundaries, bool sync)

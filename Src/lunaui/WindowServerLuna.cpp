@@ -503,6 +503,7 @@ void WindowServerLuna::slotScreenLockStatusChanged(bool locked)
 			g_message("%s: [NOV-115353] overlaywm getting focus",__FUNCTION__);
 		}
 	}
+        resetCachedContent(); // Reset wallpaper cache
 }
 
 void WindowServerLuna::dockModeUiTransition(bool enter)
