@@ -67,7 +67,7 @@ contains(MACHINE_NAME, "topaz") {
 #	QMAKE_LFLAGS +=  
 ############
 
-	CONFIG_BUILD += opengl # texturesharing fb1poweroptimization directrendering 
+	CONFIG_BUILD += opengl directrendering # texturesharing fb1poweroptimization
 	CONFIG_BUILD += haptics webosdevice
     LIBS += -lqpalm
 }

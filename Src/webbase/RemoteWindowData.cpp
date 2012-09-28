@@ -45,7 +45,8 @@ RemoteWindowData* RemoteWindowDataFactory::generate(int width, int height, bool 
 	data = new RemoteWindowDataSoftwareTextureShared(width, height, hasAlpha);
 #elif defined(OPENGLCOMPOSITED)
 	data = new RemoteWindowDataSoftwareOpenGLComposited(width, height, hasAlpha);
-#elif defined(HAVE_OPENGL)
+    // for now, we don't support remote OpenGL on Desktop
+#elif defined(HAVE_OPENGL) && defined(DIRECT_RENDERING)
     data = new RemoteWindowDataOpenGLQt(width, height, hasAlpha);
 #else
 	data = new RemoteWindowDataSoftwareQt(width, height, hasAlpha);

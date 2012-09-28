@@ -449,8 +449,6 @@ WindowServer::WindowServer()
 	setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing, true);
 	scene->setItemIndexMethod(QGraphicsScene::NoIndex);
 
-	setViewport(viewportWidget);
-
 	viewportWidget->grabGesture(Qt::TapGesture);
 	viewportWidget->grabGesture(Qt::TapAndHoldGesture);
 	viewportWidget->grabGesture(Qt::PinchGesture);
@@ -470,7 +468,11 @@ WindowServer::WindowServer()
 
     m_orientation = OrientationEvent::Orientation_Up;
 
+    // The Qt QPA system and/or the XCB QPA has trouble with reparenting nested OpenGL widgets. It will destroy the platform
+    // context before reparenting without recreating it. We can avoid this by setting the viewport only after we move this widget
+    // into the layout through setCentralWidget. Just working around a XCB/QPA bug.
 	HostBase::instance()->setCentralWidget(this);
+    setViewport(viewportWidget);
 
 	m_uiElementsGroup = new QGraphicsItemGroup;
 	m_uiElementsGroup->setZValue(1000);

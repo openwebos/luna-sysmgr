@@ -47,9 +47,7 @@ isEmpty (WEBKIT_PATH) {
 DEFINES += TARGET_DESKTOP
 #DEFINES += ENABLE_JS_DEBUG_VERBOSE
 
-# OpenGL is disabled for now as it does not play nice
-# with the xcb QPA that will be used in the desktiop build
-#CONFIG_BUILD += opengl
+CONFIG_BUILD += opengl
 
 #CONFIG_BUILD += openglcomposited
 
