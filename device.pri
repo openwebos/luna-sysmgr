@@ -30,24 +30,24 @@ MACHINE_NAME = $$(MACHINE)
 
 contains(MACHINE_NAME, "chile") {
 	DEFINES += MACHINE_CHILE
-	CONFIG_BUILD += opengl
+	CONFIG_BUILD += opengl webosdevice
     LIBS += -lqpalm
 }
 contains(MACHINE_NAME, "broadway") {
 	DEFINES += MACHINE_BROADWAY
 	CONFIG_BUILD += opengl texturesharing directrendering
-	CONFIG_BUILD += haptics
+	CONFIG_BUILD += haptics webosdevice
     LIBS += -lqpalm
 }
 contains(MACHINE_NAME, "mantaray") {
 	DEFINES += MACHINE_MANTARAY
 	CONFIG_BUILD += opengl openglcomposited directrendering
-	CONFIG_BUILD += haptics
+	CONFIG_BUILD += haptics webosdevice
     LIBS += -lqpalm
 }
 contains(MACHINE_NAME, "windsornot") {
 	DEFINES += MACHINE_WINDSORNOT
-	CONFIG_BUILD += opengl openglcomposited directrendering
+	CONFIG_BUILD += opengl openglcomposited directrendering webosdevice
     LIBS += -lqpalm
 }
 contains(MACHINE_NAME, "topaz") {
@@ -68,42 +68,20 @@ contains(MACHINE_NAME, "topaz") {
 ############
 
 	CONFIG_BUILD += opengl # texturesharing fb1poweroptimization directrendering 
-	CONFIG_BUILD += haptics
+	CONFIG_BUILD += haptics webosdevice
     LIBS += -lqpalm
 }
 contains(MACHINE_NAME, "opal") {
 	DEFINES += MACHINE_OPAL
 	CONFIG_BUILD += opengl texturesharing directrendering
-	CONFIG_BUILD += haptics
+	CONFIG_BUILD += haptics webosdevice
     LIBS += -lqpalm
 }
 contains(MACHINE_NAME, "pyramid") {
 	DEFINES += MACHINE_PYRAMID
 	CONFIG_BUILD += opengl 
-	CONFIG_BUILD += haptics
+	CONFIG_BUILD += haptics webosdevice
     LIBS += -lqpalm
-}
-contains(MACHINE_NAME, "qemux86") {
-    DEFINES += MACHINE_QEMUX86
-    #DEFINES += ENABLE_JS_DEBUG_VERBOSE
-    TARGET_TYPE = TARGET_EMULATOR
-
-    # emulator doesn't support these libraries
-    LIBS -= -ljemalloc_mt -lpowerd 
-    LIBS += -Wl,-rpath $$(STAGING_LIBDIR)
-    SOURCES += SoundPlayerDummy.cpp
-    HEADERS += SoundPlayerDummy.h
-}
-contains(MACHINE_NAME, "qemuarm") {
-    DEFINES += MACHINE_QEMUARM
-    #DEFINES += ENABLE_JS_DEBUG_VERBOSE
-    TARGET_TYPE = TARGET_EMULATOR
-
-    # emulator doesn't support these libraries
-    LIBS -= -ljemalloc_mt -lpowerd 
-    LIBS += -Wl,-rpath $$(STAGING_LIBDIR)
-    SOURCES += SoundPlayerDummy.cpp
-    HEADERS += SoundPlayerDummy.h
 }
 
 DEFINES += $$TARGET_TYPE HAVE_LUNA_PREF=1 PALM_DEVICE QT_PLUGIN QT_STATICPLUGIN
@@ -130,9 +108,12 @@ INCLUDEPATH += \
 		$$(STAGING_INCDIR)/napp \
 		$$(STAGING_INCDIR)/ime \
 
-contains(TARGET_TYPE, TARGET_DEVICE) {
-        INCLUDEPATH +=  $$(STAGING_INCDIR)/hid/IncsPublic
-        SOURCES += SoundPlayer.cpp
-        HEADERS += SoundPlayer.h
-        LIBS += -lmedia-api  -lserviceinstall -laffinity -lhid -lmemchute
+contains(CONFIG_BUILD, webosdevice) {
+    INCLUDEPATH +=  $$(STAGING_INCDIR)/hid/IncsPublic
+    SOURCES += SoundPlayer.cpp
+    HEADERS += SoundPlayer.h
+    LIBS += -lmedia-api  -lserviceinstall -laffinity -lhid -lmemchute
+} else {
+    warning($$MACHINE_NAME not matched in device.pri)
+
 }

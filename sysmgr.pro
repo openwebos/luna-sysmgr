@@ -36,6 +36,8 @@ TEMPLATE = app
 
 CONFIG += qt
 
+TARGET_TYPE = 
+
 ENV_BUILD_TYPE = $$(BUILD_TYPE)
 !isEmpty(ENV_BUILD_TYPE) {
 	CONFIG -= release debug
@@ -655,27 +657,24 @@ QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-parameter -Wno-unused-variable -Wno-reorde
 
 LIBS += -lcjson -lLunaSysMgrIpc -llunaservice -lpbnjson_cpp -lssl -lsqlite3 -lssl -lcrypto -lnyx
 
-linux-g++|linux-g++-64 {
-	include(desktop.pri)
-}
-
-linux-qemux86-g++ {
-	include(device.pri)
+linux-g++ {
+    include(desktop.pri)
+} else:linux-g++-64 {
+    include(desktop.pri)
+} else:linux-qemux86-g++ {
+	include(emulator.pri)
 	QMAKE_CXXFLAGS += -fno-strict-aliasing
+} else {
+    ## First, check to see if this in an emulator build
+    include(emulator.pri)
+    contains (CONFIG_BUILD, webosemulator) {
+        QMAKE_CXXFLAGS += -fno-strict-aliasing
+    } else {
+        ## Neither a desktop nor an emulator build, so must be a device
+        include(device.pri)
+    }
 }
 
-linux-qemuarm-g++ {
-    include(device.pri)
-    QMAKE_CXXFLAGS += -fno-strict-aliasing
-}
-
-linux-armv7-g++ {
-	include(device.pri)
-}
-
-linux-armv6-g++ {
-	include(device.pri)
-}
 
 contains(CONFIG_BUILD, opengl) {
 	QT += opengl
