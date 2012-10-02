@@ -930,7 +930,12 @@ void WindowServerLuna::generateWallpaperImages()
 	if (image.isNull())
 		return;
 
-	if(((image.width() < screenWidth) || (image.height() < screenHeight)) && ((image.height() < screenWidth) || (image.width() < screenHeight))) {
+	bool desktop(false);
+#ifdef TARGET_DESKTOP
+	desktop = true;
+#endif
+
+	if(((image.width() < screenWidth) || (image.height() < screenHeight)) && ((image.height() < screenWidth) || (image.width() < screenHeight)) && !desktop) {
 		// image is not large enough to fill the screen in any orientation, so do not scale it and
 		// draw it centered on the screen
 		m_normalWallpaperImage = QPixmap(image.width(), image.height());
