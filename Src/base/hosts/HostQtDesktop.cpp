@@ -22,6 +22,7 @@
 #include "Common.h"
 
 #include "HostQtDesktop.h"
+#include "Settings.h"
 
 #include <QApplication>
 #include <QHBoxLayout>
@@ -40,7 +41,7 @@
 #include "FlickGesture.h"
 #include "FlickGestureRecognizer.h"
 
-static const int GESTURE_AREA_HEIGHT = 50;
+static const int GESTURE_AREA_HEIGHT = Settings::LunaSettings()->gestureAreaHeight || 50;
 
 static QWidget *viewport(QWidget *widget)
 {

@@ -94,6 +94,7 @@ public:
 	
 	int					displayWidth;
 	int					displayHeight;
+	int					gestureAreaHeight;
 	int                 displayNumBuffers;
 
 	// parameters to control led pulsing
