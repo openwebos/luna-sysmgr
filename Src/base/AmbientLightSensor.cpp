@@ -46,6 +46,10 @@
 
 AmbientLightSensor* AmbientLightSensor::m_instance = NULL;
 
+/*! \page com_palm_ambient_light_sensor_control Service API com.palm.ambientLightSensor/control/
+ *  Public methods:
+ *  - \ref com_palm_ambient_light_sensor_control_status
+ */
 static LSMethod alsMethods[] = {
     {"status", AmbientLightSensor::controlStatus},
     {},
@@ -543,6 +547,103 @@ end:
 #endif
 }
 
+/*!
+\page com_palm_ambient_light_sensor_control
+\n
+\section com_palm_ambient_light_sensor_control_status status
+
+\e Public.
+
+com.palm.ambientLightSensor/control/status
+
+Get status and optionally enable or disable the ambient light sensor.
+
+\subsection com_palm_ambient_light_sensor_control_status_syntax Syntax:
+\code
+{
+    "subscribe": boolean,
+    "disableALS": boolean
+}
+\endcode
+
+\param subscribe Set to true to receive status updates.
+\param disableALS If \e subscribe is set to true, set this to true to disable the ambient light sensor.
+
+\subsection com_palm_ambient_light_sensor_control_status_returns_call Returns for a call:
+\code
+{
+    "returnValue": boolean,
+    "current": int,
+    "average": int,
+    "disabled": boolean,
+    "subscribed": boolean
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param current Current value of the ambient light sensor.
+\param average Average value of the ambient light sensor.
+\param disabled True if ambient light sensor is disabled.
+\param subscribed True if subscribed to receive status updates.
+
+\subsection com_palm_ambient_light_sensor_control_status_returns_status Returns for status updates:
+\code
+{
+    "returnValue": boolean,
+    "current": int,
+    "region": int
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param current Current value of the ambient light sensor.
+\param region A value between 0-4 describing the amount of ambient light:
+\li 0: Undefined, when the sensor is disabled.
+\li 1: Dark
+\li 2: Dim
+\li 3: Indoor
+\li 4: Outdoor
+
+\subsection com_palm_ambient_light_sensor_control_status_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.ambientLightSensor/control/status '{ "subscribe": true, "disableALS": false }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "current": 6,
+    "average": 187,
+    "disabled": true,
+    "subscribed": true
+}
+\endcode
+
+Example status updates:
+\code
+{
+    "returnValue": true,
+    "current": 184,
+    "region": 3
+}
+{
+    "returnValue": true,
+    "current": 179,
+    "region": 3
+}
+{
+    "returnValue": true,
+    "current": 171,
+    "region": 3
+}
+{
+    "returnValue": true,
+    "current": 66,
+    "region": 3
+}
+\endcode
+*/
 bool AmbientLightSensor::controlStatus(LSHandle *sh, LSMessage *message, void *ctx)
 {
 #if defined (TARGET_DEVICE)

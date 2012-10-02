@@ -82,9 +82,159 @@ static std::string getAbsolutePath(const std::string& inStr,
 #include "../tests/mime.cpp"
 #endif
 
+
+/*! \page com_palm_application_manager Service API com.palm.applicationManager/
+ *
+ *  Public methods:
+ *  - \ref com_palm_application_manager_add_launch_point
+ *  - \ref com_palm_application_manager_get_app_base_path
+ *  - \ref com_palm_application_manager_get_handler_for_extension
+ *  - \ref com_palm_application_manager_get_handler_for_mime_type
+ *  - \ref com_palm_application_manager_get_handler_for_mime_type_by_verb
+ *  - \ref com_palm_application_manager_get_handler_for_url
+ *  - \ref com_palm_application_manager_get_handler_for_url_by_verb
+ *  - \ref com_palm_application_manager_launch
+ *  - \ref com_palm_application_manager_list_all_handlers_for_mime
+ *  - \ref com_palm_application_manager_list_all_handlers_for_mime_by_verb
+ *  - \ref com_palm_application_manager_list_all_handlers_for_multiple_mime
+ *  - \ref com_palm_application_manager_list_all_handlers_for_multiple_url_pattern
+ *  - \ref com_palm_application_manager_list_all_handlers_for_url
+ *  - \ref com_palm_application_manager_list_all_handlers_for_url_by_verb
+ *  - \ref com_palm_application_manager_list_all_handlers_for_url_pattern
+ *  - \ref com_palm_application_manager_list_extension_map
+ *  - \ref com_palm_application_manager_mime_type_for_extension
+ *  - \ref com_palm_application_manager_open
+ *  - \ref com_palm_application_manager_remove_launch_point
+ *  - \ref com_palm_application_manager_update_launch_point_icon
+ *
+ *
+ *  Private methods:
+ *  - \ref com_palm_application_manager_add_dock_mode_launch_point
+ *  - \ref com_palm_application_manager_add_redirect_handler
+ *  - \ref com_palm_application_manager_add_resource_handler
+ *  - \ref com_palm_application_manager_clear_mime_table
+ *  - \ref com_palm_application_manager_close
+ *  - \ref com_palm_application_manager_dump_mime_table
+ *  - \ref com_palm_application_manager_force_single_app_scan
+ *  - \ref com_palm_application_manager_get_app_info
+ *  - \ref com_palm_application_manager_get_resource_info
+ *  - \ref com_palm_application_manager_get_size_of_apps
+ *  - \ref com_palm_application_manager_inspect
+ *  - \ref com_palm_application_manager_install
+ *  - \ref com_palm_application_manager_launch_point_changes
+ *  - \ref com_palm_application_manager_list_apps
+ *  - \ref com_palm_application_manager_list_dock_mode_launch_points
+ *  - \ref com_palm_application_manager_list_dock_points
+ *  - \ref com_palm_application_manager_list_launch_points
+ *  - \ref com_palm_application_manager_list_packages
+ *  - \ref com_palm_application_manager_list_pending_launch_points
+ *  - \ref com_palm_application_manager_register_verbs_for_redirect
+ *  - \ref com_palm_application_manager_register_verbs_for_resource
+ *  - \ref com_palm_application_manager_remove_dock_mode_launch_point
+ *  - \ref com_palm_application_manager_remove_handlers_for_app_id
+ *  - \ref com_palm_application_manager_rescan
+ *  - \ref com_palm_application_manager_reset_to_mime_defaults
+ *  - \ref com_palm_application_manager_restore_mime_table
+ *  - \ref com_palm_application_manager_running
+ *  - \ref com_palm_application_manager_save_mime_table
+ *  - \ref com_palm_application_manager_search_apps
+ *  - \ref com_palm_application_manager_swap_redirect_handler
+ *  - \ref com_palm_application_manager_swap_resource_handler
+ *
+ */
+/*  Leaving these out as the functionality is not implemented.
+ *  - \ref com_palm_application_manager_list_redirect_handlers
+ *  - \ref com_palm_application_manager_list_resource_handlers
+ */
+
 static LSHandle*  listRunningApps_lshandle = 0;
 QList<LSMessage*> listRunningApps_messages;
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_running running
+
+\e Private.
+
+com.palm.applicationManager/running
+
+List all the applications and their process IDs that are running in LunaSysMgr.
+
+\subsection com_palm_application_manager_running_syntax Syntax:
+\code
+{
+}
+\endcode
+
+\subsection com_palm_application_manager_running_returns Returns:
+\code
+{
+    "running": [
+        {
+            "id": string,
+            "processid": string
+        },
+        "returnValue": boolean
+    ]
+}
+\endcode
+
+\param running Object array with the running applications. See fields below.
+\param id Application's ID.
+\param processid Process ID for the application.
+\param returnValue Indicates if the call was succesful.
+
+\subsection com_palm_application_manager_running_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/running '{}'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "running": [
+        {
+            "id": "com.palm.systemui",
+            "processid": "1000"
+        },
+        {
+            "id": "com.palm.launcher",
+            "processid": "1001"
+        },
+        {
+            "id": "com.palm.app.email",
+            "processid": "1002"
+        },
+        {
+            "id": "com.palm.app.phone",
+            "processid": "1003"
+        },
+        {
+            "id": "com.palm.app.messaging",
+            "processid": "1004"
+        },
+        {
+            "id": "com.palm.app.calendar",
+            "processid": "1005"
+        },
+        {
+            "id": "com.palm.app.photos",
+            "processid": "1012"
+        },
+        {
+            "id": "com.palm.app.musicplayer",
+            "processid": "1015"
+        },
+        {
+            "id": "com.palm.systemui",
+            "processid": "1051"
+        }
+    ],
+    "returnValue": true
+}
+\endcode
+*/
 static bool servicecallback_listRunningApps( LSHandle* lshandle,
 		LSMessage *message, void *user_data)
 {
@@ -122,11 +272,59 @@ void appManagerCallback_listRunningApps( const std::string& runnigAppsJsonArray 
 	listRunningApps_messages.clear();
 }
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_close close
 
-/**
-	\fn com.palm.applicationManager/close (previously kill)
-	\brief close an application in the system manager.
- */
+\e Private.
+
+com.palm.applicationManager/close
+
+Close an application in the system manager.
+
+\subsection com_palm_application_manager_close_syntax Syntax:
+\code
+{
+    "processId": string
+}
+\endcode
+
+\param processId ID of the process to close.
+
+\subsection com_palm_application_manager_close_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "errorText": string
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param errorText Describes the error if call was not succesful.
+
+\note The \e returnValue will be true as long as the syntax is correct, even if the process ID is not a valid one.
+
+\subsection com_palm_application_manager_close_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/close '{ "processId": "1052" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false,
+    "errorText": "Must provide a valid processId to close"
+}
+\endcode
+*/
 static bool servicecallback_close( LSHandle* lshandle, LSMessage *message,
 		void *user_data)
 {
@@ -198,10 +396,71 @@ static bool isMeaninglessMimeType(const std::string& mimeStr)
 	return false;
 }
 
-/**
-	\fn com.palm.applicationManager/getResourceInfo
-	\brief get the content type and appid(s) of the handler(s) for this type.
- */
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_get_resource_info getResourceInfo
+
+\e Private.
+
+com.palm.applicationManager/getResourceInfo
+
+Get content type and appid(s) of the handler(s) for a resource.
+
+\subsection com_palm_application_manager_get_resource_info_syntax Syntax:
+\code
+{
+    "uri": string,
+    "mime": string
+}
+\endcode
+
+\param uri Resource URI. \e Required.
+\param mime Mime type for the resource.
+
+\subsection com_palm_application_manager_get_resource_info_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "uri": string,
+    "appIdByExtension": string,
+    "mimeByExtension": string,
+    "canStream": boolean,
+    "errorText": string
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param uri The resource URI.
+\param appIdByExtension Application ID of the handler application.
+\param mimeByExtension Mime type for the URI.
+\param canStream Is the resource streamable.
+\param errorText Describes the error if the call was not succesful.
+
+\subsection com_palm_application_manager_get_resource_info_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/getResourceInfo '{ "uri": "file:///media/internal/downloads/pat5463489.pdf" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "uri": "file:\/\/\/media\/internal\/downloads\/pat5463489.pdf",
+    "appIdByExtension": "com.quickoffice.ar",
+    "mimeByExtension": "application\/pdf",
+    "canStream": false
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false,
+    "errorText": "can't find a handler for the given uri"
+}
+\endcode
+*/
 static bool servicecallback_getresourceinfo( LSHandle* lshandle, LSMessage *message,
 		void *user_data)
 {
@@ -340,10 +599,156 @@ static bool servicecallback_getresourceinfo( LSHandle* lshandle, LSMessage *mess
 	return true;
 }
 
-/**
-	\fn com.palm.applicationManager/getAppInfo
-	\brief return the app information (title,...) for a given appid
- */
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_get_app_info getAppInfo
+
+\e Private.
+
+com.palm.applicationManager/getAppInfo
+
+Get application information for a given application ID.
+
+\subsection com_palm_application_manager_get_app_info_syntax Syntax:
+\code
+{
+     "appId": string
+}
+\endcode
+
+\param appId: The application's ID.
+
+\subsection com_palm_application_manager_get_app_info_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "appId": string,
+    "appInfo": object
+    "errorText": string
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param appId The application's ID.
+\param appInfo Object containing information about the appliation.
+\param errorText Description of error if call was not succesful.
+
+\subsection com_palm_application_manager_get_app_info_examples Example calls:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/getAppInfo '{ "appId": "com.palm.app.browser" }'
+\endcode
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/getAppInfo '{ "appId": "com.palm.app.musicplayer" }'
+\endcode
+
+Example responses for succesful calls:
+\code
+{
+    "returnValue": true,
+    "appId": "com.palm.app.browser",
+    "appInfo": {
+        "id": "com.palm.app.browser",
+        "main": "file:\/\/\/usr\/palm\/applications\/com.palm.app.browser\/index.html",
+        "version": "3.0.1",
+        "category": "",
+        "title": "Web",
+        "appmenu": "Web",
+        "vendor": "HP",
+        "vendorUrl": "",
+        "size": 0,
+        "icon": "\/usr\/palm\/applications\/com.palm.app.browser\/icon.png",
+        "removable": false,
+        "userInstalled": false,
+        "hasAccounts": false,
+        "universalSearch": {
+            "dbsearch": {
+                "displayName": "Bookmarks & History",
+                "url": "com.palm.app.browser",
+                "launchParam": "url",
+                "launchParamDbField": "url",
+                "displayFields": [
+                    "title",
+                    "url"
+                ],
+                "dbQuery": [
+                    {
+                        "method": "search",
+                        "params": {
+                            "query": {
+                                "from": "com.palm.browserbookmarks:1",
+                                "where": [
+                                    {
+                                        "prop": "searchText",
+                                        "op": "?",
+                                        "val": "",
+                                        "collate": "primary"
+                                    }
+                                ],
+                                "limit": 20
+                            }
+                        }
+                    },
+                    {
+                        "method": "search",
+                        "params": {
+                            "query": {
+                                "from": "com.palm.browserhistory:1",
+                                "where": [
+                                    {
+                                        "prop": "searchText",
+                                        "op": "?",
+                                        "val": "",
+                                        "collate": "primary"
+                                    }
+                                ],
+                                "limit": 50
+                            }
+                        }
+                    }
+                ],
+                "batchQuery": true
+            }
+        },
+        "uiRevision": 2,
+        "tapToShareSupported": true
+    }
+}
+\endcode
+\code
+{
+    "returnValue": true,
+    "appId": "com.palm.app.musicplayer",
+    "appInfo": {
+        "id": "com.palm.app.musicplayer",
+        "main": "file:\/\/\/usr\/palm\/applications\/com.palm.app.musicplayer\/index.html",
+        "version": "3.0.1",
+        "category": "",
+        "title": "Music",
+        "appmenu": "Music",
+        "vendor": "HP",
+        "vendorUrl": "",
+        "size": 0,
+        "icon": "\/usr\/palm\/applications\/com.palm.app.musicplayer\/icon.png",
+        "removable": false,
+        "userInstalled": false,
+        "hasAccounts": false,
+        "uiRevision": 2,
+        "tapToShareSupported": false
+    }
+}
+
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false,
+    "errorText": "Invalid appId specified: com.palm.app.photo"
+}
+
+\endcode
+*/
 static bool servicecallback_getappinfo( LSHandle* lshandle, LSMessage *message,
 		void *user_data)
 {
@@ -419,11 +824,61 @@ static bool servicecallback_getappinfo( LSHandle* lshandle, LSMessage *message,
 	return true;
 }
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_install install
 
-/**
-	\fn com.palm.applicationManager/install
-	\brief Install an application in the system manager.
- */
+\e Private.
+
+com.palm.applicationManager/install
+
+Install an application in the system manager.
+
+\subsection com_palm_application_manager_install_syntax Syntax:
+\code
+{
+    "target": string,
+    "authToken": string,
+    "deviceId": string
+}
+\endcode
+
+\param target The package to install. \e Required.
+\param authToken Authorization token. Only used for remote packages.
+\param deviceId Device ID. Only used for remote packages.
+
+\subsection com_palm_application_manager_install_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "errorText": string
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param errorText Describes the error if call was not succesful.
+
+\subsection com_palm_application_manager_install_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/install '{ "target": "/tmp/notavalidpackage" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false,
+    "errorText": "Not a valid install target"
+}
+\endcode
+*/
 static bool servicecallback_install( LSHandle* lshandle, LSMessage *message,
 		void *user_data)
 {
@@ -557,11 +1012,158 @@ static bool servicecallback_install( LSHandle* lshandle, LSMessage *message,
 }
 
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_open open
 
-/**
-  \fn com.palm.applicationManager/open
-  \brief Open/Launch an application in the system manager.
- */
+\e Public.
+
+com.palm.applicationManager/open
+
+Launch an application or open a resource in the system manager.
+
+\subsection com_palm_application_manager_open_syntax Syntax:
+\code
+{
+    "id": string,
+    "target": string,
+    "mime": string,
+    "params": [ string, object ],
+    "authToken": object,
+    "deviceId": object,
+    "overrideHandlerAppId": string,
+    "fileName": string,
+    "subscribe": boolean
+}
+\endcode
+
+\param id ID of the application to open. Either this or \e target is needed.
+\param target A target URL. If \e id is not specified, this URL is opened in an appropriate application, if there is one.
+\param mime Mime type for \a target.
+\param params Additional launch parameters for the application.
+\param authToken Authorization token given to download manager when opening a remote file. \e deviceId is required with this.
+\param deviceId Device ID given to download manager when opening a remote file. \e authToken is required with this.
+\param overrideHandlerAppId If specified, this appid will be used to open a resource
+\param fileName File name of \e target.
+\param Set to true to receive status updates, for example when opening a remote file.
+
+\subsection com_palm_application_manager_open_examples Examples:
+Open browser application:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/open '{"id": "com.palm.app.browser" }'
+\endcode
+This returns:
+\code
+{
+    "processId": "success",
+    "returnValue": true
+}
+\endcode
+
+Open a local music file:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/open '{ "target": " /media/internal/downloads/this_is_revolution/02 - No Control - Lunar Cycle.mp3", "mime": "audio/mpa" }'
+\endcode
+If the URL was correct, this returns:
+\code
+{
+    "processId": "success",
+    "returnValue": true
+}
+\endcode
+
+Download and view US patent number 5,463,489 from www.pat2pdf.org:
+\code
+luna-send -n 20 -f luna://com.palm.applicationManager/open '{ "target": "http://www.pat2pdf.org/patents/pat5463489.pdf", "subscribe": true }'
+\endcode
+This returns:
+\code
+{
+    "ticket": "8",
+    "result": "Download requested",
+    "subscribed": true,
+    "returnValue": false,
+    "errorText": ""
+}
+{
+    "returnValue": true,
+    "url": "http:\/\/www.pat2pdf.org\/patents\/pat5463489.pdf",
+    "target": "\/media\/internal\/downloads\/pat5463489_2.pdf",
+    "subscribed": true,
+    "ticket": "8"
+}
+{
+    "amountReceived": 2666,
+    "amountTotal": 827727,
+    "ticket": "8"
+}
+{
+    "amountReceived": 106922,
+    "amountTotal": 827727,
+    "ticket": "8"
+}
+{
+    "amountReceived": 223138,
+    "amountTotal": 827727,
+    "ticket": "8"
+}
+{
+    "amountReceived": 333266,
+    "amountTotal": 827727,
+    "ticket": "8"
+}
+{
+    "amountReceived": 447658,
+    "amountTotal": 827727,
+    "ticket": "8"
+}
+{
+    "amountReceived": 562050,
+    "amountTotal": 827727,
+    "ticket": "8"
+}
+{
+    "amountReceived": 666306,
+    "amountTotal": 827727,
+    "ticket": "8"
+}
+{
+    "amountReceived": 770106,
+    "amountTotal": 827727,
+    "ticket": "8"
+}
+{
+    "url": "http:\/\/www.pat2pdf.org\/patents\/pat5463489.pdf",
+    "sourceUrl": "http:\/\/www.pat2pdf.org\/patents\/pat5463489.pdf",
+    "deviceId": "",
+    "authToken": "",
+    "destTempPrefix": ".",
+    "destFile": "pat5463489_2.pdf",
+    "destPath": "\/media\/internal\/downloads\/",
+    "mimetype": "application\/pdf",
+    "amountReceived": 827727,
+    "amountTotal": 827727,
+    "canHandlePause": false,
+    "cookieHeader": "",
+    "completionStatusCode": 200,
+    "httpStatus": 200,
+    "interrupted": false,
+    "completed": true,
+    "aborted": false,
+    "target": "\/media\/internal\/downloads\/pat5463489_2.pdf",
+    "ticket": "8"
+}
+\endcode
+
+Example response for a failed call without \e target or \e id:
+\code
+{
+    "returnValue": false,
+    "errorText": "Unable to process command. Provide a valid \"id\" or \"target\" field"
+}
+\endcode
+*/
 static bool servicecallback_open( LSHandle* lshandle, LSMessage *message,
 		void *user_data)
 {
@@ -857,12 +1459,64 @@ static bool servicecallback_open( LSHandle* lshandle, LSMessage *message,
 	return true;
 }
 
-/**
-	\fn com.palm.applicationManager/launch
-	\brief Launch an application in the system manager.
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_launch launch
 
-	This differs from open in that it JUST blindly launches the specified id
- */
+\e Public.
+
+com.palm.applicationManager/launch
+
+Launch an application in the system manager.
+
+This differs from \e open in that it JUST blindly launches the specified id.
+
+\subsection com_palm_application_manager_launch_syntax Syntax:
+\code
+{
+    "id": string,
+    "params": [ string/object array ]
+}
+\endcode
+
+\param id The application ID.
+\param params Parameters for the application.
+
+\subsection com_palm_application_manager_launch_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "processId": string,
+    "errorText": string
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param processId Process ID for the launched application.
+\param errorText Describes the error if call was not succesful.
+
+\subsection com_palm_application_manager_launch_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/launch '{ "id": "com.palm.app.musicplayer", "params": [] }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "processId": "success"
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false,
+    "errorText": "Malformed JSON detected in payload"
+}
+\endcode
+*/
 static bool servicecallback_launch( LSHandle* lshandle, LSMessage *message,
 		void *user_data)
 {
@@ -972,9 +1626,105 @@ static bool servicecallback_launch( LSHandle* lshandle, LSMessage *message,
 
 }
 
-/**
-	ListApps: This returns all the registered apps
- */
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_list_apps listApps
+
+\e Private.
+
+com.palm.applicationManager/listApps
+
+List all registered applications.
+
+\subsection com_palm_application_manager_list_apps_syntax Syntax:
+\code
+{
+}
+\endcode
+
+\subsection com_palm_application_manager_list_apps_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "apps": [ object array ]
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param apps Array that contains objects for the applications.
+
+\subsection com_palm_application_manager_list_apps_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/listApps '{}'
+\endcode
+
+Example response for a succesful call:
+\code
+    "returnValue": true,
+    "apps": [
+        {
+            "id": "com.palm.app.backup",
+            "main": "file:\/\/\/usr\/palm\/applications\/com.palm.app.backup\/index.html",
+            "version": "3.0.1",
+            "category": "",
+            "title": "Backup",
+            "appmenu": "Backup",
+            "vendor": "Palm, Inc.",
+            "vendorUrl": "",
+            "size": 0,
+            "icon": "\/usr\/palm\/applications\/com.palm.app.backup\/icon.png",
+            "removable": false,
+            "userInstalled": false,
+            "hasAccounts": false,
+            "uiRevision": 2,
+            "tapToShareSupported": false
+        },
+        ...
+        {
+            "id": "com.palm.app.enyo-findapps",
+            "main": "file:\/\/\/media\/cryptofs\/apps\/usr\/palm\/applications\/com.palm.app.enyo-findapps\/index.html",
+            "version": "3.0.4100",
+            "category": "",
+            "title": "HP App Catalog",
+            "appmenu": "HP App Catalog",
+            "vendor": "Palm",
+            "vendorUrl": "",
+            "size": 0,
+            "icon": "\/media\/cryptofs\/apps\/usr\/palm\/applications\/com.palm.app.enyo-findapps\/icon.png",
+            "removable": false,
+            "userInstalled": false,
+            "hasAccounts": false,
+            "universalSearch": {
+                "search": {
+                    "displayName": "HP App Catalog",
+                    "url": "com.palm.app.findapps",
+                    "launchParam": {
+                        "common": {
+                            "sceneType": "search",
+                            "params": {
+                                "type": "query",
+                                "search": "#{searchTerms}"
+                            }
+                        }
+                    }
+                }
+            },
+            "uiRevision": 2,
+            "tapToShareSupported": false
+        },
+        ...
+    ]
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false
+    }
+\endcode
+*/
 static bool servicecallback_listApps(LSHandle* lshandle, LSMessage *message,
 		void *user_data)
 {
@@ -1016,9 +1766,120 @@ static bool servicecallback_listApps(LSHandle* lshandle, LSMessage *message,
 	return true;
 }
 
-/**
-	ListPackages: This returns all the registered packages and their apps and service descriptions
- */
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_list_packages listPackages
+
+\e Private.
+
+com.palm.applicationManager/listPackages
+
+List all the registered packages and their apps and service descriptions
+
+\subsection com_palm_application_manager_list_packages_syntax Syntax:
+\code
+{
+}
+\endcode
+
+\subsection com_palm_application_manager_list_packages_returns Returns:
+\code
+{
+    "returnValue": true,
+    "packages": [ object array ]
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param packages Array that contains objects for the packages.
+
+\subsection com_palm_application_manager_list_packages_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/listPackages '{}'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "packages": [
+        {
+            "id": "com.palm.app.accounts",
+            "version": "3.0.1",
+            "size": 0,
+            "loc_name": "Accounts",
+            "vendor": "HP",
+            "vendorUrl": "",
+            "icon": "\/usr\/palm\/applications\/com.palm.app.accounts\/icon.png",
+            "miniicon": "\/usr\/palm\/applications\/com.palm.app.accounts\/miniicon.png",
+            "userInstalled": false,
+            "apps": [
+                {
+                    "id": "com.palm.app.accounts",
+                    "main": "file:\/\/\/usr\/palm\/applications\/com.palm.app.accounts\/index.html",
+                    "version": "3.0.1",
+                    "category": "",
+                    "title": "Accounts",
+                    "appmenu": "Accounts",
+                    "vendor": "HP",
+                    "vendorUrl": "",
+                    "size": 0,
+                    "icon": "\/usr\/palm\/applications\/com.palm.app.accounts\/icon.png",
+                    "removable": false,
+                    "userInstalled": false,
+                    "hasAccounts": false,
+                    "uiRevision": 2,
+                    "tapToShareSupported": false
+                }
+            ],
+            "services": [
+            ]
+        },
+        ...
+        {
+            "id": "com.quickoffice.webos",
+            "loc_name": "Quickoffice",
+            "package_format_version": 2,
+            "vendor": "Quickoffice",
+            "vendorurl": "http:\/\/www.quickoffice.com\/",
+            "version": "2.0.761",
+            "size": 21037056,
+            "icon": "\/media\/cryptofs\/apps\/usr\/palm\/packages\/com.quickoffice.webos\/images\/qo-icon-64.png",
+            "userInstalled": false,
+            "apps": [
+                {
+                    "id": "com.quickoffice.webos",
+                    "main": "file:\/\/\/media\/cryptofs\/apps\/usr\/palm\/applications\/com.quickoffice.webos\/index.html",
+                    "version": "2.0.761",
+                    "category": "",
+                    "title": "Quickoffice",
+                    "appmenu": "Quickoffice",
+                    "vendor": "Quickoffice",
+                    "vendorUrl": "http:\/\/www.quickoffice.com\/",
+                    "size": 0,
+                    "icon": "\/media\/cryptofs\/apps\/usr\/palm\/applications\/com.quickoffice.webos\/images\/qo-icon-64.png",
+                    "removable": false,
+                    "userInstalled": false,
+                    "hasAccounts": false,
+                    "uiRevision": 2,
+                    "tapToShareSupported": false
+                }
+            ],
+            "services": [
+            ]
+        }
+    ]
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false
+}
+\endcode
+*/
 static bool servicecallback_listPackages(LSHandle* lshandle, LSMessage *message, void *user_data)
 {
 	LSError lserror;
@@ -1125,6 +1986,70 @@ static bool servicecallback_listPackages(LSHandle* lshandle, LSMessage *message,
 
 }
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_get_size_of_apps getSizeOfApps
+
+\e Private.
+
+com.palm.applicationManager/getSizeOfApps
+
+Get size of applications.
+
+\subsection com_palm_application_manager_get_size_of_apps_syntax Syntax:
+\code
+{
+    "includeDbSize": bool,
+    "appIds": [string array ]
+}
+\endcode
+
+\param includeDbSize If true, application database size is calculated into the total size.
+\param appIds The application IDs of the applications for which to get size.
+
+\subsection com_palm_application_manager_get_size_of_apps_returns Returns:
+\code
+{
+    "subscribed": false,
+    "returnValue": true,
+    "errorCode": string
+    "<appId>": int,
+    "<appId>": int,
+    ...
+}
+\endcode
+
+\param subscribed Always false, no subscriptions.
+\param returnValue Indicates if the call was succesful.
+\param errorCode Describes the error if call was not succesful.
+\param <appId> The size of the corresponding application in bytes.
+
+\subsection com_palm_application_manager_get_size_of_apps_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/getSizeOfApps '{ "includeDbSize": true, "appIds": ["com.palm.app.browser", "com.palm.app.musicplayer"] }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "returnValue": true,
+    "com.palm.app.browser": 1134592,
+    "com.palm.app.musicplayer": 2727936
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "returnValue": false,
+    "errorCode": "Malformed JSON detected in payload"
+}
+
+\endcode
+*/
 static bool servicecallback_getSizeOf(LSHandle* lshandle, LSMessage *message,
 		void *user_data)
 {
@@ -1232,15 +2157,74 @@ static bool servicecallback_getSizeOf(LSHandle* lshandle, LSMessage *message,
 	return true;
 }
 
-/**
- * 
- * List apps by prefix match of the partial/whole search term provided against the keywords of each app
- * 
- * AND against the title/long name and "menu name"/short name of each app
- * 
- * 
- */
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_search_apps searchApps
 
+\e Private.
+
+com.palm.applicationManager/searchApps
+
+List apps by prefix match of the partial/whole search term provided against the
+keywords of each app and against the title/long name and "menu name"/short name
+of each app.
+
+\subsection com_palm_application_manager_search_apps_syntax Syntax:
+\code
+{
+    "keyword": string
+}
+\endcode
+
+\param keyword Keyword to search with.
+
+\subsection com_palm_application_manager_search_apps_returns Returns:
+\code
+{
+    "apps": [
+        {
+            "launchPoint": string
+        }
+    ],
+    "returnValue": boolean,
+    "errorCode": string
+}
+\endcode
+
+\param apps Object array, see fields below.
+\param launchPoint Application launch point.
+\param returnValue Indicates if the call was succesful.
+\param errorCode Describes the error if call was not succesful.
+
+\subsection com_palm_application_manager_search_apps_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/searchApps '{ "keyword": "music" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "apps": [
+        {
+            "launchPoint": "com.palm.app.musicplayer_default"
+        },
+        {
+            "launchPoint": "com.palm.app.soundsandalerts_default"
+        }
+    ],
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false,
+    "errorCode": "Malformed JSON detected in payload"
+}
+\endcode
+*/
 static bool servicecallback_searchForApps(LSHandle* lshandle, LSMessage *message,
 		void *user_data)
 {
@@ -1334,6 +2318,126 @@ static bool servicecallback_searchForApps(LSHandle* lshandle, LSMessage *message
 /**
 	ListLaunchPoints: This returns all the launchPoints
  */
+
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_list_launch_points listLaunchPoints
+
+\e Private.
+
+com.palm.applicationManager/listLaunchPoints
+
+Get all launch points.
+
+\subsection com_palm_application_manager_list_launch_points_syntax Syntax:
+\code
+{
+}
+\endcode
+
+\subsection com_palm_application_manager_list_launch_points_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "launchPoints": [
+        {
+            "id": string,
+            "version": string,
+            "appId": string,
+            "vendor": string,
+            "vendorUrl": string,
+            "size": int,
+            "packageId": string,
+            "removable": boolean,
+            "launchPointId": string,
+            "title": string,
+            "appmenu": string,
+            "icon": string
+        }
+    ]
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param launchPoints Object array of launch points, see fields below.
+\param id ID.
+\param version Version information.
+\param appId Application ID.
+\param vendor Name of the vendor.
+\param vendorUrl Vendor URL.
+\param size Size.
+\param packageId Package ID.
+\param removable Is package removable.
+\param launchPointId Launch point ID.
+\param title Title of the application
+\param appmenu Menu title
+\param icon Path to application icon.
+
+\subsection com_palm_application_manager_list_launch_points_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/listLaunchPoints '{}'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "launchPoints": [
+        {
+            "id": "com.palm.app.backup",
+            "version": "3.0.1",
+            "appId": "com.palm.app.backup",
+            "vendor": "Palm, Inc.",
+            "vendorUrl": "",
+            "size": 0,
+            "packageId": "com.palm.app.backup",
+            "removable": false,
+            "launchPointId": "com.palm.app.backup_default",
+            "title": "Backup",
+            "appmenu": "Backup",
+            "icon": "\/usr\/palm\/applications\/com.palm.app.backup\/icon.png"
+        },
+        {
+            "id": "com.palm.app.location",
+            "version": "3.0.1",
+            "appId": "com.palm.app.location",
+            "vendor": "Palm, Inc.",
+            "vendorUrl": "",
+            "size": 0,
+            "packageId": "com.palm.app.location",
+            "removable": false,
+            "launchPointId": "com.palm.app.location_default",
+            "title": "Location Services",
+            "appmenu": "Location Services",
+            "icon": "\/usr\/palm\/applications\/com.palm.app.location\/icon.png"
+        },
+        ...
+        {
+            "id": "com.palm.app.youtube",
+            "version": "1.0.0",
+            "appId": "com.palm.app.youtube",
+            "vendor": "HP",
+            "vendorUrl": "",
+            "size": 524288,
+            "packageId": "com.palm.app.youtube",
+            "removable": false,
+            "launchPointId": "com.palm.app.youtube_default",
+            "title": "YouTube",
+            "appmenu": "YouTube",
+            "icon": "\/media\/cryptofs\/apps\/usr\/palm\/applications\/com.palm.app.youtube\/images\/youtube-icon64.png"
+        }
+    ]
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": boolean,
+}
+\endcode
+*/
 static bool servicecallback_listLaunchPoints(LSHandle* lshandle, LSMessage *message,
 		void *user_data)
 {
@@ -1378,9 +2482,89 @@ static bool servicecallback_listLaunchPoints(LSHandle* lshandle, LSMessage *mess
 	return true;
 }
 
-/**
-	ListLaunchPoints: This returns all the dockLaunchPoints
- */
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_list_dock_mode_launch_points listDockModeLaunchPoints
+
+\e Private.
+
+com.palm.applicationManager/listDockModeLaunchPoints
+
+List all dock mode launch points.
+
+\subsection com_palm_application_manager_list_dock_mode_launch_points_syntax Syntax:
+\code
+{
+}
+\endcode
+
+\subsection com_palm_application_manager_list_dock_mode_launch_points_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "launchPoints": [ object array ]
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param launchPoints Launch points in an object array.
+
+\subsection com_palm_application_manager_list_dock_mode_launch_points_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/listDockModeLaunchPoints '{}'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "launchPoints": [
+        {
+            "id": "com.palm.app.agendaview",
+            "version": "3.0.1",
+            "appId": "com.palm.app.agendaview",
+            "vendor": "Palm",
+            "vendorUrl": "",
+            "size": 0,
+            "packageId": "com.palm.app.agendaview",
+            "exhibitionMode": true,
+            "exhibitionModeTitle": "Agenda",
+            "removable": false,
+            "launchPointId": "com.palm.app.agendaview_default",
+            "title": "Agenda",
+            "appmenu": "Agenda",
+            "icon": "\/usr\/palm\/applications\/com.palm.app.agendaview\/icon-64x64.png",
+            "enabled": true
+        },
+        {
+            "id": "com.palm.app.photos",
+            "version": "3.0.1",
+            "appId": "com.palm.app.photos",
+            "vendor": "Palm, Inc.",
+            "vendorUrl": "",
+            "size": 0,
+            "packageId": "com.palm.app.photos",
+            "exhibitionMode": true,
+            "exhibitionModeTitle": "Photos",
+            "removable": false,
+            "launchPointId": "com.palm.app.photos_default",
+            "title": "Photos & Videos",
+            "appmenu": "Photos & Videos",
+            "icon": "\/usr\/palm\/applications\/com.palm.app.photos\/icon.png",
+            "enabled": true
+        }
+    ]
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false
+}
+\endcode
+*/
 static bool servicecallback_listDockModeLaunchPoints(LSHandle* lshandle, LSMessage *message,
 		void *user_data)
 {
@@ -1431,9 +2615,55 @@ static bool servicecallback_listDockModeLaunchPoints(LSHandle* lshandle, LSMessa
 	return true;
 }
 
-/**
-	ListPendingLaunchPoints: This returns all the launchPoints which are pending an update or a new install
- */
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_list_pending_launch_points listPendingLaunchPoints
+
+\e Public.
+
+com.palm.applicationManager/listPendingLaunchPoints
+
+Get a list of all the launchPoints which are pending an update or a new install.
+
+\subsection com_palm_application_manager_list_pending_launch_points_syntax Syntax:
+\code
+{
+}
+\endcode
+
+\subsection com_palm_application_manager_list_pending_launch_points_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "launchPoints": [ object array ]
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param launchPoints Pending launch points in an object array.
+
+\subsection com_palm_application_manager_list_pending_launch_points_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/listPendingLaunchPoints '{}'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "launchPoints": [
+    ]
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false
+}
+\endcode
+*/
 static bool servicecallback_listPendingLaunchPoints(LSHandle* lshandle, LSMessage *message,
 		void *user_data)
 {
@@ -1478,9 +2708,54 @@ static bool servicecallback_listPendingLaunchPoints(LSHandle* lshandle, LSMessag
 	return true;
 }
 
-/**
-	listDockPoints: This returns the list of items sitting on the quick launch bar
- */
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_list_dock_points listDockPoints
+
+\e Private.
+
+com.palm.applicationManager/listDockPoints
+
+Get the list of dock launch points.
+
+\subsection com_palm_application_manager_list_dock_points_syntax Syntax:
+\code
+{
+}
+\endcode
+
+\subsection com_palm_application_manager_list_dock_points_returns Returns:
+\code
+{
+    "returnValue": true,
+    "dockPoints": [ object array ]
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+
+\subsection com_palm_application_manager_list_dock_points_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/listDockPoints '{}'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "dockPoints": [
+    ]
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false
+}
+\endcode
+*/
 static bool servicecallback_listDockPoints(LSHandle* lsHandle, LSMessage* message,
 		void* user_data)
 {
@@ -1526,9 +2801,54 @@ static bool servicecallback_listDockPoints(LSHandle* lsHandle, LSMessage* messag
 	return true;
 }
 
-/**
-	addDockModeLaunchPoint: Adds the launchpoint represented by the passed appId to the dock mode
- */
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_add_dock_mode_launch_point addDockModeLaunchPoint
+
+\e Private.
+
+com.palm.applicationManager/addDockModeLaunchPoint
+
+Add the launchpoint represented by the passed appId to the dock mode.
+
+\subsection com_palm_application_manager_add_dock_mode_launch_point_syntax Syntax:
+\code
+{
+    "appId": string
+}
+\endcode
+
+\param appId The application ID.
+
+\subsection com_palm_application_manager_add_dock_mode_launch_point_returns Returns:
+\code
+{
+    "returnValue": boolean
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+
+\subsection com_palm_application_manager_add_dock_mode_launch_point_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/addDockModeLaunchPoint '{ "appId": "com.palm.app.musicplayer" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false
+}
+\endcode
+*/
 static bool servicecallback_addDockModeLaunchPoint(LSHandle* lsHandle, LSMessage* message, void* user_data) {
 	json_object* root = 0;
 	json_object* appId = 0;
@@ -1571,9 +2891,52 @@ static bool servicecallback_addDockModeLaunchPoint(LSHandle* lsHandle, LSMessage
 	return true;
 }
 
-/**
-	removeDockModeLaunchPoint: Adds the launchpoint represented by the passed appId to the dock mode
- */
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_remove_dock_mode_launch_point removeDockModeLaunchPoint
+
+\e Private.
+
+com.palm.applicationManager/removeDockModeLaunchPoint
+
+Removes a launch point represented by an application ID from the dock mode.
+
+\subsection com_palm_application_manager_remove_dock_mode_launch_point_syntax Syntax:
+\code
+{
+    "appId": string
+}
+\endcode
+
+\subsection com_palm_application_manager_remove_dock_mode_launch_point_returns Returns:
+\code
+{
+    "returnValue": boolean
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+
+\subsection com_palm_application_manager_remove_dock_mode_launch_point_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/removeDockModeLaunchPoint '{ "appId": "com.palm.app.foo" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false
+}
+\endcode
+*/
 static bool servicecallback_removeDockModeLaunchPoint(LSHandle* lsHandle, LSMessage* message, void* user_data) {
 	json_object* root = 0;
 	json_object* appId = 0;
@@ -1616,11 +2979,44 @@ static bool servicecallback_removeDockModeLaunchPoint(LSHandle* lsHandle, LSMess
 	return true;
 }
 
-/**
-	Rescan
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_rescan rescan
 
-	rescan/load the running applications.
- */
+\e Private.
+
+com.palm.applicationManager/rescan
+
+Rescan/load the running applications.
+
+\subsection com_palm_application_manager_rescan_syntax Syntax:
+\code
+{
+}
+\endcode
+
+\subsection com_palm_application_manager_rescan_returns Returns:
+\code
+{
+    "returnValue": boolean
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+
+\subsection com_palm_application_manager_rescan_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/rescan '{}'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+}
+\endcode
+*/
 static bool servicecallback_rescan( LSHandle* lshandle,
 		LSMessage * message, void * /*user_data*/)
 {
@@ -1654,6 +3050,29 @@ static bool servicecallback_rescan( LSHandle* lshandle,
 }
 
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_inspect inspect
+
+\e Private.
+
+com.palm.applicationManager/inspect
+
+Inspect a process.
+
+\subsection com_palm_application_manager_inspect_syntax Syntax:
+\code
+{
+    "processId": string
+}
+\endcode
+
+\subsection com_palm_application_manager_inspect_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/inspect '{ "processId": "1000" }'
+\endcode
+*/
 static bool servicecallback_inspect( LSHandle* lshandle, LSMessage* message, void* user_data )
 {
 	std::string result;
@@ -1688,9 +3107,70 @@ static bool servicecallback_inspect( LSHandle* lshandle, LSMessage* message, voi
 	return true;
 }
 
-/**
-	addLaunchPoint: Add a Dynamic launchpoint
- */
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_add_launch_point addLaunchPoint
+
+\e Public.
+
+com.palm.applicationManager/addLaunchPoint
+
+Add a Dynamic launchpoint
+
+\subsection com_palm_application_manager_add_launch_point_syntax Syntax:
+\code
+{
+    "id": string,
+    "title": string,
+    "appMenu": string,
+    "icon": string,
+    "params": string,
+    "removable": boolean
+}
+\endcode
+
+\param id Application ID. \e Required.
+\param title Title for the launch point. \e Required.
+\param appMenu App menu title.
+\param icon Path to icon. \e Required.
+\param params Parameters to pass to the application. \e Required.
+\param removable Is the launch point removable.
+
+\subsection com_palm_application_manager_add_launch_point_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "launchPointId": string,
+    "errorText": string
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param launchPointId ID for the created launch point.
+\param errorText Describes the error if call was not succesful.
+
+\subsection com_palm_application_manager_add_launch_point_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/addLaunchPoint '{ "id": "com.palm.app.musicplayer", "title": "musaa", "appMenu": "musamenu", "icon": "/usr/lib/luna/luna-media-shim/images/music-file-icon.png", "params": {}, "removable": true }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "launchPointId": "00164209"
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false,
+    "errorText": "Invalid arguments"
+}
+\endcode
+*/
 static bool servicecallback_addLaunchPoint(LSHandle* lshandle, LSMessage *message,
 		void *user_data)
 {
@@ -1807,9 +3287,55 @@ static bool servicecallback_addLaunchPoint(LSHandle* lshandle, LSMessage *messag
 	return true;
 }
 
-/**
-	removeLaunchPoint: Remove a Dynamic launchpoint
- */
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_remove_launch_point removeLaunchPoint
+
+\e Public.
+
+com.palm.applicationManager/removeLaunchPoint
+
+Remove a dynamic launchpoint.
+
+\subsection com_palm_application_manager_remove_launch_point_syntax Syntax:
+\code
+{
+    "launchPointId": string
+}
+\endcode
+
+\subsection com_palm_application_manager_remove_launch_point_returns Returns:
+\code
+{
+    "returnValue": string,
+    "errorText": string
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param errorText Describes the error if call was not succesful.
+
+\subsection com_palm_application_manager_remove_launch_point_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/removeLaunchPoint '{ "launchPointId": "00294900" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false,
+    "errorText": "launch point [00294900] not found"
+}
+\endcode
+*/
 static bool servicecallback_removeLaunchPoint(LSHandle* lshandle, LSMessage *message,
 		void *user_data)
 {
@@ -1870,6 +3396,58 @@ static bool servicecallback_removeLaunchPoint(LSHandle* lshandle, LSMessage *mes
 /**
 	updateLaunchPointIcon: Update a launch points icon
  */
+
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_update_launch_point_icon updateLaunchPointIcon
+
+\e Public.
+
+com.palm.applicationManager/updateLaunchPointIcon
+
+Update a launch point's icon.
+
+\note Only an application can update it's own icon.
+
+\subsection com_palm_application_manager_update_launch_point_icon_syntax Syntax:
+\code
+{
+    "launchPointId": string,
+    "icon": string
+}
+\endcode
+
+\param launchPointId Launch point's ID.
+\param icon Path to new icon for the launch point.
+
+\subsection com_palm_application_manager_update_launch_point_icon_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "errorText": string
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param errorText Description of the error if the call was not succesful.
+
+\subsection com_palm_application_manager_update_launch_point_icon_examples Examples:
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false,
+    "errorText": "Unrecognized application sender"
+}
+\endcode
+*/
 static bool servicecallback_updateLaunchPointIcon(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 	LSError lserror;
@@ -1973,9 +3551,82 @@ static bool servicecallback_updateLaunchPointIcon(LSHandle* lsHandle, LSMessage 
 	return true;
 }
 
-/**
-	launchPointChanges: Subscription method to be informed when changes occur in launchPoints
- */
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_launch_point_changes launchPointChanges
+
+\e Private.
+
+com.palm.applicationManager/launchPointChanges
+
+Subscription method to be informed when changes occur in launchPoints.
+
+\subsection com_palm_application_manager_launch_point_changes_syntax Syntax:
+\code
+{
+    "subscribe": boolean
+}
+\endcode
+
+\param subscribe Set to true to be to be informed when changes occur in launchPoints.
+
+\subsection com_palm_application_manager_launch_point_changes_returns Returns:
+\code
+{
+    "subscribed": boolean,
+    "returnValue": boolean,
+    "errorText": string
+}
+\endcode
+
+\param subscribed True if subscribed.
+\param returnValue Indicates if the call was succesful.
+\param errorText Describes the error if call was not succesful.
+
+\subsection com_palm_application_manager_launch_point_changes_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/launchPointChanges '{ "subscribe": true }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "subscribed": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false,
+    "subscribed": false,
+    "errorText": "Only supports subscriptions"
+}
+\endcode
+
+Example of a status change message when a launch point is added:
+\code
+{
+    "id": "com.palm.app.musicplayer",
+    "version": "3.0.1",
+    "appId": "com.palm.app.musicplayer",
+    "vendor": "HP",
+    "vendorUrl": "",
+    "size": 0,
+    "packageId": "com.palm.app.musicplayer",
+    "removable": true,
+    "launchPointId": "00453104",
+    "title": "musaa",
+    "appmenu": "musaa",
+    "icon": "\/usr\/lib\/luna\/luna-media-shim\/images\/music-file-icon.png",
+    "params": {
+    },
+    "change": "added"
+}
+\endcode
+*/
 static bool servicecallback_launchPointChanges(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 	LSError     lsError;
@@ -2036,6 +3687,28 @@ static std::string getAbsolutePath(const std::string& inStr,
 	return parentDirectory + "/" + inStr;
 }
 
+/* !
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_list_resource_handlers listResourceHandlers
+
+\e Private.
+
+com.palm.applicationManager/listResourceHandlers
+
+\note Functionality not implemented.
+
+\subsection com_palm_application_manager_list_resource_handlers_syntax Syntax:
+\code
+{
+}
+\endcode
+
+\subsection com_palm_application_manager_list_resource_handlers_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/listResourceHandlers '{}'
+\endcode
+*/
 static bool servicecallback_listResourceHandlers(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
     // {}
@@ -2046,6 +3719,28 @@ static bool servicecallback_listResourceHandlers(LSHandle* lsHandle, LSMessage *
 	return true;
 }
 
+/* !
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_list_redirect_handlers listRedirectHandlers
+
+\e Private.
+
+com.palm.applicationManager/listRedirectHandlers
+
+\note Functionality not implemented.
+
+\subsection com_palm_application_manager_list_redirect_handlers_syntax Syntax:
+\code
+{
+}
+\endcode
+
+\subsection com_palm_application_manager_list_redirect_handlers_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/listRedirectHandlers '{}'
+\endcode
+*/
 static bool servicecallback_listRedirectHandlers(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
     // {}
@@ -2056,6 +3751,126 @@ static bool servicecallback_listRedirectHandlers(LSHandle* lsHandle, LSMessage *
 	return true;
 }
 
+
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_dump_mime_table dumpMimeTable
+
+\e Private.
+
+com.palm.applicationManager/dumpMimeTable
+
+Get the complete mime table.
+
+\subsection com_palm_application_manager_dump_mime_table_syntax Syntax:
+\code
+{
+}
+\endcode
+
+\subsection com_palm_application_manager_dump_mime_table_returns Returns:
+\code
+{
+    "resources": [
+        {
+            "mimeType": string,
+            "handlers": {
+                "primary": { object },
+                { alternate handler objects },
+                ...
+            }
+        },
+        ...
+    ],
+    "redirects": [
+        {
+            "url": string,
+            "handlers": {
+                "primary": { object },
+                { alternate handler objects },
+                ...
+            }
+        },
+        ...
+    ]
+}
+\endcode
+
+\param resources Object array with objects for different mime types and their resource handlers.
+\param mimeType The mime type.
+\param handlers Object which contains the primary handler followed by alternate handlers.
+\param redirects Object array with objects for different URL patterns and their redirect handlers.
+\param url The URL pattern.
+\param handlers Object which contains the primary handler followed by alternate handlers.
+
+\subsection com_palm_application_manager_dump_mime_table_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/dumpMimeTable '{}'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "resources": [
+        {
+            "mimeType": "application\/cer",
+            "handlers": {
+                "primary": {
+                    "mime": "application\/cer",
+                    "extension": "cer",
+                    "appId": "com.palm.app.certificate",
+                    "streamable": false,
+                    "index": 46,
+                    "tag": "system-default"
+                }
+            }
+        },
+        ...
+        {
+            "mimeType": "video\/quicktime",
+            "handlers": {
+                "primary": {
+                    "mime": "video\/quicktime",
+                    "extension": "mp4",
+                    "appId": "com.palm.app.videoplayer",
+                    "streamable": true,
+                    "index": 49,
+                    "tag": "system-default"
+                }
+            }
+        }
+    ],
+    "redirects": [
+        {
+            "url": "^chatWith:",
+            "handlers": {
+                "primary": {
+                    "url": "^chatWith:",
+                    "appId": "com.palm.app.messaging",
+                    "index": 10,
+                    "tag": "system-default",
+                    "schemeForm": true
+                }
+            }
+        },
+        ...
+        {
+            "url": "^ypc:",
+            "handlers": {
+                "primary": {
+                    "url": "^ypc:",
+                    "appId": "com.palm.app.ypmobile",
+                    "index": 34,
+                    "tag": "system-default",
+                    "schemeForm": true
+                }
+            }
+        }
+    ]
+}
+\endcode
+*/
 static bool servicecallback_dumpMimeTable(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 	LSError     lsError;
@@ -2074,6 +3889,67 @@ static bool servicecallback_dumpMimeTable(LSHandle* lsHandle, LSMessage *message
 	return true;
 }
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_add_resource_handler addResourceHandler
+
+\e Private.
+
+com.palm.applicationManager/addResourceHandler
+
+
+
+\subsection com_palm_application_manager_add_resource_handler_syntax Syntax:
+\code
+{
+    "appId": string,
+    "shouldDownload": boolean,
+    "mimeType": string
+    "extension": string
+}
+\endcode
+
+\param appId ID of the handler application. \e Required.
+\param shouldDownload True if the handler application should download any remote resources. Defaults to false.
+\param mimeType The mime type that the application should handle. This or \e extension is required.
+\param extension Extension of the file type that the application should handle. This or \e mimeType is required.
+
+\subsection com_palm_application_manager_add_resource_handler_returns Returns:
+\code
+{
+    "subscribed": false,
+    "returnValue": true,
+    "errorCode": string
+}
+\endcode
+
+\param subscribed Always false, no subscriptions available.
+\param returnValue Indicates if the call was succesful.
+\param errorCode Description of the error if call was not succesful.
+
+\subsection com_palm_application_manager_add_resource_handler_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/addResourceHandler '{ "appId": "com.palm.app.musicplayer", "shouldDownload": true, "mimeType": "audio/mpa" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "returnValue": false,
+    "errorCode": "Cannot find mime type for extension [audio\/mpa]"
+}
+\endcode
+*/
 static bool servicecallback_addResourceHandler(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 
@@ -2174,6 +4050,65 @@ static bool servicecallback_addResourceHandler(LSHandle* lsHandle, LSMessage *me
 	return true;
 }
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_add_redirect_handler addRedirectHandler
+
+\e Private.
+
+com.palm.applicationManager/addRedirectHandler
+
+Add an URL redirect handler application.
+
+\subsection com_palm_application_manager_add_redirect_handler_syntax Syntax:
+\code
+{
+    "appId": string,
+    "urlPattern": string,
+    "schemeForm": boolean
+}
+\endcode
+
+\param addId ID of the new handler application.
+\param urlPattern The URL pattern that the application should handle.
+\param schemeForm Set to true if the \e urlPattern is an URI scheme.
+
+\subsection com_palm_application_manager_add_redirect_handler_returns Returns:
+\code
+{
+    "subscribed": false,
+    "returnValue": true,
+    "errorCode": string
+}
+\endcode
+
+\param subscribed Always false, no subscriptions available.
+\param returnValue Indicates if the call was succesful.
+\param errorCode Description of the error if call was not succesful.
+
+\subsection com_palm_application_manager_add_redirect_handler_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/addRedirectHandler '{ "appId": "com.palm.app.browser", "urlPattern": "^im:", "schemeForm": false }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "returnValue": false,
+    "errorCode": "schemeForm parameter incorrectly specified (should be a boolean value)"
+}
+\endcode
+*/
 static bool servicecallback_addRedirectHandler(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 
@@ -2255,6 +4190,67 @@ static bool servicecallback_addRedirectHandler(LSHandle* lsHandle, LSMessage *me
 	return true;
 }
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_mime_type_for_extension mimeTypeForExtension
+
+\e Public.
+
+com.palm.applicationManager/mimeTypeForExtension
+
+Get mime type for a file type extension.
+
+\subsection com_palm_application_manager_mime_type_for_extension_syntax Syntax:
+\code
+{
+    "extension": string
+}
+\endcode
+
+\param extension File type extension.
+
+\subsection com_palm_application_manager_mime_type_for_extension_returns Returns:
+\code
+{
+    "subscribed": false,
+    "returnValue": true,
+    "mimeType": string,
+    "extension": string
+    "errorCode": string
+}
+\endcode
+
+\param subscribed Always false, no subscriptions available.
+\param returnValue Indicates if the call was succesful.
+\param mimeType Mime type.
+\param extension The file type extension given as parameter.
+\param errorCode Description of the error if call was not succesful.
+
+\subsection com_palm_application_manager_mime_type_for_extension_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/mimeTypeForExtension '{"extension": "mp3"}'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "returnValue": true,
+    "mimeType": "audio\/mpa",
+    "extension": "mp3"
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "returnValue": false,
+    "errorCode": "No mime mapped to this extension"
+}
+\endcode
+*/
 static bool servicecallback_getMimeTypeForExtension(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 	LSError lserror;
@@ -2318,6 +4314,69 @@ static bool servicecallback_getMimeTypeForExtension(LSHandle* lsHandle, LSMessag
 	return true;
 }
 
+
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_get_handler_for_mime_type getHandlerForMimeType
+
+\e Public.
+
+com.palm.applicationManager/getHandlerForMimeType
+
+Get handler application for a mime type.
+
+\subsection com_palm_application_manager_get_handler_for_mime_type_syntax Syntax:
+\code
+{
+    "mimeType": string
+}
+\endcode
+
+\subsection com_palm_application_manager_get_handler_for_mime_type_returns Returns:
+\code
+{
+    "subscribed": boolean,
+    "returnValue": boolean,
+    "mimeType": string
+    "appId": string
+    "download": boolean,
+    "errorCode":string
+}
+\endcode
+
+\param subscribed Always false, no subscriptions.
+\param returnValue Indicates if the call was succesful.
+\param mimeType The mime type.
+\param appId The handler application ID.
+\param download Is a remote resource downloaded before the handler application is launched.
+\param errorCode Describes the error if the call was not succesful.
+
+\subsection com_palm_application_manager_get_handler_for_mime_type_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/getHandlerForMimeType '{ "mimeType": "application/pdf" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "returnValue": true,
+    "mimeType": "application\/pdf",
+    "appId": "com.quickoffice.ar",
+    "download": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "returnValue": false,
+    "errorCode": "No handler mapped to this mimeType"
+}
+\endcode
+*/
 static bool servicecallback_getHandlerForMimeType(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 	LSError lserror;
@@ -2385,6 +4444,68 @@ static bool servicecallback_getHandlerForMimeType(LSHandle* lsHandle, LSMessage 
 
 }
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_get_handler_for_extension getHandlerForExtension
+
+\e Public.
+
+com.palm.applicationManager/getHandlerForExtension
+
+Get handler application for a file type extension.
+
+\subsection com_palm_application_manager_get_handler_for_extension_syntax Syntax:
+\code
+{
+    "extension": string
+}
+\endcode
+
+\subsection com_palm_application_manager_get_handler_for_extension_returns Returns:
+\code
+{
+    "subscribed": boolean,
+    "returnValue": boolean,
+    "mimeType": string,
+    "appId": string,
+    "download": boolean,
+    "errorCode": string
+}
+\endcode
+
+\param subscribed Always false, no subscriptions.
+\param returnValue Indicates if the call was succesful.
+\param mimeType Mime type for the extension.
+\param appId Handler application ID.
+\param download Is a remote resource downloaded before the handler application is launched.
+\param errorCode Describes the error if call was not succesful.
+
+\subsection com_palm_application_manager_get_handler_for_extension_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/getHandlerForExtension '{ "extension": "mp3" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "returnValue": true,
+    "mimeType": "audio\/mpa",
+    "appId": "com.palm.app.streamingmusicplayer",
+    "download": false
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "returnValue": false,
+    "errorCode": "No mime type mapped to extension fob"
+}
+\endcode
+*/
 static bool servicecallback_getHandlerForExtension(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 	LSError lserror;
@@ -2459,6 +4580,73 @@ static bool servicecallback_getHandlerForExtension(LSHandle* lsHandle, LSMessage
 
 }
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_get_handler_for_url getHandlerForUrl
+
+\e Public.
+
+com.palm.applicationManager/getHandlerForUrl
+
+Get handler application for an URL.
+
+\subsection com_palm_application_manager_get_handler_for_url_syntax Syntax:
+\code
+{
+    "url": string
+}
+\endcode
+
+\subsection com_palm_application_manager_get_handler_for_url_returns Returns:
+\code
+{
+}
+\endcode
+
+\param subscribed Always false, no subscriptions.
+\param returnValue Indicates if the call was succesful.
+\param mimeType Mime type of the resource.
+\param appId The handler application ID.
+\param download Is a remote resource downloaded before the handler application is launched.
+\param errorCode Describes the error if the call was not succesful.
+
+\subsection com_palm_application_manager_get_handler_for_url_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/getHandlerForUrl '{ "url": "file:///media/internal/downloads/pat5463489.pdf" }'
+\endcode
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/getHandlerForUrl '{ "url": "http://www.google.fi" }'
+\endcode
+
+Example responses for succesful calls:
+\code
+{
+    "subscribed": false,
+    "returnValue": true,
+    "mimeType": "application\/pdf",
+    "appId": "com.quickoffice.ar",
+    "download": true
+}
+\endcode
+\code
+{
+    "subscribed": false,
+    "returnValue": true,
+    "appId": "com.palm.app.browser",
+    "download": false
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "returnValue": false,
+    "errorCode": "No handler found for url [file:\/\/\/media\/internal\/downloads\/pat5463489]"
+}
+\endcode
+*/
 static bool servicecallback_getHandlerForUrl(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 
@@ -2563,6 +4751,144 @@ static bool servicecallback_getHandlerForUrl(LSHandle* lsHandle, LSMessage *mess
 
 }
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_get_handler_for_mime_type_by_verb getHandlerForMimeTypeByVerb
+
+\e Public.
+
+com.palm.applicationManager/getHandlerForMimeTypeByVerb
+
+Search for a handler application for a mime type and filter the results with a verb.
+
+\subsection com_palm_application_manager_get_handler_for_mime_type_by_verb_syntax Syntax:
+\code
+{
+    "mime": string,
+    "verb": string
+}
+\endcode
+
+\param mime The mime type to get handler for.
+\param verb The verb to search for.
+
+\subsection com_palm_application_manager_get_handler_for_mime_type_by_verb_returns Returns:
+\code
+{
+    "subscribed": boolean,
+    "returnValue": boolean,
+    "mimeType": string,
+    "appId": string,
+    "download": boolean,
+    "index": int,
+    "errorCode": string
+}
+\endcode
+
+\param subscribed Always false, no subscriptions available.
+\param returnValue Indicates if the call was succesful.
+\param mimeType The mime type that was given as parameter.
+\param appId The ID of the handler application.
+\param download Is a remote resource downloaded before the handler application is launched.
+\param index Index for the application.
+\param errorCode Describes the error if the call was not succesful.
+
+\subsection com_palm_application_manager_get_handler_for_mime_type_by_verb_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/getHandlerForMimeTypeByVerb '{"mime": "audio/mpa", "verb": "exampleVerb" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "returnValue": true,
+    "mimeType": "audio\/mpa",
+    "appId": "com.palm.app.streamingmusicplayer",
+    "download": false,
+    "index": 179
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "returnValue": false,
+    "errorCode": "No resource handler found for audio\/mpa"
+}
+\endcode
+*/
+
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_get_handler_for_url_by_verb getHandlerForUrlByVerb
+
+\e Public.
+
+com.palm.applicationManager/getHandlerForUrlByVerb
+
+Search for a handler application for an URL and filter the results with a verb.
+
+\subsection com_palm_application_manager_get_handler_for_url_by_verb_syntax Syntax:
+\code
+{
+    "url": string,
+    "verb": string
+}
+\endcode
+
+\param url The URL to get handler for.
+\param verb The verb to search for.
+
+\subsection com_palm_application_manager_get_handler_for_url_by_verb_returns Returns:
+\code
+{
+    "subscribed": boolean,
+    "returnValue": boolean,
+    "appId": string,
+    "download": boolean,
+    "index": int,
+    "errorCode": string
+}
+\endcode
+
+\param subscribed Always false, no subscriptions available.
+\param returnValue Indicates if the call was succesful.
+\param appId The ID of the handler application.
+\param download Is a remote resource downloaded before the handler application is launched.
+\param index Index for the application.
+\param errorCode Describes the error if the call was not succesful.
+
+\param returnValue Indicates if the call was succesful.
+
+\subsection com_palm_application_manager_get_handler_for_url_by_verb_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/getHandlerForUrlByVerb '{ "url": "sprint-music:", "verb": "exampleVerb" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "returnValue": true,
+    "appId": "com.palm.sprintmusicplus",
+    "download": false,
+    "index": 136
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "returnValue": false,
+    "errorCode": "No redirect handler found for sprint-music:"
+}
+\endcode
+*/
 static bool servicecallback_getHandlerByVerb(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 
@@ -2667,6 +4993,206 @@ static bool servicecallback_getHandlerByVerb(LSHandle* lsHandle, LSMessage *mess
 
 }
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_list_all_handlers_for_mime listAllHandlersForMime
+
+\e Public.
+
+com.palm.applicationManager/listAllHandlersForMime
+
+Get all handlers for a mime type.
+
+\subsection com_palm_application_manager_list_all_handlers_for_mime_syntax Syntax:
+\code
+{
+    "mime": string
+}
+\endcode
+
+\param mime The mime type.
+
+\subsection com_palm_application_manager_list_all_handlers_for_mime_returns Returns:
+\code
+{
+    "subscribed": boolean,
+    "mime": string,
+    "returnValue": boolean,
+    "resourceHandlers": {
+        "activeHandler": {
+            "mime": string,
+            "extension": string,
+            "appId": string,
+            "streamable": boolean,
+            "index": int,
+            "tag": string,
+            "verbs": {
+                "<name of the verb>": string,
+                ...
+            },
+            "appName": string
+        },
+        "alternates": [ object array ]
+    }
+}
+\endcode
+
+\param subscribed Always false, no subscriptions available.
+\param mime The mime type that was given as parameter.
+\param returnValue Indicates if the call was succesful.
+\param resourceHandlers Resource handlers for the mime type. See below.
+\param activeHandler Current active handler for the mime type. See fields below.
+\param mime The mime type.
+\param extension File type extension for this mime type.
+\param appId Id of the handler application.
+\param streamable True if the content is streamable.
+\param index Index for the application.
+\param tag A tag for the handler application.
+\param verbs Object that contains any verbs registered for the application.
+\param appName Name of the handler application.
+\param alternates Alternative handler applications.
+
+\subsection com_palm_application_manager_list_all_handlers_for_mime_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/listAllHandlersForMime '{ "mime": "audio/mpa" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "mime": "audio\/mpa",
+    "returnValue": true,
+    "resourceHandlers": {
+        "activeHandler": {
+            "mime": "audio\/mpa",
+            "extension": "mp3",
+            "appId": "com.palm.app.streamingmusicplayer",
+            "streamable": true,
+            "index": 179,
+            "tag": "system-default",
+            "appName": "Streaming Music Player"
+        },
+        "alternates": [
+            {
+                "mime": "audio\/mpa",
+                "extension": "audio.mpa",
+                "appId": "com.palm.app.musicplayer",
+                "streamable": true,
+                "index": 131,
+                "appName": "Music"
+            }
+        ]
+    }
+}
+
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "mime": "foobar",
+    "returnValue": false,
+    "errorCode": "No handlers found for foobar"
+}
+\endcode
+*/
+
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_list_all_handlers_for_url listAllHandlersForUrl
+
+\e Public.
+
+com.palm.applicationManager/listAllHandlersForUrl
+
+Get all handlers for an URL.
+
+\subsection com_palm_application_manager_list_all_handlers_for_url_syntax Syntax:
+\code
+{
+    "url": string
+}
+\endcode
+
+\param url The URL.
+
+\subsection com_palm_application_manager_list_all_handlers_for_url_returns Returns:
+\code
+{
+    "subscribed": boolean,
+    "url": string,
+    "returnValue": boolean,
+    "redirectHandlers": {
+        "activeHandler": {
+            "url": string,
+            "appId": string,
+            "streamable": boolean,
+            "index": int,
+            "tag": string,
+            "schemeForm": boolean,
+            "verbs": {
+                "<name of the verb>": string
+            }
+            "appName": string
+        },
+        "alternates": [ object array ]
+    }
+}
+\endcode
+
+\param subscribed Always false, no subscriptions available.
+\param url The URL that was given as parameter.
+\param returnValue Indicates if the call was succesful.
+\param redirectHandlers Redirecting handler applications for the URL. See below.
+\param activeHandler Current active handler for the URL. See fields below.
+\param url The URL pattern handled by this application.
+\param appId Id of the handler application.
+\param index Index for the application.
+\param tag A tag for the handler application.
+\param schemeForm True if \e url is an URI scheme.
+\param verbs Object containing any verbs registered for this handler.
+\param appName Name of the handler application.
+\param alternates Alternative handler applications.
+
+\subsection com_palm_application_manager_list_all_handlers_for_url_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/listAllHandlersForUrl '{"url": "http://www.google.com"}'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "url": "http:\/\/www.google.com",
+    "returnValue": true,
+    "redirectHandlers": {
+        "activeHandler": {
+            "url": "^https?:",
+            "appId": "com.palm.app.browser",
+            "index": 16,
+            "tag": "system-default",
+            "schemeForm": true,
+            "appName": "Web"
+        }
+    }
+}
+
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "url": "www.google.com",
+    "returnValue": false,
+    "errorCode": "No handlers found for www.google.com"
+}
+\endcode
+*/
 static bool servicecallback_listAllHandlers(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 
@@ -2808,7 +5334,113 @@ static bool servicecallback_listAllHandlers(LSHandle* lsHandle, LSMessage *messa
 
 }
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_list_all_handlers_for_multiple_mime listAllHandlersForMultipleMime
 
+\e Public.
+
+com.palm.applicationManager/listAllHandlersForMultipleMime
+
+List all handlers for multiple mime types.
+
+\subsection com_palm_application_manager_list_all_handlers_for_multiple_mime_syntax Syntax:
+\code
+{
+    "mimes": [ string array ]
+}
+\endcode
+
+\param mimes The mime types for which to list handlers.
+
+\subsection com_palm_application_manager_list_all_handlers_for_multiple_mime_returns Returns:
+\code
+{
+    "subscribed": boolean,
+    "returnValue": boolean,
+    errorCode: string,
+    "<mime>": {
+        "activeHandler": {
+            "mime": string,
+            "extension": string,
+            "appId": string,
+            "streamable": boolean,
+            "index": int,
+            "appName": string
+        },
+        "alternates": [ object array ]
+    },
+    ...
+}
+\endcode
+
+\param subscribed Always false, no subscriptions.
+\param returnValue Indicates if the call was succesful.
+\param errorCode Describes the error if call was not succesful.
+\param <mime> Object, contains the handlers.
+\param activeHandler Currently active handler for the particular mime type.
+\param mime The mime type.
+\param extension File type extension corresponding the mime type.
+\param appId ID for the handler application.
+\param streamable Can the application handle streaming content.
+\param index Index of the application.
+\param appName Name of the handler application.
+\param alternates Object array containing any alternate handler applications.
+
+\subsection com_palm_application_manager_list_all_handlers_for_multiple_mime_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/listAllHandlersForMultipleMime '{ "mimes": [ "application/pdf", "audio/mpa" ] }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "returnValue": true,
+    "application/pdf": {
+        "activeHandler": {
+            "mime": "application\/pdf",
+            "extension": "pdf",
+            "appId": "com.quickoffice.ar",
+            "streamable": false,
+            "index": 150,
+            "appName": "Adobe Reader"
+        }
+    },
+    "audio/mpa": {
+        "activeHandler": {
+            "mime": "audio\/mpa",
+            "extension": "mp3",
+            "appId": "com.palm.app.streamingmusicplayer",
+            "streamable": true,
+            "index": 179,
+            "tag": "system-default",
+            "appName": "Streaming Music Player"
+        },
+        "alternates": [
+            {
+                "mime": "audio\/mpa",
+                "extension": "audio.mpa",
+                "appId": "com.palm.app.musicplayer",
+                "streamable": true,
+                "index": 131,
+                "appName": "Music"
+            }
+        ]
+    }
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "returnValue": false,
+    "errorCode": "Missing 'mimes' array parameter"
+}
+\endcode
+*/
 static bool servicecallback_listAllHandlersMultipleMime(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 
@@ -2929,6 +5561,102 @@ static bool servicecallback_listAllHandlersMultipleMime(LSHandle* lsHandle, LSMe
 
 }
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_list_all_handlers_for_multiple_url_pattern listAllHandlersForMultipleUrlPattern
+
+\e Public.
+
+com.palm.applicationManager/listAllHandlersForMultipleUrlPattern
+
+Lists all handler applications for multiple URLs.
+
+\subsection com_palm_application_manager_list_all_handlers_for_multiple_url_pattern_syntax Syntax:
+\code
+{
+    "urls": [string array]
+}
+\endcode
+
+\param urls The urls for which to find handlers.
+
+\subsection com_palm_application_manager_list_all_handlers_for_multiple_url_pattern_returns Returns:
+\code
+{
+    "subscribed": boolean,
+    "returnValue": boolean,
+    errorCode: string,
+    "<url>": {
+        "activeHandler": {
+            "url": string,
+            "appId": string,
+            "index": int,
+            "tag": string,
+            "schemeForm": boolean,
+            "appName": string
+        },
+        "alternates": [ object array ]
+    },
+    ...
+}
+\endcode
+
+\param subscribed Always false, no subscriptions.
+\param returnValue Indicates if the call was succesful.
+\param errorCode Describes the error if call was not succesful.
+\param <url> Object, contains the handlers.
+\param activeHandler Currently active handler for the particular mime type.
+\param url The url pattern.
+\param appId ID for the handler application.
+\param index Index of the application.
+\param tag A tag for the application.
+\param schemeForm True if \e url is an URI scheme.
+\param appName Name of the handler application.
+\param alternates Object array containing any alternate handler applications.
+
+\subsection com_palm_application_manager_list_all_handlers_for_multiple_url_pattern_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/listAllHandlersForMultipleUrlPattern '{ "urls": ["^https?:", "^mailto:"] }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "returnValue": true,
+    "^https?:": {
+        "activeHandler": {
+            "url": "^https?:",
+            "appId": "com.palm.app.browser",
+            "index": 126,
+            "tag": "system-default",
+            "schemeForm": true,
+            "appName": "Web"
+        }
+    },
+    "^mailto:": {
+        "activeHandler": {
+            "url": "^mailto:",
+            "appId": "com.palm.app.email",
+            "index": 128,
+            "tag": "system-default",
+            "schemeForm": true,
+            "appName": "Email"
+        }
+    }
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "returnValue": false,
+    "errorCode": "Bad 'urls' array parameter specified"
+}
+\endcode
+*/
 static bool servicecallback_listAllHandlersMultipleUrlPattern(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 	LSError lserror;
@@ -3047,6 +5775,79 @@ static bool servicecallback_listAllHandlersMultipleUrlPattern(LSHandle* lsHandle
 	return true;
 }
 
+
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_list_all_handlers_for_url_pattern listAllHandlersForUrlPattern
+
+\e Public.
+
+com.palm.applicationManager/listAllHandlersForUrlPattern
+
+List all handler applications for an URL pattern.
+
+\subsection com_palm_application_manager_list_all_handlers_for_url_pattern_syntax Syntax:
+\code
+{
+    "urlPattern": url
+}
+\endcode
+
+\subsection com_palm_application_manager_list_all_handlers_for_url_pattern_returns Returns:
+\code
+{
+    "subscribed": false,
+    "urlPattern": "^https?:",
+    "returnValue": true,
+    "redirectHandlers": {
+        "activeHandler": {
+            "url": "^https?:",
+            "appId": "com.palm.app.browser",
+            "index": 126,
+            "tag": "system-default",
+            "schemeForm": true
+        },
+        "alternates": [ object array ]
+    }
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+
+\subsection com_palm_application_manager_list_all_handlers_for_url_pattern_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/listAllHandlersForUrlPattern '{ "urlPattern": "^https?:" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "urlPattern": "^https?:",
+    "returnValue": true,
+    "redirectHandlers": {
+        "activeHandler": {
+            "url": "^https?:",
+            "appId": "com.palm.app.browser",
+            "index": 126,
+            "tag": "system-default",
+            "schemeForm": true
+        }
+    }
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "urlPattern": "foo",
+    "returnValue": false,
+    "errorCode": "No handlers found for foo"
+}
+\endcode
+*/
 static bool servicecallback_listAllUrlHandlersByPattern(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 
@@ -3143,6 +5944,170 @@ static bool servicecallback_listAllUrlHandlersByPattern(LSHandle* lsHandle, LSMe
 
 }
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_list_all_handlers_for_mime_by_verb listAllHandlersForMimeByVerb
+
+\e Public.
+
+com.palm.applicationManager/listAllHandlersForMimeByVerb
+
+List all handlers for a mime type and filter the results by a verb.
+
+\subsection com_palm_application_manager_list_all_handlers_for_mime_by_verb_syntax Syntax:
+\code
+{
+    "verb": string,
+    "mime": string
+}
+\endcode
+
+\param verb The verb to search for.
+\param mime The mime type to search handlers for.
+
+\subsection com_palm_application_manager_list_all_handlers_for_mime_by_verb_returns Returns:
+\code
+{
+    "subscribed": boolean,
+    "mime": string,
+    "verb": string,
+    "returnValue": boolean,
+    "errorCode": string
+    "resourceHandlers": { object }
+}
+\endcode
+
+\param subscribed Always false, no subscriptions available.
+\param mime The mime type given as parameter.
+\param verb The verb that was given as parameter.
+\param returnValue Indicates if the call was succesful.
+\param errorCode Describes the error if the call was not succesful.
+\param resourceHandlers Object containing the resource handlers that have the verb that was searched for. Syntax for this is the same as in \ref com_palm_application_manager_list_all_handlers_for_mime.
+
+\subsection com_palm_application_manager_list_all_handlers_for_mime_by_verb_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/listAllHandlersForMimeByVerb '{"verb": "exampleVerb", "mime": "audio/mpa"}'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "mime": "audio\/mpa",
+    "verb": "exampleVerb",
+    "returnValue": true,
+    "resourceHandlers": {
+        "alternates": [
+            {
+                "mime": "audio\/mpa",
+                "extension": "mp3",
+                "appId": "com.palm.app.streamingmusicplayer",
+                "streamable": true,
+                "index": 179,
+                "tag": "system-default",
+                "verbs": {
+                    "exampleVerb": "42"
+                }
+            }
+        ]
+    }
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "mime": "audio\/mpa",
+    "verb": "noSuchVerb",
+    "returnValue": false,
+    "errorCode": "No handlers found for audio\/mpa"
+}
+\endcode
+*/
+
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_list_all_handlers_for_url_by_verb listAllHandlersForUrlByVerb
+
+\e Public.
+
+com.palm.applicationManager/listAllHandlersForUrlByVerb
+
+Search for handlers for an URL and filter the results by a verb.
+
+\subsection com_palm_application_manager_list_all_handlers_for_url_by_verb_syntax Syntax:
+\code
+{
+    "verb": string,
+    "url": string
+}
+\endcode
+
+\param verb The verb to filter the results with.
+\param url The URL to search handlers for.
+
+\subsection com_palm_application_manager_list_all_handlers_for_url_by_verb_returns Returns:
+\code
+{
+    "subscribed": boolean,
+    "url": string,
+    "verb": string,
+    "returnValue": boolean,
+    "errorCode": string
+    "redirectHandlers": { object }
+}
+\endcode
+
+\param subscribed Always false, no subscriptions available.
+\param mime The mime type given as parameter.
+\param verb The verb that was given as parameter.
+\param returnValue Indicates if the call was succesful.
+\param errorCode Describes the error if the call was not succesful.
+\param redirectHandlers Object containing the redirect handlers that have the verb that was searched for. Syntax for this is the same as in \ref com_palm_application_manager_list_all_handlers_for_url.
+
+\subsection com_palm_application_manager_list_all_handlers_for_url_by_verb_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/listAllHandlersForUrlByVerb '{"verb": "exampleVerb", "url": "sprint-music:"}'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "url": "sprint-music:",
+    "verb": "exampleVerb",
+    "returnValue": true,
+    "redirectHandlers": {
+        "alternates": [
+            {
+                "url": "^sprint-music:",
+                "appId": "com.palm.sprintmusicplus",
+                "index": 136,
+                "tag": "system-default",
+                "schemeForm": true,
+                "verbs": {
+                    "exampleVerb": "42"
+                }
+            }
+        ]
+    }
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "url": "sprint-music:",
+    "verb": "noSuchVerb",
+    "returnValue": false,
+    "errorCode": "No handlers found for sprint-music:"
+}
+\endcode
+*/
 static bool servicecallback_listAllHandlersByVerb(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 
@@ -3253,7 +6218,68 @@ static bool servicecallback_listAllHandlersByVerb(LSHandle* lsHandle, LSMessage 
 
 }
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_list_extension_map listExtensionMap
 
+\e Public.
+
+com.palm.applicationManager/listExtensionMap
+
+List file type extensions and mime types.
+
+\subsection com_palm_application_manager_list_extension_map_syntax Syntax:
+\code
+{
+}
+\endcode
+
+\subsection com_palm_application_manager_list_extension_map_returns Returns:
+\code
+{
+    "subscribed": boolean,
+    "returnValue": boolean,
+    "extensionMap": [
+        {
+            "<extension>": "<mime type>"
+        }
+    ]
+}
+\endcode
+
+\param subscribed Always false, no subscriptions available.
+\param returnValue Indicates if the call was succesful.
+\param extensionMap Object array.
+
+\subsection com_palm_application_manager_list_extension_map_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/listExtensionMap '{}'
+\endcode
+
+Example response:
+\code
+{
+    "subscribed": false,
+    "returnValue": true,
+    "extensionMap": [
+        {
+            "3g2": "video\/3gpp2"
+        },
+        {
+            "3ga": "audio\/3gpp"
+        },
+        ...
+        {
+            "xls": "application\/xls"
+        },
+        {
+            "xlsx": "application\/xls"
+        }
+    ]
+}
+\endcode
+*/
 static bool servicecallback_listExtensionMap(LSHandle* lsHandle, LSMessage *message, void *userData) 
 {
 	
@@ -3280,6 +6306,63 @@ static bool servicecallback_listExtensionMap(LSHandle* lsHandle, LSMessage *mess
 		
 }
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_swap_resource_handler swapResourceHandler
+
+\e Private.
+
+com.palm.applicationManager/swapResourceHandler
+
+Change the active handler application for a mime type.
+
+\subsection com_palm_application_manager_swap_resource_handler_syntax Syntax:
+\code
+{
+    "mimeType": string,
+    "index": int
+}
+\endcode
+
+\param mimeType The mime type for which to change the handler.
+\param index Index of the new handler application.
+
+\subsection com_palm_application_manager_swap_resource_handler_returns Returns:
+\code
+{
+    "subscribed": boolean,
+    "returnValue": boolean,
+    "errorCode": string
+}
+\endcode
+
+\param subscribed Always false, no subscriptions.
+\param returnValue Indicates if the call was succesful.
+\param errorCode Describes the error if call was not succesful.
+
+\subsection com_palm_application_manager_swap_resource_handler_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/swapResourceHandler '{ "mimeType": "application/pdf", "index": 150 }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "returnValue": false,
+    "errorCode": "swap failed (incorrect index for mime type, perhaps?)"
+}
+\endcode
+*/
 static bool servicecallback_swapResourceHandler(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 	LSError lserror;
@@ -3350,6 +6433,63 @@ static bool servicecallback_swapResourceHandler(LSHandle* lsHandle, LSMessage *m
 	return true;
 }
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_swap_redirect_handler swapRedirectHandler
+
+\e Private.
+
+com.palm.applicationManager/swapRedirectHandler
+
+Change the redirect handler application for an URL pattern.
+
+\subsection com_palm_application_manager_swap_redirect_handler_syntax Syntax:
+\code
+{
+    "url": string,
+    "index": int
+}
+\endcode
+
+\param url The URL pattern for which to change the handler.
+\param index Index of the new handler application.
+
+\subsection com_palm_application_manager_swap_redirect_handler_returns Returns:
+\code
+{
+    "subscribed": boolean,
+    "returnValue": boolean,
+    "errorCode": string
+}
+\endcode
+
+\param subscribed Always false, no subscriptions.
+\param returnValue Indicates if the call was succesful.
+\param errorCode Describes the error if call was not succesful.
+
+\subsection com_palm_application_manager_swap_redirect_handler_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/swapRedirectHandler '{ "url": "^im:", "index": 134 }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "returnValue": false,
+    "errorCode": "swap failed (incorrect index for url, perhaps?)"
+}
+\endcode
+*/
 static bool servicecallback_swapRedirectHandler(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 	LSError lserror;
@@ -3421,6 +6561,130 @@ static bool servicecallback_swapRedirectHandler(LSHandle* lsHandle, LSMessage *m
 	return true;
 }
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_register_verbs_for_redirect registerVerbsForRedirect
+
+\e Private.
+
+com.palm.applicationManager/registerVerbsForRedirect
+
+Register verbs for a redirect handler.
+
+\subsection com_palm_application_manager_register_verbs_for_redirect_syntax Syntax:
+\code
+{
+    "appId": string,
+    "url": string,
+    "verbs": {
+        "<nameOfVerb>": int,
+        ...
+    }
+}
+\endcode
+
+\param appId ID of the handler application.
+\param url The url pattern handled for which to register the verbs.
+\param verbs Object containing key-value pairs of name of the verb and a value for it as an int.
+
+\subsection com_palm_application_manager_register_verbs_for_redirect_returns Returns:
+\code
+{
+    "subscribed": boolean,
+    "returnValue": boolean,
+    "errorCode": string
+}
+\endcode
+
+\param subscribed Always false, no subscriptions.
+\param returnValue Indicates if the call was succesful.
+\param errorCode Describes the error if call was not succesful.
+
+\subsection com_palm_application_manager_register_verbs_for_redirect_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/registerVerbsForRedirect '{ "appId": "com.palm.sprintmusicplus", "url": "^sprint-music:", "verbs": { "exampleVerb": 42 } }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "returnValue": false,
+    "errorCode": "No verbs specified\/invalid verb list format"
+}
+\endcode
+*/
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_register_verbs_for_resource registerVerbsForResource
+
+\e Private.
+
+com.palm.applicationManager/registerVerbsForResource
+
+Register verbs for a resource.
+
+\subsection com_palm_application_manager_register_verbs_for_resource_syntax Syntax:
+\code
+{
+    "appId": string,
+    "mime": string,
+    "verbs": {
+        "<nameOfVerb>": int,
+        ...
+    }
+}
+\endcode
+
+\param appId ID of the handler application.
+\param mime The mime type of the resource.
+\param verbs Object containing key-value pairs of name of the verb and a value for it as an int.
+
+\subsection com_palm_application_manager_register_verbs_for_resource_returns Returns:
+\code
+{
+    "subscribed": boolean,
+    "returnValue": boolean,
+    "errorCode": string
+}
+\endcode
+
+\param subscribed Always false, no subscriptions.
+\param returnValue Indicates if the call was succesful.
+\param errorCode Describes the error if call was not succesful.
+
+\subsection com_palm_application_manager_register_verbs_for_resource_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/registerVerbsForResource '{ "appId": "com.palm.app.streamingmusicplayer", "mime": "audio/mpa", "verbs": { "exampleVerb": 42 } }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "returnValue": false,
+    "errorCode": "No verbs specified\/invalid verb list format"
+}
+\endcode
+*/
 static bool servicecallback_registerVerbs(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 
@@ -3510,6 +6774,59 @@ static bool servicecallback_registerVerbs(LSHandle* lsHandle, LSMessage *message
 	return true;
 }
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_remove_handlers_for_app_id removeHandlersForAppId
+
+\e Private.
+
+com.palm.applicationManager/removeHandlersForAppId
+
+Remove an application from resource or redirect handlers.
+
+\subsection com_palm_application_manager_remove_handlers_for_app_id_syntax Syntax:
+\code
+{
+    "appId": string
+}
+\endcode
+
+\subsection com_palm_application_manager_remove_handlers_for_app_id_returns Returns:
+\code
+{
+    "subscribed": boolean,
+    "returnValue": boolean,
+    "errorText": string
+}
+\endcode
+
+\param subscribed Always false, no subscriptions.
+\param returnValue Indicates if the call was succesful.
+\param errorCode Describes the error if call was not succesful.
+
+\subsection com_palm_application_manager_remove_handlers_for_app_id_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/removeHandlersForAppId '{ "appId": "com.palm.app.videoplayer" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "returnValue": false,
+    "errorCode": "Missing appId parameter"
+}
+\endcode
+*/
 static bool servicecallback_removeHandlersForAppId(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 
@@ -3572,6 +6889,61 @@ static bool servicecallback_removeHandlersForAppId(LSHandle* lsHandle, LSMessage
 	return true;
 }
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_save_mime_table saveMimeTable
+
+\e Private.
+
+com.palm.applicationManager/saveMimeTable
+
+Save the current mime table.
+
+\subsection com_palm_application_manager_save_mime_table_syntax Syntax:
+\code
+{
+    "file": string
+}
+\endcode
+
+\param file The file where the mime table is saved to. If not specified, the table is saved to the current file.
+
+\subsection com_palm_application_manager_save_mime_table_returns Returns:
+\code
+{
+    "subscribed": boolean,
+    "returnValue": boolean,
+    "errorCode": string
+}
+\endcode
+
+\param subscribed Always false, no subscriptions.
+\param returnValue Indicates if the call was succesful.
+\param errorCode Describes the error if call was not succesful.
+
+\subsection com_palm_application_manager_save_mime_table_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/saveMimeTable '{ "file": "/tmp/savedmimetable" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "returnValue": false,
+    "errorCode": "Saving mime table failed - Unable to open file \/tmp\/webos\/savedmimetable"
+}
+\endcode
+*/
 static bool servicecallback_saveMimeTable(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 	LSError lserror;
@@ -3634,6 +7006,59 @@ static bool servicecallback_saveMimeTable(LSHandle* lsHandle, LSMessage *message
 	return true;
 }
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_restore_mime_table restoreMimeTable
+
+\e Private.
+
+com.palm.applicationManager/restoreMimeTable
+
+Restore a saved mime table.
+
+\subsection com_palm_application_manager_restore_mime_table_syntax Syntax:
+\code
+{
+    "file": string
+}
+\endcode
+
+\subsection com_palm_application_manager_restore_mime_table_returns Returns:
+\code
+{
+    "subscribed": boolean,
+    "returnValue": boolean,
+    "errorCode": string
+}
+\endcode
+
+\param subscribed Always false, no subscriptions.
+\param returnValue Indicates if the call was succesful.
+\param errorCode Describes the error if call was not succesful.
+
+\subsection com_palm_application_manager_restore_mime_table_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/restoreMimeTable '{ "file": "/tmp/savedmimetable" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "returnValue": false,
+    "errorCode": "Restoring mime table failed - No saved tables found in \/tmp\/saved"
+}
+\endcode
+*/
 static bool servicecallback_restoreMimeTable(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 	LSError lserror;
@@ -3696,6 +7121,58 @@ static bool servicecallback_restoreMimeTable(LSHandle* lsHandle, LSMessage *mess
 }
 
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_clear_mime_table clearMimeTable
+
+\e Private.
+
+com.palm.applicationManager/clearMimeTable
+
+Clear mime table.
+
+\subsection com_palm_application_manager_clear_mime_table_syntax Syntax:
+\code
+{
+}
+\endcode
+
+\subsection com_palm_application_manager_clear_mime_table_returns Returns:
+\code
+{
+    "subscribed": boolean,
+    "returnValue": boolean,
+    "errorCode": string
+}
+\endcode
+
+\param subscribed Always false, no subscriptions.
+\param returnValue Indicates if the call was succesful.
+\param errorCode Describes the error if call was not succesful.
+
+\subsection com_palm_application_manager_clear_mime_table_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/clearMimeTable '{}'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "returnValue": true,
+    "errorCode": "clearing mime tables failed"
+}
+\endcode
+*/
 static bool servicecallback_clearMimeTable(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 	LSError lserror;
@@ -3730,6 +7207,47 @@ static bool servicecallback_clearMimeTable(LSHandle* lsHandle, LSMessage *messag
 
 }
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_reset_to_mime_defaults resetToMimeDefaults
+
+\e Private.
+
+com.palm.applicationManager/resetToMimeDefaults
+
+Reset mime table to default.
+
+\subsection com_palm_application_manager_reset_to_mime_defaults_syntax Syntax:
+\code
+{
+}
+\endcode
+
+\subsection com_palm_application_manager_reset_to_mime_defaults_returns Returns:
+\code
+{
+    "subscribed": boolean,
+    "returnValue": boolean
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param subscribed Always false, no subscriptions.
+
+\subsection com_palm_application_manager_reset_to_mime_defaults_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/resetToMimeDefaults '{}'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "returnValue": true
+}
+\endcode
+*/
 static bool servicecallback_deleteSavedTable(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 	LSError lserror;
@@ -3757,6 +7275,61 @@ static bool servicecallback_deleteSavedTable(LSHandle* lsHandle, LSMessage *mess
 
 }
 
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_force_single_app_scan forceSingleAppScan
+
+\e Private.
+
+com.palm.applicationManager/forceSingleAppScan
+
+Make a forced post install scan for an application.
+
+\subsection com_palm_application_manager_force_single_app_scan_syntax Syntax:
+\code
+{
+    "id": string
+}
+\endcode
+
+\subsection com_palm_application_manager_force_single_app_scan_returns Returns:
+\code
+{
+    "subscribed": boolean,
+    "returnValue": boolean,
+    "errorText": string
+}
+\endcode
+
+\param subscribed Always false, no subscriptions.
+\param returnValue Indicates if the call was succesful.
+\param errorText Describes the error if call was not succesful.
+
+\param returnValue Indicates if the call was succesful.
+
+\subsection com_palm_application_manager_force_single_app_scan_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/forceSingleAppScan '{ "id": "com.palm.app.browser" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "subscribed": false,
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "subscribed": false,
+    "returnValue": false,
+    "errorText": "no key 'id' provided"
+}
+\endcode
+*/
 static bool servicecallback_forceSingleAppScan(LSHandle* lsHandle, LSMessage *message, void *userData)
 {
 	LSError lserror;
@@ -3877,10 +7450,10 @@ void ApplicationManager::postLaunchPointChange(const LaunchPoint* lp, const std:
  *				processId: "..."
  *			}
  *			...
- *		]	
+ *		]
  *	}
- * 
- * 
+ *
+ *
  */
 
 /*
@@ -3910,10 +7483,61 @@ void ApplicationManager::relayStatus (const std::string& jsonPayload,const unsig
 
 }
 
-/**
-	\fn com.palm.applicationManager/getAppBasePath
-	\brief return the path to the app for a given appid
- */
+/*!
+\page com_palm_application_manager
+\n
+\section com_palm_application_manager_get_app_base_path getAppBasePath
+
+\e Public.
+
+com.palm.applicationManager/getAppBasePath
+
+Get the path to the app for a given application ID.
+
+\subsection com_palm_application_manager_get_app_base_path_syntax Syntax:
+\code
+{
+    "appId": string
+}
+\endcode
+
+\subsection com_palm_application_manager_get_app_base_path_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "appId": string,
+    "basePath": string
+    "errorText": string
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param appId The application ID.
+\param basePath Path to the application.
+\param errorText Description of the error if call was not succesful.
+
+\subsection com_palm_application_manager_get_app_base_path_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.applicationManager/getAppBasePath '{ "appId": "com.palm.app.youtube" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "appId": "com.palm.app.youtube",
+    "basePath": "file:\/\/\/media\/cryptofs\/apps\/usr\/palm\/applications\/com.palm.app.youtube\/index.html"
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false,
+    "errorText": "Invalid appId specified: foobar"
+}
+\endcode
+*/
 static bool servicecallback_getappbasepath( LSHandle* lshandle, LSMessage *message,
 		void *user_data)
 {

@@ -51,7 +51,11 @@ static const char * strCookieTempFile = "/tmp/com.palm.luna-sysmgr.cookies-html5
  */
 static const char * strBrowserDbFile = "/tmp/com.palm.app.browser-html5-backup.sql";
 static const char * strBrowserDbUrl = "file:///usr/palm/applications/com.palm.app.browser/index.html:0";
-
+/*! \page com_palm_app_data_backup Service API com.palm.appDataBackup/
+ *  Public methods:
+ *  - \ref com_palm_app_data_backup_post_restore
+ *  - \ref com_palm_app_data_backup_pre_backup
+ */
 /**
  * These are the methods that the backup service can call when it's doing a 
  * backup or restore.
@@ -182,6 +186,58 @@ BackupManager* BackupManager::instance()
 	return s_instance;
 }
 
+/*!
+\page com_palm_app_data_backup
+\n
+\section com_palm_app_data_backup_pre_backup preBackup
+
+\e Public.
+
+com.palm.appDataBackup/preBackup
+
+Make a backup of LunaSysMgr.
+
+\subsection com_palm_app_data_backup_pre_backup_syntax Syntax:
+\code
+{
+}
+\endcode
+
+\subsection com_palm_app_data_backup_pre_backup_returns Returns:
+\code
+{
+    "description": string,
+    "version": string,
+    "files": [ string array ]
+}
+\endcode
+
+\param descrition Describes the backup.
+\param version Version information.
+\param files String array of files included in the backup.
+
+\subsection com_palm_app_data_backup_pre_backup_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.appDataBackup/preBackup '{}'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "description": "Backup of LunaSysMgr files for launcher, quicklaunch, dockmode and sysmgr cookies",
+    "version": "1.0",
+    "files": [
+        "\/var\/luna\/preferences\/used-first-card",
+        "\/var\/palm\/user-exhibition-apps.json",
+        "\/var\/luna\/preferences\/launcher3\/launcher_fixed.msave",
+        "\/var\/luna\/preferences\/launcher3\/page_ReorderablePage_APPS_{eb1b2baa-dbe6-4d51-9ec2-2517fdd284ac}",
+        "\/var\/luna\/preferences\/launcher3\/page_ReorderablePage_DOWNLOADS_{88540c1e-7dc2-4f0f-b4aa-3721aab97ab7}",
+        "\/var\/luna\/preferences\/launcher3\/page_ReorderablePage_FAVORITES_{b83a9aa7-22f4-4ac8-b38a-4a68379ecd31}",
+        "\/var\/luna\/preferences\/launcher3\/page_ReorderablePage_SETTINGS_{6890fced-9122-4498-bbb1-50cb31b189b7}",
+        "\/var\/luna\/preferences\/launcher3\/quicklaunch_fixed.qlsave"
+    ]
+}
+\endcode
 /**
  * Called by the backup service for all four of our callback functions: preBackup, 
  * postBackup, preRestore, postRestore.
@@ -252,6 +308,58 @@ bool BackupManager::preBackupCallback( LSHandle* lshandle, LSMessage *message, v
 	return true;
 }
 
+/*!
+\page com_palm_app_data_backup
+\n
+\section com_palm_app_data_backup_post_restore postRestore
+
+\e Public.
+
+com.palm.appDataBackup/postRestore
+
+Restore a backup of LunaSysMgr.
+
+\subsection com_palm_app_data_backup_post_restore_syntax Syntax:
+\code
+{
+    "files" : [string array]
+}
+\endcode
+
+\param files List of backup files.
+
+\subsection com_palm_app_data_backup_post_restore_returns Returns:
+\code
+{
+    "returnValue": boolean
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+
+\subsection com_palm_app_data_backup_post_restore_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.appDataBackup/postRestore '{
+    "files": [
+        "/var/luna/preferences/used-first-card",
+        "/var/palm/user-exhibition-apps.json",
+        "/var/luna/preferences/launcher3/launcher_fixed.msave",
+        "/var/luna/preferences/launcher3/page_ReorderablePage_APPS_{eb1b2baa-dbe6-4d51-9ec2-2517fdd284ac}",
+        "/var/luna/preferences/launcher3/page_ReorderablePage_DOWNLOADS_{88540c1e-7dc2-4f0f-b4aa-3721aab97ab7}",
+        "/var/luna/preferences/launcher3/page_ReorderablePage_FAVORITES_{b83a9aa7-22f4-4ac8-b38a-4a68379ecd31}",
+        "/var/luna/preferences/launcher3/page_ReorderablePage_SETTINGS_{6890fced-9122-4498-bbb1-50cb31b189b7}",
+        "/var/luna/preferences/launcher3/quicklaunch_fixed.qlsave"
+    ]
+}'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+}
+\endcode
+*/
 bool BackupManager::postRestoreCallback( LSHandle* lshandle, LSMessage *message, void *user_data)
 {
     BackupManager* pThis = static_cast<BackupManager*>(user_data);

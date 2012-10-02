@@ -76,6 +76,14 @@
 #define HEADSET_BTN_SINGLE_PRESS	"single_click"
 #define HEADSET_BTN_DOUBLE_PRESS	"double_click"
 
+/*! \page com_palm_keys Service API com.palm.keys/
+ *
+ * Public methods:
+ *  - \ref com_palm_keys_audio_status
+ *  - \ref com_palm_keys_headset_status
+ *  - \ref com_palm_keys_media_status
+ *  - \ref com_palm_keys_switches_status
+ */
 
 static LSMethod s_audioMethods[] = {
 	{ METHOD_STATUS, InputManager::audioKeyServiceCallback },
@@ -413,18 +421,216 @@ bool InputManager::processKeyState(LSHandle* handle, LSMessage* msg, void* userD
 	return true;
 }
 
+/*!
+\page com_palm_keys
+\n
+\section com_palm_keys_audio_status audio/status
+
+\e Public.
+
+com.palm.keys/audio/status
+
+Subscribe to audio key status changes.
+
+\subsection com_palm_keys_audio_status_syntax Syntax:
+\code
+{
+    "subscribe": boolean
+}
+\endcode
+
+\param subscribe Set to true to subscribe to status changes.
+
+\subsection com_palm_keys_audio_status_returns Returns:
+\code
+{
+    "errorCode": int,
+    "errorText": string
+    "returnValue": boolean,
+    "subscribed": boolean
+}
+\endcode
+
+\param errorCode Code for the error if call was not succesful.
+\param errorText Describes the error if call was not succesful.
+\param returnValue Indicates if the call was succesful.
+\param subscribed True if subscription to status changes is made.
+
+\subsection com_palm_keys_audio_status_examples Examples:
+\code
+luna-send -n 2 -f luna://com.palm.keys/audio/status '{ "subscribe": true }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "subscribed": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "errorCode": -1,
+    "errorText": "We were expecting a subscribe type message, but we did not recieve one.",
+    "returnValue": false,
+    "subscribed": false
+}
+\endcode
+*/
 bool InputManager::audioKeyServiceCallback(LSHandle* handle, LSMessage* msg, void* userData)
 {
 	// we only care about subscriptions
 	return processSubscription(handle, msg, userData);
 }
 
+/*!
+\page com_palm_keys
+\n
+\section com_palm_keys_media_status media/status
+
+\e Public.
+
+com.palm.keys/media/status
+
+Subscribe to media key status changes.
+
+\subsection com_palm_keys_media_status_syntax Syntax:
+\code
+{
+    "subscribe": boolean
+}
+\endcode
+
+\param subscribe Set to true to subscribe to status changes.
+
+\subsection com_palm_keys_media_status_returns Returns:
+\code
+{
+    "errorCode": int,
+    "errorText": string
+    "returnValue": boolean,
+    "subscribed": boolean
+}
+\endcode
+
+\param errorCode Code for the error if call was not succesful.
+\param errorText Describes the error if call was not succesful.
+\param returnValue Indicates if the call was succesful.
+\param subscribed True if subscription to status changes is made.
+
+\subsection com_palm_keys_media_status_examples Examples:
+\code
+luna-send -n 2 -f luna://com.palm.keys/media/status '{ "subscribe": true }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "subscribed": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "errorCode": -1,
+    "errorText": "We were expecting a subscribe type message, but we did not recieve one.",
+    "returnValue": false,
+    "subscribed": false
+}
+\endcode
+*/
 bool InputManager::mediaKeyServiceCallback(LSHandle* handle, LSMessage* msg, void* userData)
 {
 	// we only care about subscriptions
 	return processSubscription(handle, msg, userData);
 }
 
+/*!
+\page com_palm_keys
+\n
+\section com_palm_keys_switches_status switches/status
+
+\e Public.
+
+com.palm.keys/switches/status
+
+Subscribe to switch state changes or request the state of a particular switch.
+
+\subsection com_palm_keys_switches_status_syntax_subscribe Syntax for subscribing:
+\code
+{
+    "subscribe": boolean
+}
+\endcode
+
+\param subscribe Set to true to subscribe to status changes.
+
+\subsection com_palm_keys_switches_status_syntax_request Syntax for requesting a switch state:
+\code
+{
+    "get": string
+}
+\endcode
+
+\param get Name of the swtich, for example ringer, slider, etc.
+
+\subsection com_palm_keys_switches_status_returns_subscribe Returns for subscribe messages:
+\code
+{
+    "returnValue": boolean,
+    "subscribe": boolean
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param subscribe True if subscribed to switch status changes.
+
+\subsection com_palm_keys_switches_status_returns_request Returns for request messages:
+\code
+{
+    "key": string,
+    "state": string,
+    "returnValue": boolean
+}
+\endcode
+
+\param key Name of the switch.
+\param state State of the switch.
+\param returnValue Indicates if the call was succesful.
+
+\subsection com_palm_keys_switches_status_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.keys/switches/status '{ "get": "ringer" } '
+\endcode
+
+Example response for a succesful request call:
+\code
+{
+    "key": "ringer",
+    "state": "up",
+    "returnValue": true
+}
+\endcode
+
+Example response for a succesful subscription call:
+\code
+{
+    "returnValue": true,
+    "subscribed": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false
+}
+\endcode
+*/
 bool InputManager::switchesStatusCallback(LSHandle* handle, LSMessage* msg, void* userData)
 {
 	InputManager* i = (InputManager*)userData;
@@ -438,6 +644,64 @@ bool InputManager::switchesStatusCallback(LSHandle* handle, LSMessage* msg, void
 	}
 }
 
+/*!
+\page com_palm_keys
+\n
+\section com_palm_keys_headset_status headset/status
+
+\e Public.
+
+com.palm.keys/headset/status
+
+Subscribe to headset key events. Currently only "headset_button" exists with "up" "down" "hold" "single_press" and "double_press" states.
+
+\subsection com_palm_keys_headset_status_syntax Syntax:
+\code
+{
+    "subscribe": boolean
+}
+\endcode
+
+\param subscribe Set to true to subscribe to status changes.
+
+\subsection com_palm_keys_headset_status_returns Returns:
+\code
+{
+    "errorCode": int,
+    "errorText": string
+    "returnValue": boolean,
+    "subscribed": boolean
+}
+\endcode
+
+\param errorCode Code for the error if call was not succesful.
+\param errorText Describes the error if call was not succesful.
+\param returnValue Indicates if the call was succesful.
+\param subscribed True if subscription to status changes is made.
+
+\subsection com_palm_keys_headset_status_examples Examples:
+\code
+luna-send -n 2 -f luna://com.palm.keys/headset/status '{ "subscribe": true }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "subscribed": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "errorCode": -1,
+    "errorText": "We were expecting a subscribe type message, but we did not recieve one.",
+    "returnValue": false,
+    "subscribed": false
+}
+\endcode
+*/
 bool InputManager::headsetStatusCallback(LSHandle* handle, LSMessage* msg, void* userData)
 {
 	// we only care about subscriptions

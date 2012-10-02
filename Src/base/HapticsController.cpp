@@ -38,6 +38,13 @@
 #include <HapticsControllerCastle.cpp>
 #endif
 
+/*! \page com_palm_vibrate Service API com.palm.vibrate/
+ *
+ * Public methods:
+ * - \ref com_palm_vibrate_vibrate
+ * - \ref com_palm_vibrate_vibrate_named_effect
+ */
+
 HapticsController* HapticsController::s_instance = NULL;
 
 HapticsController * HapticsController::instance() {
@@ -57,6 +64,59 @@ HapticsController::HapticsController()
 	s_instance = this;
 }
 
+/*!
+\page com_palm_vibrate
+\n
+\section com_palm_vibrate_vibrate vibrate
+
+\e Public.
+
+com.palm.vibrate/vibrate
+
+Vibrate the device in periods for a specified duration or infinitely.
+
+\subsection com_palm_vibrate_vibrate_syntax Syntax:
+\code
+{
+    "period": int,
+    "duration": int
+}
+\endcode
+
+\param interval Period of the vibration in ms. \e Required.
+\param duration Duration of the vibration in ms. If not specified, device will vibrate until stopped with LSCallCancel.
+
+\subsection com_palm_vibrate_vibrate_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "errorText": string
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful or not.
+\param errorText Describes the error if call was not succesful
+
+\subsection com_palm_vibrate_vibrate_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.vibrate/vibrate '{ "period": 500, "duration": 4000 }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false,
+    "errorText": "Invalid arguments"
+}
+\endcode
+*/
 static bool cbVibrate(LSHandle *lh, LSMessage *m,void *ctx)
 {
     // {"period": integer, "duration": integer}
@@ -117,6 +177,59 @@ error:
 	return true; 
 }
 
+/*!
+\page com_palm_vibrate
+\n
+\section com_palm_vibrate_vibrate_named_effect vibrateNamedEffect
+
+\e Public.
+
+com.palm.vibrate/vibrateNamedEffect
+
+Vibrate an effect.
+
+\subsection com_palm_vibrate_vibrate_named_effect_syntax Syntax:
+\code
+{
+    "name": string,
+    "continous": boolean
+}
+\endcode
+
+\param name Name of the effect.
+\param continuos If true, effect is played until stopped with LSCallCancel.
+
+\subsection com_palm_vibrate_vibrate_named_effect_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "errorText": string
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful or not.
+\param errorText Describes the error if call was not succesful
+
+\subsection com_palm_vibrate_vibrate_named_effect_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.vibrate/vibrateNamedEffect '{ "name": "ringtone", "continous": false }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false,
+    "errorText": "Unable to vibrate"
+}
+\endcode
+*/
 static bool cbVibrateNamedEffect(LSHandle *lh, LSMessage *m, void *ctx)
 {
     // {"name": string, "continous": boolean}

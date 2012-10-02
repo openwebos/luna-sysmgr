@@ -140,8 +140,23 @@ statvfsfn ApplicationInstaller::s_statvfsFn = ::statvfs;
 std::map<uint32_t,std::pair<uint32_t,uint32_t> > ApplicationInstaller::dbg_statfs_map;
 std::map<uint32_t,std::pair<uint32_t,uint32_t> > ApplicationInstaller::dbg_statvfs_map;
 	
-/// --------------------------------------------------------------------------------------------------------------------
+//// --------------------------------------------------------------------------------------------------------------------
 
+/*! \page com_palm_appinstaller Service API com.palm.appinstaller/
+ *  Public methods:
+ *  - \ref com_palm_appinstaller_get_user_installed_app_sizes
+ *  - \ref com_palm_appinstaller_query_install_capacity
+ *  - \ref com_palm_appinstaller_install
+ *  - \ref com_palm_appinstaller_install_no_verify
+ *  - \ref com_palm_appinstaller_notify_on_change
+ *  - \ref com_palm_appinstaller_remove
+ *  - \ref com_palm_appinstaller_revoke
+ */
+/* TODO: These should be documented, but were not available on current emulator
+ *       images. Check with a newer image.
+ *  - \ref com_palm_appinstaller_install_progress_query
+ *  - \ref com_palm_appinstaller_is_installed
+ */
 static LSMethod s_methods[]  = {
 	{ "installProgressQuery",     	ApplicationInstaller::cbInstallProgressQuery },
 	{ "install",					ApplicationInstaller::cbInstall },
@@ -1768,6 +1783,94 @@ bool ApplicationInstaller::cbInstallProgressQuery(LSHandle* lshandle, LSMessage 
 	return (ApplicationInstaller::instance()->lunasvcInstallProgressQuery(lshandle,msg,user_data));
 }
 
+/*!
+\page com_palm_appinstaller
+\n
+\section com_palm_appinstaller_install install
+
+\e Public.
+
+com.palm.appinstaller/install
+
+Install an application.
+
+\subsection com_palm_appinstaller_install_syntax Syntax:
+\code
+{
+    "target": string,
+    "id": string,
+    "uncompressedSize": integer,
+    "subscribe": boolean
+}
+\endcode
+
+\param target Package file. \e Required.
+\param id ID for the package.
+\param uncompressedSize Uncompressed size of the package.
+\param subscribe Set to true to receive status change events.
+
+\subsection com_palm_appinstaller_install_returns_call Returns when installation request is made:
+\code
+{
+    "returnValue": boolean,
+    "subscribed": boolean,
+    "ticket": string
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param subscribed Indicates if subscribed to receive status change events.
+\param ticket Identifier that was assigned for the installation request.
+
+\subsection com_palm_appinstaller_install_returns_status Returns when status changes:
+\code
+{
+    "ticket": int,
+    "status": string
+}
+\endcode
+
+\param ticket Identifier that was assigned for the installation request.
+\param status Describes the installation status.
+
+\subsection com_palm_appinstaller_install_examples Examples:
+\code
+luna-send -n 10 -f luna://com.palm.appinstaller/install '{ "target":  "/tmp/apackage", "id": "com.whatnot.package", "uncompressedSize": 100, "subscribe": true }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "subscribed": true,
+    "ticket": "6"
+}
+\endcode
+
+Example status updates for a failed installation when subscribed:
+\code
+{
+    "ticket": 6,
+    "status": "STARTING"
+}
+{
+    "ticket": 6,
+    "status": "FAILED_PACKAGEFILE_NOT_FOUND"
+}
+{
+    "ticket": 6,
+    "status": "FAILED_IPKG_INSTALL"
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false,
+    "subscribed": false
+}
+\endcode
+*/
 bool ApplicationInstaller::cbInstall(LSHandle* lshandle, LSMessage *msg,void *user_data) {
 	
 	LSError lserror;
@@ -1870,6 +1973,95 @@ Done:
 	json_object_put(reply);
 	return true;
 }
+
+/*!
+\page com_palm_appinstaller
+\n
+\section com_palm_appinstaller_install_no_verify installNoVerify
+
+\e Public.
+
+com.palm.appinstaller/installNoVerify
+
+Install a package without verification.
+
+\subsection com_palm_appinstaller_install_no_verify_syntax Syntax:
+\code
+{
+    "target": string,
+    "uncompressedSize": integer,
+    "systemMode": boolean,
+    "subscribe": boolean
+}
+\endcode
+
+\param target Package file. \e Required.
+\param uncompressedSize Uncompressed size of the package.
+\param systemMode Set to true to turn on system mode, which disables ipkg flags.
+\param subscribe Set to true to receive status change events.
+
+\subsection com_palm_appinstaller_install_no_verify_returns_call Returns for a call:
+\code
+{
+    "returnValue": boolean,
+    "ticket": int,
+    "subscribed": boolean
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param ticket Identifier that was assigned for the installation request.
+\param subscribed Indicates if subscribed to receive status change events.
+
+\subsection com_palm_appinstaller_install_no_verify_returns_status Returns for status change events:
+\code
+{
+    "ticket": int,
+    "status": string
+}
+\endcode
+
+\param ticket Identifier that was assigned for the installation request.
+\param status Describes the installation status.
+
+\subsection com_palm_appinstaller_install_no_verify_examples Examples:
+\code
+luna-send -n 10 -f luna://com.palm.appinstaller/installNoVerify '{ "target":  "/tmp/apackage", "uncompressedSize": 100, "systemMode": true, "subscribe": true }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "ticket": 1,
+    "subscribed": true
+}
+\endcode
+
+Example of status changes for a failed installation:
+\code
+{
+    "ticket": 1,
+    "status": "STARTING"
+}
+{
+    "ticket": 1,
+    "status": "FAILED_PACKAGEFILE_NOT_FOUND"
+}
+{
+    "ticket": 1,
+    "status": "FAILED_IPKG_INSTALL"
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false,
+    "errorCode": "Failed to find param target in message"
+}
+\endcode
+*/
 
 /**
  * Nearly identical to cbInstall, but will pass in a parameter to cbInstall_detached that will
@@ -1994,7 +2186,88 @@ Done:
 	return true;
 }
 
+/*!
+\page com_palm_appinstaller
+\n
+\section com_palm_appinstaller_remove remove
 
+\e Public.
+
+com.palm.appinstaller/remove
+
+Remove a package.
+
+\subsection com_palm_appinstaller_remove_syntax Syntax:
+\code
+{
+    "packageName": string,
+    "subscribe": boolean
+}
+\endcode
+
+\param packageName Name of the package to remove.
+\param subscribe Set to true to receive events on status changes.
+
+\subsection com_palm_appinstaller_remove_returns_call Returns for a call:
+\code
+{
+    "ticket": int,
+    "returnValue": boolean,
+    "version": version,
+    "subscribed": boolean
+}
+\endcode
+
+\param ticket Identifier for the removal.
+\param returnValue Indicates if the call was succesful.
+\param version Installed version of the package.
+\param subscribed Indicates if subscribed to receive status change events.
+
+\subsection com_palm_appinstaller_remove_returns_change Returns when ticket status changes:
+\code
+{
+    "ticket": int,
+    "status": string
+}
+\endcode
+
+\param ticket Identifier for the removal.
+\param status Describes the status of the remove action.
+
+\subsection com_palm_appinstaller_remove_examples Examples:
+\code
+luna-send -n 10 -f luna://com.palm.appinstaller/remove '{ "packageName": "com.palm.app.email", "subscribe": true }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "ticket": 6,
+    "returnValue": true,
+    "version": "3.0.13801",
+    "subscribed": true
+}
+\endcode
+
+Examples of removal status changes:
+\code
+{
+    "ticket": 6,
+    "status": "IPKG_REMOVE"
+}
+{
+    "ticket": 6,
+    "status": "SUCCESS"
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false
+}
+\endcode
+*/
 bool ApplicationInstaller::cbRemove(LSHandle* lshandle, LSMessage *msg,void *user_data) {
 	
 	LSError lserror;
@@ -2134,6 +2407,78 @@ bool ApplicationInstaller::cbIsInstalled(LSHandle* lshandle, LSMessage *msg,void
 	return (ApplicationInstaller::instance()->lunasvcIsInstalled(lshandle,msg,user_data));
 }
 
+/*!
+\page com_palm_appinstaller
+\n
+\section com_palm_appinstaller_notify_on_change notifyOnChange
+
+\e Public.
+
+com.palm.appinstaller/notifyOnChange
+
+Subscribe to receive notifications when applications are installed or removed.
+
+\subsection com_palm_appinstaller_notify_on_change_syntax Syntax:
+\code
+{
+    "appId": string
+}
+\endcode
+
+\param appId ID of the application to watch. If not specified, notifications are received for all applications.
+
+\subsection com_palm_appinstaller_notify_on_change_returns_call Returns on call:
+\code
+{
+    "returnValue": boolean,
+    "subscribed": boolean,
+    "appId":string
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param subscribed True when subscribed to receive change events.
+\param appId ID of the watched application, or * in case all applications are watched.
+
+\subsection com_palm_appinstaller_notify_on_change_returns_on_change Returns on status changes:
+\code
+{
+    "appId": string,
+    "version": string,
+    "statusChange": string,
+    "cause": string
+}
+\endcode
+
+\param appId ID of the application.
+\param version Version of the application.
+\param statusChange Describes the status change.
+\param cause What caused the change.
+
+\subsection com_palm_appinstaller_notify_on_change_examples Examples:
+\code
+luna-send -n 10 -f luna://com.palm.appinstaller/notifyOnChange '{ "appId": "com.palm.app.email" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "subscribed": true,
+    "appId": "com.palm.app.email"
+}
+\endcode
+
+Example of an application removal:
+\code
+{
+    "appId": "com.palm.app.email",
+    "version": "3.0.13801",
+    "statusChange": "REMOVED",
+    "cause": "USER"
+}
+\endcode
+*/
 bool ApplicationInstaller::cbNotifyOnChange(LSHandle* lshandle, LSMessage *msg,void *user_data) {
 	
 	LSError lserror;
@@ -2222,11 +2567,154 @@ bool ApplicationInstaller::cbNotifyOnChange(LSHandle* lshandle, LSMessage *msg,v
 	return true;
 }
 
+/*!
+\page com_palm_appinstaller
+\n
+\section com_palm_appinstaller_get_user_installed_app_sizes getUserInstalledAppSizes
+
+\e Public.
+
+com.palm.appinstaller/getUserInstalledAppSizes
+
+Get sizes for user installed applications.
+
+\subsection com_palm_appinstaller_get_user_installed_app_sizes_syntax Syntax:
+\code
+{
+}
+\endcode
+
+\subsection com_palm_appinstaller_get_user_installed_app_sizes_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "apps": [
+        {
+            "appName": string,
+            "size": int
+        }
+    ],
+    "totalSize": int
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param apps Object array, see fields of contained objects below.
+\param appName Name of the application.
+\param size Size of the application in kilobytes.
+\param totalSize Combined size of all the applications in kilobytes.
+
+\subsection com_palm_appinstaller_get_user_installed_app_sizes_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.appinstaller/getUserInstalledAppSizes '{ }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "apps": [
+        {
+            "appName": "com.palm.app.enyo-facebook",
+            "size": 0
+        },
+        {
+            "appName": "com.palm.app.enyo-findapps",
+            "size": 0
+        },
+        {
+            "appName": "com.palm.app.kindle",
+            "size": 0
+        },
+        {
+            "appName": "com.palm.app.youtube",
+            "size": 0
+        },
+        {
+            "appName": "com.quickoffice.ar",
+            "size": 0
+        },
+        {
+            "appName": "com.quickoffice.webos",
+            "size": 0
+        }
+    ],
+    "totalSize": 0
+}
+\endcode
+*/
 bool ApplicationInstaller::cbGetSizes(LSHandle* lshandle,LSMessage *msg,void *user_data)
 {
 	return ApplicationInstaller::instance()->lunasvcGetInstalledSizes(lshandle,msg);
 }
 
+/*!
+\page com_palm_appinstaller
+\n
+\section com_palm_appinstaller_query_install_capacity queryInstallCapacity
+
+\e Public.
+
+com.palm.appinstaller/queryInstallCapacity
+
+Query for the space that is available, and space that is required to install an application package.
+
+\subsection com_palm_appinstaller_query_install_capacity_syntax Syntax:
+\code
+{
+    "appId": string,
+    "packageId": string,
+    "size": string,
+    "uncompressedSize": string
+}
+\endcode
+
+\param appId Application ID. Either this, or \e packageId is required.
+\param packageId Package ID. Either this, or \e appId is required.
+\param size Size of the package in kilobytes. Required.
+\param uncompressedSize Uncompressed size of the package in kilobytes.
+
+\subsection com_palm_appinstaller_query_install_capacity_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "result": int,
+    "spaceNeededInKB": string,
+    "errorCode": string,
+    "errorText": string
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param result Available space in kilobytes.
+\param spaceNeededInKB Space required to install the package.
+\param errorCode Error code in case the call failed.
+\param errorText Describes the error in more detail.
+
+\subsection com_palm_appinstaller_query_install_capacity_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.appinstaller/queryInstallCapacity '{ "packageId": "com.whatnot.app", "size": "300", "uncompressedSize": "1200" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "result": 0,
+    "spaceNeededInKB": "1536"
+}
+
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false,
+    "errorCode": "appinstaller_error",
+    "errorText": "missing size parameter"
+}
+\endcode
+*/
 bool ApplicationInstaller::cbQueryInstallCapacity(LSHandle* lshandle,LSMessage *msg,void *user_data) {
 	
 	LSError lserror;
@@ -2836,6 +3324,65 @@ bool ApplicationInstaller::cbDbgGetAppSizeOnFs(LSHandle* lshandle,LSMessage *msg
 	return true;
 }
 
+/*!
+\page com_palm_appinstaller
+\n
+\section com_palm_appinstaller_revoke revoke
+
+\e Public.
+
+com.palm.appinstaller/revoke
+
+Revoke one on more applications.
+
+\subsection com_palm_appinstaller_revoke_syntax Syntax:
+\code
+{
+    "item": {
+        "payload": {
+            "signature": string,
+            "appId": [ string array ]
+        }
+    }
+}
+\endcode
+
+\param item Object.
+\param payload Object.
+\param signature Valid signature required to revoke applications.
+\param appId IDs of applications to revoke
+
+\subsection com_palm_appinstaller_revoke_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "errorCode": string
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param errorCode Describes the error if call was not succesful.
+
+\subsection com_palm_appinstaller_revoke_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.appinstaller/revoke '{ "item": { "payload": { "signature": "notAValidSignature", "appId": ["com.palm.app.oneApp", "com.palm.app.anotherApp" ] } } }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false,
+    "errorCode": "verify failed"
+}
+\endcode
+*/
 bool ApplicationInstaller::cbRevoke(LSHandle* lshandle,LSMessage *msg,void *user_data)
 {
 	std::string errorText;

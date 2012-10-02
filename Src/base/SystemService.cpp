@@ -172,6 +172,38 @@ static bool cbSubscribeTurboMode(LSHandle* lshandle, LSMessage *message, void *u
 
 static bool cbSubscriptionCancel(LSHandle *lshandle, LSMessage *message, void *user_data);
 
+/*! \page com_palm_systemmanager Service API com.palm.systemmanager
+ *  Public methods:
+ *  - \ref com_palm_systemmanager_application_has_been_terminated
+ *  - \ref com_palm_systemmanager_clear_cache
+ *  - \ref com_palm_systemmanager_dismiss_modal_app
+ *  - \ref com_palm_systemmanager_get_animation_values
+ *  - \ref com_palm_systemmanager_get_app_restore_needed
+ *  - \ref com_palm_systemmanager_get_boot_status
+ *  - \ref com_palm_systemmanager_get_device_lock_mode
+ *  - \ref com_palm_systemmanager_get_dock_mode_status
+ *  - \ref com_palm_systemmanager_get_foreground_application
+ *  - \ref com_palm_systemmanager_get_lock_status
+ *  - \ref com_palm_systemmanager_get_security_policy
+ *  - \ref com_palm_systemmanager_get_system_status
+ *  - \ref com_palm_systemmanager_launch_modal_app
+ *  - \ref com_palm_systemmanager_lock_button_triggered
+ *  - \ref com_palm_systemmanager_match_device_passcode
+ *  - \ref com_palm_systemmanager_publish_to_system_ui
+ *  - \ref com_palm_systemmanager_run_progress_animation
+ *  - \ref com_palm_systemmanager_set_animation_values
+ *  - \ref com_palm_systemmanager_set_device_passcode
+ *  - \ref com_palm_systemmanager_set_javascript_flags
+ *  - \ref com_palm_systemmanager_subscribe_turbo_mode
+ *  - \ref com_palm_systemmanager_system_ui
+ *  - \ref com_palm_systemmanager_take_screen_shot
+ *  - \ref com_palm_systemmanager_touch_to_share_app_url_transferred
+ *  - \ref com_palm_systemmanager_touch_to_share_device_in_range
+ *  - \ref com_palm_systemmanager_update_pin_app_state
+ */
+/* This one is left out for now.
+ *  - \ref com_palm_systemmanager_subscribe_to_system_ui
+ */
 static LSMethod s_methods[]  = {
 	{ "takeScreenShot",    cbTakeScreenShot },
 	{ "clearCache", 	   cbClearCache },
@@ -961,6 +993,169 @@ static pbnjson::JSchema cbSystemUiSchema()
 	return pbnjson::JSchemaFragment("{}");
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_system_ui systemUi
+
+\e Public.
+
+com.palm.systemmanager/systemUi
+
+Send commands to the system UI.
+
+\subsection com_palm_systemmanager_system_ui_syntax Syntax:
+\code
+{
+    "<target>": <commands>
+}
+\endcode
+
+The type of the commands depends on the target.
+
+ - \ref com_palm_systemmanager_system_ui_syntax_launcheraction
+ - \ref com_palm_systemmanager_system_ui_syntax_virtualkeyboard
+ - \ref com_palm_systemmanager_system_ui_syntax_quicklaunch
+ - \ref com_palm_systemmanager_system_ui_syntax_universal_search
+ - \ref com_palm_systemmanager_system_ui_syntax_launcher
+ - \ref com_palm_systemmanager_system_ui_syntax_launchermenu
+ - \ref com_palm_systemmanager_system_ui_syntax_launchertitlechange
+
+\n
+\subsubsection com_palm_systemmanager_system_ui_syntax_launcheraction launcheraction
+
+Syntax:
+\code
+{
+    "launcheraction": string
+}
+\endcode
+
+Valid commands for the launcheraction are:
+\li \c showAppMenu Shows the application menu.
+\li \c showAppInfo Shows application info.
+\li \c editPageTitle Edit the page title.
+
+Example:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/systemUi '{ "launcheraction": "showAppMenu" }'
+\endcode
+
+\n
+\subsubsection com_palm_systemmanager_system_ui_syntax_virtualkeyboard virtualkeyboard
+
+Syntax:
+\code
+{
+    "virtualkeyboard": { <command>: <value>,  <command>: <value>, ... }
+}
+\endcode
+
+Valid commands for virtualkeyboard:
+\li \c get Will get a named value from the current keyboard.
+\li \c height Set the height for the keyboard in pixels.
+\li \c size Set a pre-defined size for the keyboard, -2 is XS, -1 is S, 0 is M, and 1 is L.
+\li \c hide Hide the keyboard if the value is true.
+
+Example:
+\code
+luna-send -i -n 1 luna://com.palm.systemmanager/systemUi '{ "virtualkeyboard":{"hide": true, "size": -1} }'
+\endcode
+
+\n
+\subsubsection com_palm_systemmanager_system_ui_syntax_quicklaunch quicklaunch
+
+Show or hide the quicklaunch dock.
+
+Syntax:
+\code
+{
+    "quicklaunch": boolean
+}
+\endcode
+
+Example:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/systemUi '{ "quicklaunch": true }'
+\endcode
+
+\n
+\subsubsection com_palm_systemmanager_system_ui_syntax_universal_search universal search
+
+Show or hide the universal search.
+
+Syntax:
+\code
+{
+    "universal search": boolean
+}
+\endcode
+
+Example:
+\code
+luna-send -i -n 1 luna://com.palm.systemmanager/systemUi '{"universal search": true }'
+\endcode
+
+\n
+\subsubsection com_palm_systemmanager_system_ui_syntax_launcher launcher
+
+Show or hide the launcher.
+
+Syntax:
+\code
+{
+    "launcher": boolean
+}
+\endcode
+
+Example:
+\code
+luna-send -i -n 1 luna://com.palm.systemmanager/systemUi '{"launcher": true }'
+\endcode
+
+\n
+\subsubsection com_palm_systemmanager_system_ui_syntax_launchermenu launchermenu
+
+Send commands to launcher menu.
+
+Syntax:
+\code
+{
+    "launchermenu": string
+}
+\endcode
+
+Valid commands for launchermenu:
+\li \c addcard
+\li \c reordercards
+\li \c deletecard
+\li \c invokerenamecard
+\li \c other
+
+Example:
+\code
+luna-send -i -n 1 luna://com.palm.systemmanager/systemUi '{"launchermenu": "addcard" }'
+\endcode
+
+\n
+\subsubsection com_palm_systemmanager_system_ui_syntax_launchertitlechange launchertitlechange
+
+Change a card title in the launcher.
+
+Syntax:
+\code
+{
+    "launchertitlechange": { "id": int, "label": string }
+}
+\endcode
+
+\param id Id of the card.
+\param label New title for the card.
+
+\code
+luna-send -i -n 1 luna://com.palm.systemmanager/systemUi '{"launchertitlechange": {"id":1, "label": "new title"} }'
+\endcode
+*/
 static bool cbSystemUi(LSHandle* lshandle, LSMessage *message, void *user_data)
 {
     DEPRECATED_SERVICE_MSG();
@@ -1185,6 +1380,50 @@ static bool cbSystemUiDbg(LSHandle* lshandle, LSMessage *message,
 	return true;
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_get_app_restore_needed getAppRestoreNeeded
+
+\e Public.
+
+com.palm.systemmanager/getAppRestoreNeeded
+
+Subscribe to events indicating application restore is needed.
+
+\subsection com_palm_systemmanager_get_app_restore_needed_syntax Syntax:
+\code
+{
+    "subscribe": boolean
+}
+\endcode
+
+\param subscribe Set to true to subscribe to status change events.
+
+\subsection com_palm_systemmanager_get_app_restore_needed_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "subscribed": boolean
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param subscribed True if subscribed to events.
+
+\subsection com_palm_systemmanager_get_app_restore_needed_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/getAppRestoreNeeded '{ "subscribe": true }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "subscribed": true
+}
+\endcode
+*/
 static bool cbGetAppRestoreNeeded(LSHandle* lsHandle, LSMessage *message,
 								  void *user_data)
 {
@@ -1219,6 +1458,44 @@ Done:
 	return true;
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_clear_cache clearCache
+
+\e Public.
+
+com.palm.systemmanager/clearCache
+
+Clear the webkit cache.
+
+\subsection com_palm_systemmanager_clear_cache_syntax Syntax:
+\code
+{
+}
+\endcode
+
+\subsection com_palm_systemmanager_clear_cache_returns Returns:
+\code
+{
+    "returnValue": boolean
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+
+\subsection com_palm_systemmanager_clear_cache_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/clearCache '{}'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+}
+\endcode
+*/
 static bool cbClearCache(LSHandle* handle, LSMessage * msg, void * data)
 {
     EMPTY_SCHEMA_RETURN(handle, msg);
@@ -1238,6 +1515,56 @@ static bool cbClearCache(LSHandle* handle, LSMessage * msg, void * data)
 	return true;
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_take_screen_shot takeScreenShot
+
+\e Public.
+
+com.palm.systemmanager/takeScreenShot
+
+Take a screenshot.
+
+\subsection com_palm_systemmanager_take_screen_shot_syntax Syntax:
+\code
+{
+    "file": string
+}
+\endcode
+
+\param file Destination path for the screenshot image. Can be absolute or
+relative path. If the path is relative, the image will be stored under home
+folder.
+
+\subsection com_palm_systemmanager_take_screen_shot_returns Returns:
+\code
+{
+    "returnValue": boolean
+}
+\endcode
+
+\param
+
+\subsection com_palm_systemmanager_take_screen_shot_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/takeScreenShot '{ "file": "screenshot.jpg" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false
+}
+\endcode
+*/
 static bool cbTakeScreenShot(LSHandle* lshandle, LSMessage *message,
 							 void *user_data)
 {
@@ -1308,6 +1635,50 @@ Done:
 	return true;
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_application_has_been_terminated applicationHasBeenTerminated
+
+\e Public.
+
+com.palm.systemmanager/applicationHasBeenTerminated
+
+Subscribe to events indicating application has been terminated
+
+\subsection com_palm_systemmanager_application_has_been_terminated_syntax Syntax:
+\code
+{
+    "subscribe": boolean
+}
+\endcode
+
+\param subscribe Set to true to subscribe to events.
+
+\subsection com_palm_systemmanager_application_has_been_terminated_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "subscribed": boolean
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param subscribed True if subscribed to events.
+
+\subsection com_palm_systemmanager_application_has_been_terminated_examples Examples:
+\code
+luna-send -n 10 -f luna://com.palm.systemmanager/applicationHasBeenTerminated '{ "subscribe": true }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "subscribed": true
+}
+\endcode
+*/
 static bool cbApplicationHasBeenTerminated(LSHandle* lsHandle, LSMessage *message,
 									       void *user_data)
 {
@@ -1338,6 +1709,67 @@ static bool cbApplicationHasBeenTerminated(LSHandle* lsHandle, LSMessage *messag
     return true;
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_get_foreground_application getForegroundApplication
+
+\e Public.
+
+com.palm.systemmanager/getForegroundApplication
+
+Get foreground application.
+
+\subsection com_palm_systemmanager_get_foreground_application_syntax Syntax:
+\code
+{
+    "subscribe": boolean
+}
+\endcode
+
+\param subscribe Set to true to receive events when foregound application changes.
+
+\subsection com_palm_systemmanager_get_foreground_application_returns Returns:
+\code
+{
+    "title": string,
+    "id": string,
+    "appmenu": string,
+    "returnValue": boolean,
+    "subscribed": boolean
+}
+\endcode
+
+\param title Title of the application.
+\param id Id of the application.
+\param appmenu Title of the application menu.
+\param returnValue Indicates if the call was succesful
+\param subscribed True if subscribed to events.
+
+\subsection com_palm_systemmanager_get_foreground_application_examples Examples:
+\code
+luna-send -f -n 1 luna://com.palm.systemmanager/getForegroundApplication '{"subscribe": false}'
+\endcode
+
+Example response when an application is running:
+\code
+{
+    "title": "Web",
+    "id": "com.palm.app.browser",
+    "appmenu": "Web",
+    "returnValue": true,
+    "subscribed": false
+}
+\endcode
+
+Exmple response when there is no foreground application:
+\code
+{
+    "returnValue": true,
+    "subscribed": false
+}
+\endcode
+*/
 static bool cbGetForegroundApplication(LSHandle* lsHandle, LSMessage *message,
 									   void *user_data)
 {
@@ -1389,6 +1821,53 @@ Done:
 	return true;
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_get_lock_status getLockStatus
+
+\e Public.
+
+com.palm.systemmanager/getLockStatus
+
+Get status of screen lock.
+
+\subsection com_palm_systemmanager_get_lock_status_syntax Syntax:
+\code
+{
+    "subscribe": boolean
+}
+\endcode
+
+\param subscribe Set to true to receive events when screen lock status changes.
+
+\subsection com_palm_systemmanager_get_lock_status_returns Returns:
+\code
+{
+    "locked": boolean,
+    "returnValue": boolean,
+    "subscribed": boolean
+}
+\endcode
+
+\param locked True if the screen is locked.
+\param returnValue Indicates if the call was succesful
+\param subscribed True if subscribed to events.
+
+\subsection com_palm_systemmanager_get_lock_status_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/getLockStatus '{ "subscribe": false }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "locked": false,
+    "returnValue": true,
+    "subscribed": false
+}
+\endcode
+*/
 static bool cbGetLockStatus(LSHandle* lsHandle, LSMessage* message, void* user_data)
 {
     SUBSCRIBE_SCHEMA_RETURN(lsHandle, message);
@@ -1425,6 +1904,53 @@ Done:
 	return true;
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_get_dock_mode_status getDockModeStatus
+
+\e Public.
+
+com.palm.systemmanager/getDockModeStatus
+
+Find out if device is in dock mode.
+
+\subsection com_palm_systemmanager_get_dock_mode_status_syntax Syntax:
+\code
+{
+    "subscribe": boolean
+}
+\endcode
+
+\param subscribe Set to true to receive events when screen lock status changes.
+
+\subsection com_palm_systemmanager_get_dock_mode_status_returns Returns:
+\code
+{
+    "enabled": boolean,
+    "returnValue": boolean,
+    "subscribed": boolean
+}
+\endcode
+
+\param enabled True if the device is in dock mode.
+\param returnValue Indicates if the call was succesful
+\param subscribed True if subscribed to events.
+
+\subsection com_palm_systemmanager_get_dock_mode_status_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/getDockModeStatus '{ "subscribe": false }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "enabled": false,
+    "returnValue": true,
+    "subscribed": false
+}
+\endcode
+*/
 static bool cbGetDockModeStatus(LSHandle* lsHandle, LSMessage* message, void* user_data)
 {
     SUBSCRIBE_SCHEMA_RETURN(lsHandle, message);
@@ -1461,6 +1987,54 @@ Done:
 	return true;
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_set_device_passcode setDevicePasscode
+
+\e Public.
+
+com.palm.systemmanager/setDevicePasscode
+
+Set device lock mode and passcode. This can be a simple pin code with just digits, or a password with any characters.
+
+\subsection com_palm_systemmanager_set_device_passcode_syntax Syntax:
+\code
+{
+    "lockMode":string,
+    "passCode":string
+}
+\endcode
+
+\param lockMode Can be "pin" or "password".
+\param passCode New passcode. Pin should contain only digits, but password can contain any characters.
+
+\subsection com_palm_systemmanager_set_device_passcode_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "errorText": string,
+    "errorCode": int
+
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param errorText Describes the error if the call was not succesful.
+\param errorCode Code for the error if the call was not succesful.
+
+\subsection com_palm_systemmanager_set_device_passcode_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/setDevicePasscode '{ "lockMode": "password", "passCode": "password1234" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+}
+\endcode
+*/
 static bool cbSetDevicePasscode(LSHandle* lsHandle, LSMessage *message, void *user_data)
 {
 	int errorCode = 0;
@@ -1520,6 +2094,54 @@ Done:
 	return true;
 }
 
+
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_match_device_passcode matchDevicePasscode
+
+\e Public.
+
+com.palm.systemmanager/matchDevicePasscode
+
+Check the passcode received from user against the one set to the device.
+
+\subsection com_palm_systemmanager_match_device_passcode_syntax Syntax:
+\code
+{
+    "passCode":string
+}
+\endcode
+
+\param passCode Code to check.
+
+\subsection com_palm_systemmanager_match_device_passcode_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "lockedOut": boolean,
+    "retriesLeft": int
+}
+\endcode
+
+\param returnValue Indicates if the passcode was correct.
+\param lockedOut Was the user locked out.
+\param retriesLeft How many retries are left.
+
+\subsection com_palm_systemmanager_match_device_passcode_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/matchDevicePasscode '{ "passCode": "1234" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": false,
+    "lockedOut": false,
+    "retriesLeft": 0
+}
+\endcode
+*/
 static bool cbMatchDevicePasscode(LSHandle* lsHandle, LSMessage *message, void *user_data)
 {
 	bool success = false;
@@ -1572,6 +2194,59 @@ Done:
 	return true;
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_get_device_lock_mode getDeviceLockMode
+
+\e Public.
+
+com.palm.systemmanager/getDeviceLockMode
+
+Check the device lock mode.
+
+\subsection com_palm_systemmanager_get_device_lock_mode_syntax Syntax:
+\code
+{
+    "subscribe": boolean
+}
+\endcode
+
+\param subscribe Set to true to reveive events when lock mode changes.
+
+\subsection com_palm_systemmanager_get_device_lock_mode_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "subscribed": boolean,
+    "lockMode": string,
+    "policyState": string,
+    "retriesLeft": int
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful
+\param subscribed True if subscribed to receive mode change events.
+\param lockMode Current lock mode, "password", "pin", or "none".
+\param policyState Exchange Auto Sync security policy state, "none", "active" or "pending".
+\param retriesLeft Number of passcode attempts left.
+
+\subsection com_palm_systemmanager_get_device_lock_mode_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/getDeviceLockMode '{ "subscribe": false }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "subscribed": true,
+    "lockMode": "pin",
+    "policyState": "active",
+    "retriesLeft": 0
+}
+\endcode
+*/
 static bool cbGetDeviceLockMode(LSHandle* lsHandle, LSMessage *message,	void *user_data)
 {
     SUBSCRIBE_SCHEMA_RETURN(lsHandle, message);
@@ -1611,6 +2286,83 @@ Done:
 	return true;
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_get_security_policy getSecurityPolicy
+
+\e Public.
+
+com.palm.systemmanager/getSecurityPolicy
+
+Get information about the Exchange Active Sync (EAS) security policy.
+
+\subsection com_palm_systemmanager_get_security_policy_syntax Syntax:
+\code
+{
+}
+\endcode
+
+\subsection com_palm_systemmanager_get_security_policy_returns Returns:
+\code
+{
+    "policy": {
+        "password": {
+            "enabled": boolean,
+            "minLength": int,
+            "maxRetries": int,
+            "alphaNumeric": boolean
+        },
+        "inactivityInSeconds": int,
+        "id": string,
+        "status": {
+            "enforced": boolean,
+            "retriesLeft": int
+        }
+    },
+    "returnValue": boolean
+}
+\endcode
+
+\param policy Policy object, see fields below.
+\param password Password object, see fields below.
+\param enabled Is password enabled.
+\param minLength Minimum length for the password.
+\param maxRetries Maximum amount of retries when inputting password.
+\param alphanumeric If true, password needs to have both numbers and letters.
+\param inactivityInSeconds Inactive time in seconds after which device is locked.
+\param id Policy ID.
+\param status Status object, see fields below.
+\param enforced Is policy enforced.
+\param retriesLeft Number of retries left when inputting password.
+\param returnValue Indicates if the call was succesful.
+
+\subsection com_palm_systemmanager_get_security_policy_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/getSecurityPolicy '{}'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "policy": {
+        "password": {
+            "enabled": false,
+            "minLength": 1,
+            "maxRetries": 0,
+            "alphaNumeric": false
+        },
+        "inactivityInSeconds": 9998,
+        "id": "++I8e9WUZ1KeeTfH",
+        "status": {
+            "enforced": true,
+            "retriesLeft": 0
+        }
+    },
+    "returnValue": true
+}
+\endcode
+*/
 static bool cbGetSecurityPolicy(LSHandle* lsHandle, LSMessage* message, void* user_data)
 {
     EMPTY_SCHEMA_RETURN(lsHandle, message);
@@ -1643,7 +2395,54 @@ static bool cbGetSecurityPolicy(LSHandle* lsHandle, LSMessage* message, void* us
 	return true;
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_update_pin_app_state updatePinAppState
 
+\e Public.
+
+com.palm.systemmanager/updatePinAppState
+
+Update pin code application state.
+
+\subsection com_palm_systemmanager_update_pin_app_state_syntax Syntax:
+\code
+{
+    "state":string
+}
+\endcode
+
+\param state New state, can be "cancel" or "unlock".
+
+\subsection com_palm_systemmanager_update_pin_app_state_returns Returns:
+\code
+{
+    "returnValue": boolean
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful or not.
+
+\subsection com_palm_systemmanager_update_pin_app_state_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/updatePinAppState '{ "state": "unlock" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false
+}
+\endcode
+*/
 static bool cbUpdatePinAppState(LSHandle* lsHandle, LSMessage *message, void *user_data)
 {
 	bool success = false;
@@ -1689,6 +2488,56 @@ static bool cbUpdatePinAppState(LSHandle* lsHandle, LSMessage *message, void *us
 	return true;
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_get_boot_status getBootStatus
+
+\e Public.
+
+com.palm.systemmanager/getBootStatus
+
+Check the device boot status.
+
+\subsection com_palm_systemmanager_get_boot_status_syntax Syntax:
+\code
+{
+    "subscribe": boolean
+}
+\endcode
+
+\param subscribe Set to true to receive events when boot status changes.
+
+\subsection com_palm_systemmanager_get_boot_status_returns Returns:
+\code
+{
+    "finished": boolean,
+    "firstUse": boolean,
+    "returnValue": boolean,
+    "subscribed": boolean
+}
+\endcode
+
+\param finished Is boot sequence finished.
+\param firstUse Is this the first time the device is booted.
+\param returnValue Indicates if the call was succesful.
+\param subscribed True if subscribed to receive boot status change events.
+
+\subsection com_palm_systemmanager_get_boot_status_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/getBootStatus '{ "subscribe": false }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "finished": true,
+    "firstUse": false,
+    "returnValue": true,
+    "subscribed": false
+}
+\endcode
+*/
 static bool cbGetBootStatus(LSHandle* lsHandle, LSMessage *message, void *user_data)
 {
     SUBSCRIBE_SCHEMA_RETURN(lsHandle, message);
@@ -1727,6 +2576,56 @@ Done:
 	return true;
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_run_progress_animation runProgressAnimation
+
+\e Public.
+
+com.palm.systemmanager/runProgressAnimation
+
+
+
+\subsection com_palm_systemmanager_run_progress_animation_syntax Syntax:
+\code
+{
+    "type": string,
+    "state": string
+}
+\endcode
+
+\param type Type of the animation, "msm" or "fsck".
+\param state New state for the animation. "start" shows the animation, and "stop" hides it.
+
+\subsection com_palm_systemmanager_run_progress_animation_returns Returns:
+\code
+{
+    "returnValue": boolean
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+
+\subsection com_palm_systemmanager_run_progress_animation_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/runProgressAnimation '{ "type": "msm", "state": "start" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false
+}
+\endcode
+*/
 static bool cbRunProgressAnimation(LSHandle* lsHandle, LSMessage *message, void *user_data)
 {
 	bool retVal = false;
@@ -1812,6 +2711,57 @@ static bool cbDebugger(LSHandle* lsHandle, LSMessage *message,void *user_data)
 	return true;
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_set_javascript_flags setJavascriptFlags
+
+\e Public.
+
+com.palm.systemmanager/setJavascriptFlags
+
+Set JavaScript flags.
+
+\subsection com_palm_systemmanager_set_javascript_flags_syntax Syntax:
+\code
+{
+    "flags": string
+}
+\endcode
+
+\param flags The flags you want to set.
+
+\subsection com_palm_systemmanager_set_javascript_flags_returns Returns:
+
+\code
+{
+    "returnValue": boolean
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+
+\note It is up to the user to make sure that the flags make sense. The returnValue only indicates that parsing the incoming JSON message succeeded.
+
+\subsection com_palm_systemmanager_set_javascript_flags_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/setJavascriptFlags '{"flags": "--jstop --jstop_debug" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false
+}
+\endcode
+*/
 static bool cbSetJavascriptFlags(LSHandle* lsHandle, LSMessage *message, void *user_data)
 {
 	bool success = false;
@@ -1853,6 +2803,56 @@ static bool cbSetJavascriptFlags(LSHandle* lsHandle, LSMessage *message, void *u
 	return true;
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_set_animation_values setAnimationValues
+
+\e Public.
+
+com.palm.systemmanager/setAnimationValues
+
+Set animation parameters.
+
+\subsection com_palm_systemmanager_set_animation_values_syntax Syntax:
+\code
+{
+    "<key>": int,
+    "<key>": int,
+    ...
+}
+\endcode
+
+\param <key> Key-value pairs for the parameters.
+
+\subsection com_palm_systemmanager_set_animation_values_returns Returns:
+\code
+{
+    "returnValue": boolean
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+
+\subsection com_palm_systemmanager_set_animation_values_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/setAnimationValues '{ "brickDuration": 300, "cardDeleteCurve": 6 }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false
+}
+\endcode
+*/
 static bool cbSetAnimationValues(LSHandle* lsHandle, LSMessage *message,
 								 void *user_data)
 {
@@ -1899,6 +2899,58 @@ Done:
 	return true;
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_get_animation_values getAnimationValues
+
+\e Public.
+
+com.palm.systemmanager/getAnimationValues
+
+Get animation parameters.
+
+\subsection com_palm_systemmanager_get_animation_values_syntax Syntax:
+\code
+{
+}
+\endcode
+
+\subsection com_palm_systemmanager_get_animation_values_returns Returns:
+\code
+{
+    "<key>": int,
+    "<key>": int,
+    ...
+    "<key>": int,
+    "returnValue": boolean
+
+}
+\endcode
+
+\param <key> Key-value pairs for the parameters.
+\param returnValue Indicates if the call was succesful.
+
+\subsection com_palm_systemmanager_get_animation_values_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/getAnimationValues '{ }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "brickCurve": 0,
+    "brickDuration": 300,
+    "cardAddMaxDuration": 750,
+    "cardBeforeAddDelay": 0,
+    ...
+    "statusBarTitleChangeDuration": 300,
+    "universalSearchCrossFadeCurve": 6,
+    "universalSearchCrossFadeDuration": 150,
+    "returnValue": true
+}
+\endcode
+*/
 static bool cbGetAnimationValues(LSHandle* lsHandle, LSMessage *message,
 								void *user_data)
 {
@@ -1947,7 +2999,53 @@ static bool cbDumpHeapProfiler(LSHandle* lsHandle, LSMessage *message,
 }
 #endif // USE_HEAP_PROFILER
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_lock_button_triggered lockButtonTriggered
 
+\e Public.
+
+com.palm.systemmanager/lockButtonTriggered
+
+Subscribe to lock button trigger events.
+
+\subsection com_palm_systemmanager_lock_button_triggered_syntax Syntax:
+\code
+{
+    "subscribe": boolean
+}
+\endcode
+
+\param subscribe Set to true to subscribe to lock button trigger events.
+
+\subsection com_palm_systemmanager_lock_button_triggered_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "subscribed": boolean,
+    "triggered": boolean
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param subscribed True if subscribed to receive lock button trigger events.
+\param triggered True if lock button was triggered.
+
+\subsection com_palm_systemmanager_lock_button_triggered_examples Examples:
+\code
+luna-send -n 2 -f luna://com.palm.systemmanager/lockButtonTriggered '{ "subscribe": true }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "subscribed": true,
+    "triggered": false
+}
+\endcode
+*/
 bool cbLockButtonTriggered(LSHandle* lsHandle, LSMessage *message, void *user_data)
 {
     SUBSCRIBE_SCHEMA_RETURN(lsHandle, message);
@@ -1977,7 +3075,56 @@ bool cbLockButtonTriggered(LSHandle* lsHandle, LSMessage *message, void *user_da
         return true;
 }
 
+/*  Do not include this in the created documentation.
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_subscribe_to_system_ui TODO - subscribeToSystemUI
 
+\e Public.
+
+com.palm.systemmanager/subscribeToSystemUI
+
+\todo Figure out the syntax.
+
+\subsection com_palm_systemmanager_subscribe_to_system_ui_syntax Syntax:
+\code
+{
+}
+\endcode
+
+
+\subsection com_palm_systemmanager_subscribe_to_system_ui_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "subscribed": boolean
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param subscribed True if subscribed to system UI events.
+
+\subsection com_palm_systemmanager_subscribe_to_system_ui_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/subscribeToSystemUI '{ }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+    "subscribed": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false,
+    "subscribed": false
+}
+\endcode
+*/
 bool cbSubscribeToSystemUI(LSHandle* handle, LSMessage* message, void *user_data)
 {
     SUBSCRIBE_SCHEMA_RETURN(handle, message);
@@ -2028,6 +3175,58 @@ bool cbSubscribeToSystemUI(LSHandle* handle, LSMessage* message, void *user_data
 	return true;
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_publish_to_system_ui publishToSystemUI
+
+\e Public.
+
+com.palm.systemmanager/publishToSystemUI
+
+Publish messages to system UI.
+
+\subsection com_palm_systemmanager_publish_to_system_ui_syntax Syntax:
+\code
+{
+    "event": string,
+    "message": string
+}
+\endcode
+
+\param event Type of the event.
+\param message Message to display.
+
+\note Messages are sent to System UI client for processing. If the \e event is unknown then the message will dropped at the client level.
+
+\subsection com_palm_systemmanager_publish_to_system_ui_returns Returns:
+\code
+{
+    "returnValue": boolean
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+
+\subsection com_palm_systemmanager_publish_to_system_ui_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/publishToSystemUI '{ "event": "itsAnEvent", "message": "Something really important." }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false
+}
+\endcode
+*/
 bool cbPublishToSystemUI(LSHandle* handle, LSMessage* message, void *user_data)
 {
 	bool success = true;
@@ -2546,6 +3745,82 @@ void constructSystemStatusPayload(pbnjson::JValue& obj)
     obj.put("orientation", orientationObj);
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_get_system_status getSystemStatus
+
+\e Public.
+
+com.palm.systemmanager/getSystemStatus
+
+Get information about system status.
+
+\subsection com_palm_systemmanager_get_system_status_syntax Syntax:
+\code
+{
+    "subscribe": boolean
+}
+\endcode
+
+\param subscribe Set to true to receive system status change events.
+
+\subsection com_palm_systemmanager_get_system_status_returns Returns:
+\code
+{
+    "ime": {
+        "visible": boolean
+    },
+    "orientation": {
+        "ui": string,
+        "device": string
+    },
+    "subscribed": boolean,
+    "returnValue": boolean
+}
+\endcode
+
+\param ime Object, see field below.
+\param visible Is IME (input method, i.e. virtual keyboard) visible.
+\param orientation Object containing device and UI orientation information. See fields below.
+\param ui Orientation of the UI. "up", "down", "left" or "right".
+\param device Orientation of the device. "up", "down", "left", "right", "faceup" or "facedown".
+\param subscribed Indicates if subscribed to receive status change events.
+\param returnValue Indicates if call was succesful.
+
+\subsection com_palm_systemmanager_get_system_status_examples Examples:
+\code
+luna-send -n 100 -f luna://com.palm.systemmanager/getSystemStatus '{ "subscribe": true }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "ime": {
+        "visible": false
+    },
+    "orientation": {
+        "ui": "up",
+        "device": "up"
+    },
+    "subscribed": true,
+    "returnValue": true
+}
+\endcode
+
+Example of a status change event after subscribing:
+\code
+{
+    "ime": {
+        "visible": false
+    },
+    "orientation": {
+        "ui": "up",
+        "device": "facedown"
+    }
+}
+\endcode
+*/
 bool cbGetSystemStatus(LSHandle *lsHandle, LSMessage *message, void *user_data)
 {
     SUBSCRIBE_SCHEMA_RETURN(lsHandle, message);
@@ -2597,6 +3872,62 @@ void SystemService::postSystemStatus()
         LSErrorFree (&lsError);
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_dismiss_modal_app dismissModalApp
+
+\e Public.
+
+com.palm.systemmanager/dismissModalApp
+
+Dismiss a modal application.
+
+\subsection com_palm_systemmanager_dismiss_modal_app_syntax Syntax:
+\code
+{
+    "subscribe": true,
+    "modalId": string
+}
+\endcode
+
+\param subscribe Subscribe to receive status change events. Must be set to true.
+\param modalId Id of the modal application to dismiss.
+
+\subsection com_palm_systemmanager_dismiss_modal_app_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "returnMessage": string,
+    "dismissResult": string,
+    "subscribed": boolean
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param returnMessage A message.
+\param dismissResult Describes the dismiss status.
+\param subscribed Indicates if subscribed to receive status change messages.
+
+\subsection com_palm_systemmanager_dismiss_modal_app_examples Examples:
+\code
+luna-send -n 2 -f luna://com.palm.systemmanager/dismissModalApp '{ "subscribe": true, "modalId": "MODAL_WINDOW_com.palm.app.photos_com.palm.app.browser_1" }'
+\endcode
+
+Example responses:
+\code
+{
+    "returnValue": true,
+    "dismissResult": "Initiating removal of active modal window",
+    "subscribed": true
+}
+{
+    "returnValue": true,
+    "returnMessage": "",
+    "dismissResult": "Modal card was dismissed by the service"
+}
+\endcode
+*/
 bool cbDismissModalApp(LSHandle *lsHandle, LSMessage *message, void *user_data)
 {
     // {"subscribe":true, "modalId": "dlg"}
@@ -2714,6 +4045,91 @@ done:
 	return true;
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_launch_modal_app launchModalApp
+
+\e Public.
+
+com.palm.systemmanager/launchModalApp
+
+Launch an application as a modal window from another application.
+
+\subsection com_palm_systemmanager_launch_modal_app_syntax Syntax:
+\code
+{
+    "subscribe": boolean,
+    "callerId": string,
+    "launchId": string,
+    "params": object
+}
+\endcode
+
+\param subscribe Must be set to true.
+\param callerId Id of the caller application.
+\param launchId Id of the application to launch.
+\param params Parameters for the application that is launched.
+
+\subsection com_palm_systemmanager_launch_modal_app_returns_succesful Returns for a succesfull call:
+\code
+{
+    "returnValue": boolean,
+    "launchResult": string,
+    "modalId": string,
+    "subscribed": boolean,
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful, i.e. true in this case.
+\param launchResult Description of launch status.
+\param modalId Id for the modal application window.
+\param subscribed True if subscribed to receive status change events.
+
+\subsection com_palm_systemmanager_launch_modal_app_returns_failed Returns for a failed call:
+\code
+{
+    "returnValue": boolean,
+    "errorText": string,
+    "subscribed": boolean,
+    "errorCode": int
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful, i.e. false in this case.
+\param errorText Describes the error.
+\param subscribed Indicates if subscribed.
+\param errorCode Code for the error.
+
+\subsection com_palm_systemmanager_launch_modal_app_examples Examples:
+\code
+luna-send -n 2 -f luna://com.palm.systemmanager/launchModalApp '{ "subscribe": true, "callerId": "com.palm.app.photos", "launchId": "com.palm.app.browser", "params": {} }'
+\endcode
+
+Example response for a succesful launch:
+\code
+{
+    "returnValue": true,
+    "launchResult": "Modal window launch initiated",
+    "modalId": "MODAL_WINDOW_com.palm.app.photos_com.palm.app.browser_1",
+    "subscribed": true
+}
+{
+    "returnValue": true,
+    "launchResult": "Modal window was launched successfully"
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false,
+    "errorText": "App to launch doesnt exist",
+    "subscribed": true,
+    "errorCode": 5
+}
+\endcode
+*/
 bool cbLaunchModalApp(LSHandle *lsHandle, LSMessage *message, void *user_data)
 {
 	bool subscribed = true;
@@ -3572,6 +4988,47 @@ bool SystemService::touchToShareCanTapStatus(LSHandle* handle, LSMessage* messag
 	return true;    
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_touch_to_share_device_in_range touchToShareDeviceInRange
+
+\e Public.
+
+com.palm.systemmanager/touchToShareDeviceInRange
+
+Start or stop the animation that indicates to user that Touch-to-share is active.
+
+\subsection com_palm_systemmanager_touch_to_share_device_in_range_syntax Syntax:
+\code
+{
+    "inRange" : boolean
+}
+\endcode
+
+\param inRange Set to true to start the animation and false to stop it.
+
+\subsection com_palm_systemmanager_touch_to_share_device_in_range_returns Returns:
+\code
+{
+    "returnValue": boolean
+}
+\endcode
+
+\param returnValue
+
+\subsection com_palm_systemmanager_touch_to_share_device_in_range_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/touchToShareDeviceInRange '{ "inRange": true }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+}
+\endcode
+*/
 static bool cbTouchToShareDeviceInRange(LSHandle* lsHandle, LSMessage* message,
 									   void* user_data)
 {
@@ -3612,6 +5069,47 @@ static bool cbTouchToShareDeviceInRange(LSHandle* lsHandle, LSMessage* message,
 	return true;	    
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_touch_to_share_app_url_transferred touchToShareAppUrlTransferred
+
+\e Public.
+
+com.palm.systemmanager/touchToShareAppUrlTransferred
+
+After Touch-to-share transfer is complete, call this to show the appropriate animation and minimize the application.
+
+\subsection com_palm_systemmanager_touch_to_share_app_url_transferred_syntax Syntax:
+\code
+{
+    "appid" : string
+}
+\endcode
+
+\param appid ID of the target app.
+
+\subsection com_palm_systemmanager_touch_to_share_app_url_transferred_returns Returns:
+\code
+{
+    "returnValue": boolean
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+
+\subsection com_palm_systemmanager_touch_to_share_app_url_transferred_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/touchToShareAppUrlTransferred '{"appid": "com.palm.app.browser" }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+}
+\endcode
+*/
 static bool cbTouchToShareAppUrlTransferred(LSHandle* lsHandle, LSMessage* message,
 											void* user_data)
 {
@@ -3652,6 +5150,50 @@ static bool cbTouchToShareAppUrlTransferred(LSHandle* lsHandle, LSMessage* messa
 	return true;	    
 }
 
+/*!
+\page com_palm_systemmanager
+\n
+\section com_palm_systemmanager_subscribe_turbo_mode subscribeTurboMode
+
+\e Public.
+
+com.palm.systemmanager/subscribeTurboMode
+
+Subscribe to turbo mode status changes. Turbo mode is enabled on subscription, if it was not yet enabled.
+
+\subsection com_palm_systemmanager_subscribe_turbo_mode_syntax Syntax:
+\code
+{
+    "subscribe": boolean
+}
+\endcode
+
+\param subscribe Set to true to enable turbo mode and receive events when turbo mode changes. Set to false to remove subscription.
+
+\subsection com_palm_systemmanager_subscribe_turbo_mode_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "subscribed": boolean
+}
+\endcode
+
+\param returnValue Indicates if call was succesful.
+\param subscribed True if subscribed to receive events when turbo mode changes.
+
+\subsection com_palm_systemmanager_subscribe_turbo_mode_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/subscribeTurboMode '{ "subscribe": true }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true,
+    "subscribed": true
+}
+\endcode
+*/
 static std::set<LSMessage *> sTurboModeSubscriptions;
 static bool cbSubscribeTurboMode(LSHandle* lshandle, LSMessage *message, void *user_data)
 {
