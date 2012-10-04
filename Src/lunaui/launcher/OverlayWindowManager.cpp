@@ -1729,7 +1729,7 @@ void OverlayWindowManager::addWindow(Window* win)
 		m_universalSearchWin = win;
 
 		const qreal positivePadAmount = Settings::LunaSettings()->positiveSpaceTopPadding;
-		m_universalSearchWin->resize((qint32)(boundingRect().width()),(qint32)(boundingRect().height()));
+		((HostWindow*)m_universalSearchWin)->resizeEventSync((qint32)(boundingRect().width()),(qint32)(boundingRect().height()), true);
 		m_universalSearchWin->setParentItem(this);
 		m_universalSearchWin->setPos(QPointF(0.0,positivePadAmount));
 		m_universalSearchWin->setVisible(universalSearchShown());
