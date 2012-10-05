@@ -507,8 +507,9 @@ QWebPage* SysMgrWebPage::createWindow(WebWindowType type)
     SysMgrWebBridge* newWindow = new SysMgrWebBridge(true);
     newWindow->setParent(parent());
     newWindow->setAppId(qobject_cast<SysMgrWebBridge*>(parent())->appId());
-    newWindow->setLaunchingAppId(qobject_cast<SysMgrWebBridge*>(parent())->launchingAppId());
+    newWindow->setLaunchingAppId(qobject_cast<SysMgrWebBridge*>(parent())->appId());
     newWindow->setProcessId(qobject_cast<SysMgrWebBridge*>(parent())->processId());
+    newWindow->setLaunchingProcessId(qobject_cast<SysMgrWebBridge*>(parent())->processId());
 
     WebAppManager::instance()->webPageAdded(newWindow);
     // TODO: need to add this to a list of pages in web app manager
