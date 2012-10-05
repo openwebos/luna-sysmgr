@@ -63,3 +63,10 @@ contains(MACHINE_NAME, "opal") {
 	CONFIG_BUILD += affinity haptics napp nyx hidlib webosdevice
     LIBS += -lqpalm
 }
+contains(MACHINE_NAME, "tuna") {
+    DEFINES += MACHINE_TUNA HAS_DISPLAY_TIMEOUT
+    TARGET_TYPE = TARGET_DEVICE
+    CONFIG_BUILD += webosdevice nyx
+    CONFIG_BUILD += opengl
+    LIBS += -lqpalm
+}
