@@ -469,6 +469,10 @@ void HostQtDesktop::init(int w, int h)
         qDebug() << __PRETTY_FUNCTION__ << "Going fullscreen with width" << windowWidth << "height" << (windowHeight - GESTURE_AREA_HEIGHT);
     }
 
+    if (GESTURE_AREA_HEIGHT != 0 && (GESTURE_AREA_HEIGHT < (windowHeight/30) || GESTURE_AREA_HEIGHT > (windowHeight/10))) {
+        Settings::LunaSettings()->gestureAreaHeight = (windowHeight/16);
+    }
+
     m_info.displayBuffer = 0;
     m_info.displayWidth = windowWidth;
     m_info.displayHeight = windowHeight - GESTURE_AREA_HEIGHT;
