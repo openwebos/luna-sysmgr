@@ -118,10 +118,7 @@ void CardWebApp::paintEvent(QPaintEvent* event)
         QElapsedTimer paintTime;
         paintTime.start();
 #endif
-        setTransform(QTransform()); // identity transform
-        // watch out: this is different from m_CardOrientation! For IPC buffer painting we
-        // have to use this or we get wrong results
-        rotate(angleForOrientation(m_orientation));
+        applyCardOrientation();
         render(paintContext, m_paintRect, m_paintRect);
         m_data->endPaint(false, QRect());
 #ifdef GFX_DEBUGGING
@@ -258,13 +255,13 @@ CardWebApp::CardWebApp(Window::Type winType, PIpcChannel *channel, ApplicationDe
 
     setAlignment(Qt::AlignTop | Qt::AlignLeft);
     setTransformationAnchor(QGraphicsView::NoAnchor);
-    setTransform(QTransform()); // identity transform
-    rotate(angleForOrientation(m_CardOrientation));
 
     m_webview = new QGraphicsWebView();
-    m_webview->setGeometry(QRectF(0, 0, m_windowWidth, m_windowHeight));
     m_webview->setResizesToContents(false);
+    m_webview->setGeometry(QRectF(0, 0, m_windowWidth, m_windowHeight));
+
     scene->addItem(m_webview);
+    applyCardOrientation();
 }
 
 CardWebApp::~CardWebApp()
@@ -641,10 +638,30 @@ void CardWebApp::resizeWebPage(uint32_t width, uint32_t height)
     m_webview->resize(width, height);
 }
 
+void CardWebApp::applyCardOrientation() {
+    if(m_directRendering) {
+        // if we render directly, the app is responsible for the correct rotation of what it draws
+        QTransform t;
+        t.translate(0.5 * size().width(), 0.5 * size().height());
+        t.rotate(angleForOrientation(m_CardOrientation));
+        t.translate(0.5 * (-m_webview->size().width() + m_renderOffsetX), 0.5 * (-m_webview->size().height()+m_renderOffsetY));
+        m_webview->setTransform(t);
+    } else {
+        // if we paint the ipc buffer, we reset the transform to identity since the window manager will rotate for us
+        QTransform t;
+        t.rotate(angleForOrientation(m_orientation));
+        m_webview->setTransform(t);
+    }
+}
+
 int CardWebApp::resizeEvent(int newWidth, int newHeight, bool resizeBuffer)
 {
-    resize(newWidth, newHeight);
-    m_webview->resize(newWidth, newHeight);
+    // If we want to actually support resizing webapps on-the-fly to arbitrary sizes, we have to make sure
+    // QGraphicsView plays nice with its internal scroll values since it tends to try to scroll the scene
+    // to some position it deems useful after you resize it.
+    // This conflicts with our usecase and is independent from the transform and tricky to get rid of.
+    // see also QGraphicsViewPrivate::recalculateContentSize, QGraphicsView::scrollContentsBy and friends
+
 	if (m_setWindowWidth == newWidth && m_setWindowHeight == newHeight) {
 		return -1;
 	}
@@ -771,14 +788,6 @@ void CardWebApp::flipEvent(int newWidth, int newHeight)
 
 	m_paintRect.setRect(0, 0, m_appBufWidth, m_appBufHeight);
 
-    resize(newWidth, newHeight);
-
-    // we have to manually resize the viewport independently, probably because the
-    // GraphicsView widget is set to be hidden in card view and doesn't propagate resize
-    // events when invisible.
-    viewport()->resize(newWidth, newHeight);
-
-    m_webview->resize(m_windowWidth, m_windowHeight);
     update();
     forcePaint();
 
@@ -1410,11 +1419,10 @@ void CardWebApp::handlePendingChanges()
 	m_setWindowWidth = m_windowWidth;
 	m_setWindowHeight = m_windowHeight;
 	
-    setTransform(QTransform()); // identity transform
-    rotate(angleForOrientation(m_CardOrientation));
+        applyCardOrientation();
 	updateWindowProperties();
 
-	Event::Orientation newOrient = m_pendingOrientation;
+        Event::Orientation newOrient = m_pendingOrientation;
 	
 	m_pendingResizeWidth = -1;
 	m_pendingResizeHeight = -1;
@@ -1584,7 +1592,6 @@ void CardWebApp::onDirectRenderingChanged()
 	m_metaDataBuffer->lock();
 	renderOffsetX = metaData->directRenderingScreenX;
 	renderOffsetY = metaData->directRenderingScreenY;
-    m_webview->setPos(renderOffsetX, renderOffsetY);
     renderOrientation = static_cast<SysMgrEvent::Orientation>(metaData->directRenderingOrientation);
 	directRendering = metaData->allowDirectRendering;
 	m_metaDataBuffer->unlock();
@@ -1609,12 +1616,12 @@ void CardWebApp::directRenderingChanged(bool directRendering, int renderOffsetX,
 		m_directRendering = directRendering;
 		return;
 	}
-
-    m_webview->setGeometry(QRectF(m_renderOffsetX, m_renderOffsetY, m_windowWidth, m_windowHeight));
+    resizeWebPage(m_windowWidth, m_windowHeight);
 	if (directRendering)
 		directRenderingAllowed();
     else
 		directRenderingDisallowed();
+    applyCardOrientation();
 }
 
 void CardWebApp::directRenderingAllowed()
@@ -1638,8 +1645,6 @@ void CardWebApp::directRenderingAllowed()
     }
     #endif
 
-    setTransform(QTransform()); // identity transform
-    rotate(angleForOrientation(m_renderOrientation));
 
     page()->page()->settings()->setAttribute(QWebSettings::AcceleratedCompositingEnabled, true);
 

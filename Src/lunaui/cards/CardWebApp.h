@@ -133,6 +133,14 @@ protected:
 
     void forcePaint();
 
+/*!
+    \brief Rotates the card according to the card orientation in case of direct rendering
+
+    This method only performs the card rotation for direct rendering. Otherwise the window manager
+    handles the rotation transformation.
+*/
+    void applyCardOrientation();
+
 public:
 	virtual void suspendAppRendering();
 	virtual void resumeAppRendering();
