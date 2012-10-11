@@ -30,7 +30,7 @@
 #include "WebPageClient.h"
 #include "WebAppManager.h"
 
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
     #include "NyxSensorConnector.h"
 #endif
 
@@ -41,7 +41,7 @@ namespace Palm {
 }
 
 class WebAppBase : public WebPageClient
-        #if defined (TARGET_DEVICE)
+        #if defined(HAS_NYX)
             ,public NYXConnectorObserver
         #endif
 {
@@ -192,7 +192,7 @@ protected:
 	std::string m_url;
 	ApplicationDescription *appDescImage;
 	LSMessageToken m_activityManagerToken;
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
     int m_OrientationAngle;
 #endif
 private:
@@ -200,7 +200,7 @@ private:
     WebAppBase& operator=(const WebAppBase&);
     WebAppBase(const WebAppBase&);
 
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
     /**
      * Function gets called whenever there is some data
      * available from NYX.

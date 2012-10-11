@@ -77,7 +77,7 @@
 #include "QtUtils.h"
 #include "WindowServer.h"
 
-#ifdef TARGET_DEVICE
+#if defined(TARGET_DEVICE)
 #include <FlickGesture.h>
 #include <SysMgrDefs.h>
 #else

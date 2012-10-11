@@ -58,7 +58,7 @@
 
 #include <openssl/blowfish.h>
 
-#ifdef TARGET_DEVICE
+#if defined(HAS_NYX)
 #include "NyxSensorConnector.h"
 static NYXOrientationSensorConnector* sOrientationSensor = 0;
 #endif

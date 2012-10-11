@@ -95,7 +95,8 @@
 #include <QGLFramebufferObject>
 #endif
 
-#if defined(TARGET_DEVICE) && !defined(HAVE_QPA)
+#if defined(TARGET_DEVICE) && !defined(HAS_QPA)
+// Obsolete, since we always effectively assume there will be a QPA
 #include <QWSServer>
 #include <input/hiddtp_qws.h>
 #endif
@@ -673,7 +674,7 @@ bool WindowServer::processSystemShortcut(QEvent* event)
 			}
 			break;
 		case Qt::Key_W: {
-#if defined(TARGET_DEVICE) && !defined(HAVE_QPA)			
+#if defined(TARGET_DEVICE) && !defined(HAS_QPA)			
 			if (altDown && symDown && keyEvent->type() == QEvent::KeyPress) {
 				static bool doTouchpanelRecording = false;
 				QWSHiddTpHandler* handler = static_cast<QWSHiddTpHandler*>(QWSServer::mouseHandler());

@@ -26,7 +26,7 @@
 #include <stdio.h>
 
 //work-around so that we don't have to include libnapp, libhelpers, and remote-adapter-ipc in the desktop build
-#if defined(TARGET_DEVICE)
+#if defined(HAS_NAPP)
 #include <NWindow.h>
 struct NAppWindow : public NWindow {
 #else
@@ -42,14 +42,14 @@ struct NAppWindow {
 	
 	virtual void Set(int Width, int Height)
 	{
-#if defined(TARGET_DEVICE)
+#if defined(HAS_NAPP)
 		NWindow::Set(Width, Height);
 #endif
 	}
 
     virtual bool AttachBuffers(int NumBuffers, unsigned int Handles[])
     {
-#if defined(TARGET_DEVICE)
+#if defined(HAS_NAPP)
 		return NWindow::AttachBuffers(NumBuffers, Handles);
 #else
         return true;

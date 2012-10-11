@@ -48,7 +48,7 @@
 #include <glib.h>
 #include <lunaservice.h>
 
-#if defined(HAVE_LUNA_PREF)
+#if defined(HAS_LUNA_PREF)
 #include <lunaprefs.h>
 #endif
 
@@ -138,7 +138,7 @@
 #define DISPLAY_EVENT_OFF_CALL                       115
 #define DISPLAY_EVENT_HOME_BUTTON_UP                 116
 
-#ifdef TARGET_DEVICE
+#if defined(TARGET_DEVICE)
 extern "C" void setEglSwapInterval(int);
 #endif
 
@@ -400,7 +400,7 @@ DisplayManager::DisplayManager()
     // initialize als
     m_als = new AmbientLightSensor ();
 
-#if defined(HAVE_LUNA_PREF)
+#if defined(HAS_LUNA_PREF)
     char *build = NULL;
     LPErr err = LPSystemCopyStringValue ("com.palm.properties.buildName", &build);
     if (LP_ERR_NONE == err && NULL != build)
@@ -415,7 +415,7 @@ DisplayManager::DisplayManager()
 #endif
 
     // get the default brightness
-#if defined(HAVE_LUNA_PREF)
+#if defined(HAS_LUNA_PREF)
     LPAppHandle prefHandle = NULL;
     LPErr e = LPAppGetHandle (DISPLAY_APPID, &prefHandle);
     if (LP_ERR_NONE == e && prefHandle)
@@ -693,7 +693,7 @@ bool DisplayManager::powerdServiceNotification(LSHandle *sh, const char *service
         g_message ("%s: calling on()", __PRETTY_FUNCTION__);
         dm->on ();
     }
-#if !defined (TARGET_DEVICE)
+#if !defined(TARGET_DEVICE)
     // dont (ever) go to sleep in the emulator
     dm->pushDNAST ("LunaSysMgr-on-Desktop");
 #endif
@@ -2054,42 +2054,23 @@ int32_t DisplayManager::getDisplayBrightness()
     }
 
     if (Preferences::instance()->isAlsEnabled()) {
-    // Pixie ALS is now functional
+		int region = m_als->getCurrentRegion ();
 
-    int region = m_als->getCurrentRegion ();
-
-#if defined (MACHINE_CASTLE)
-    switch (region)
-    {
-	case ALS_REGION_OUTDOOR:
-	    b = (b * 10) / 4;
-	    break;
-	case ALS_REGION_UNDEFINED:
-	case ALS_REGION_DARK:
-	    b = b * 5 / 8;
-	    break;
-	default:
-	    break;
-    }
-
-#else // for Pixie and other devices with better ALS
-
-    switch (region)
-    {
-	case ALS_REGION_OUTDOOR:
-	    b = Settings::LunaSettings()->backlightOutdoorScale * b / 100;
-	    break;
-	case ALS_REGION_DIM:
-	    b = Settings::LunaSettings()->backlightDimScale * b / 100;
-	    break;
-	case ALS_REGION_DARK:
-	    b = Settings::LunaSettings()->backlightDarkScale * b / 100;
-	    break;
-	default:
-	    // for all other cases, we use b directly
-	    break;
-    }
-#endif
+		switch (region)
+		{
+		case ALS_REGION_OUTDOOR:
+			b = Settings::LunaSettings()->backlightOutdoorScale * b / 100;
+			break;
+		case ALS_REGION_DIM:
+			b = Settings::LunaSettings()->backlightDimScale * b / 100;
+			break;
+		case ALS_REGION_DARK:
+			b = Settings::LunaSettings()->backlightDarkScale * b / 100;
+			break;
+		default:
+			// for all other cases, we use b directly
+			break;
+		}
     }
 
     if (b < MINIMUM_ON_BRIGHTNESS)
@@ -2684,7 +2665,7 @@ void DisplayManager::setActiveTouchpanel (bool enable)
 
 void DisplayManager::setTouchpanelMode (bool active)
 {
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
     LSError lserror;
     LSErrorInit (&lserror);
     nyx_error_t err;
@@ -2718,7 +2699,7 @@ void DisplayManager::setAlsDisabled (bool disable)
 
 bool DisplayManager::touchPanelOn ()
 {
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
     InputControl* ic = HostBase::instance()->getInputControlTouchpanel();
     if (NULL != ic)
     {
@@ -2731,7 +2712,7 @@ bool DisplayManager::touchPanelOn ()
 
 bool DisplayManager::touchPanelOff ()
 {
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
     InputControl* ic = HostBase::instance()->getInputControlTouchpanel();
     if (NULL != ic)
     {
@@ -3560,7 +3541,7 @@ void DisplayManager::displayOff()
 
 bool DisplayManager::allowSuspend()
 {
-#if defined (MACHINE_BROADWAY)
+#if defined(MACHINE_BROADWAY)
 	return (currentState() == DisplayStateOff || currentState() == DisplayStateOffOnCall) && !m_backlightIsOn;
 #else
 	return currentState() == DisplayStateOff && !m_backlightIsOn;

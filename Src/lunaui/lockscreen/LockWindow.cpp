@@ -589,7 +589,7 @@ void LockWindow::slotUiRotationCompleted()
 
 bool LockWindow::setLockTimeout(uint32_t timeout)
 {
-#if !defined (TARGET_DEVICE)
+#if !defined(TARGET_DEVICE)
 	return false;
 #endif
 

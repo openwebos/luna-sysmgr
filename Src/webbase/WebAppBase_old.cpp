@@ -57,7 +57,7 @@ WebAppBase::WebAppBase()
     , appDescImage(0)
     , m_activityManagerToken(LSMESSAGE_TOKEN_INVALID)
 {
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
     m_OrientationAngle = INVALID_ANGLE;
 #endif
 }
@@ -73,7 +73,7 @@ WebAppBase::~WebAppBase()
         wam->appDeleted(this);
 
         cleanResources();
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
         destroyAllSensors();
 #endif
 
@@ -435,7 +435,7 @@ bool WebAppBase::enableSensor(Palm::SensorType aSensorType, bool aNeedEvents)
 {
     bool isSuccess = false;
 
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
     NYXConnectorBase::Sensor nyxSensorType = mapSensorType(aSensorType);
 
     if (aNeedEvents)
@@ -452,7 +452,7 @@ bool WebAppBase::enableSensor(Palm::SensorType aSensorType, bool aNeedEvents)
 
 void WebAppBase::fastAccelerometerOn(bool enable)
 {
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
     if (enable && enableSensor(NYXConnectorBase::SensorAcceleration))
     {
         if (m_SensorList.contains(NYXConnectorBase::SensorAcceleration))
@@ -464,7 +464,7 @@ void WebAppBase::fastAccelerometerOn(bool enable)
 #endif
 }
 
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
 
 void WebAppBase::destroyAllSensors()
 {

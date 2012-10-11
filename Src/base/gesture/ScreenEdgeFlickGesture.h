@@ -57,7 +57,7 @@ private:
 
 private:
 
-#if defined(TARGET_DEVICE)
+#if defined(TARGET_DEVICE) && defined(HAS_QPA)
 	friend class QPAHiddTpHandler;
 #endif
 };

@@ -25,7 +25,7 @@
 #include <glib.h>
 #include <string.h>
 
-#if defined(TARGET_DEVICE)
+#if defined(HAS_AFFINITY)
 #include <libaffinity.h>
 #endif
 
@@ -33,7 +33,7 @@
 
 void setCpuAffinity(int pid, int processor)
 {
-#if defined(TARGET_DEVICE)
+#if defined(HAS_AFFINITY)
 	int ret = libaffinity_set_affinity(pid, processor);
 	if (ret)
 		g_warning("Failed to set cpu affinity for process %d to processor %d: retVal: %d, errno: %s",
@@ -46,7 +46,7 @@ void setCpuAffinity(int pid, int processor)
 
 void resetCpuAffinity(int pid)
 {
-#if defined(TARGET_DEVICE)
+#if defined(HAS_AFFINITY)
     int ret = libaffinity_reset_affinity(pid);
 	if (ret)
 		g_warning("Failed to reset cpu affinity for process %d: retVal: %d, errno: %s",

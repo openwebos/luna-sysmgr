@@ -731,6 +731,49 @@ contains(CONFIG_BUILD, haptics) {
 	DEFINES += HAPTICS=1
 }
 
+contains(CONFIG_BUILD, mediaapi) {
+    SOURCES += SoundPlayer.cpp
+    HEADERS += SoundPlayer.h
+    LIBS += -lmedia-api
+    DEFINES += HAS_MEDIA_API
+} else {
+    SOURCES += SoundPlayerDummy.cpp
+    HEADERS += SoundPlayerDummy.h
+}
+
+contains(CONFIG_BUILD, nyx) {
+    HEADERS +=  NyxInputControl.h \
+                NyxLedControl.h \
+
+    VPATH += Src/input
+
+    SOURCES += NyxInputControl.cpp \
+           NyxLedControl.cpp \
+
+    DEFINES += HAS_NYX
+}
+
+contains(CONFIG_BUILD, memchute) {
+    LIBS += -lmemchute
+    DEFINES += HAS_MEMCHUTE
+}
+
+contains(CONFIG_BUILD, hidlib) {
+    INCLUDEPATH += $$(STAGING_INCDIR)/hid/IncsPublic
+    LIBS += -lhid
+    DEFINES += HAS_HIDLIB
+}
+
+contains(CONFIG_BUILD, affinity) {
+    LIBS += -laffinity
+    DEFINES += HAS_AFFINITY
+}
+
+contains(CONFIG_BUILD, napp) {
+    INCLUDEPATH += $$(STAGING_INCDIR)/napp
+    DEFINES += HAS_NAPP
+}
+
 DESTDIR = ./$${BUILD_TYPE}-$${MACHINE_NAME}
 
 OBJECTS_DIR = $$DESTDIR/.obj

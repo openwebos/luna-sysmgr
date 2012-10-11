@@ -760,7 +760,7 @@ void DisplayOffOnCall::handleEvent (DisplayEvent displayEvent, sptr<Event> event
 	    updateLockState (DisplayLockUnlocked, displayEvent);
             break;
 	case DisplayEventPowerdSuspend:
-#if defined (MACHINE_BROADWAY) || defined(MACHINE_MANTARAY)
+#if defined(MACHINE_BROADWAY) || defined(MACHINE_MANTARAY)
 	    g_debug ("%s: received suspend event, going to off suspended", __PRETTY_FUNCTION__);
 	    changeDisplayState (DisplayStateOffSuspended, displayEvent, event);
 #else
@@ -838,7 +838,7 @@ void DisplayOn::startUserInactivityTimer()
         return;
     }
 
-#if (defined(TARGET_DESKTOP) || defined (TARGET_EMULATOR))
+#if (defined(TARGET_DESKTOP) || defined(TARGET_EMULATOR))
     g_debug("%s: not starting timer on emulator or desktop", __PRETTY_FUNCTION__);
     return;
 
@@ -939,7 +939,7 @@ bool DisplayOn::timeoutInternal()
     }
     else
     {
-#if (defined(TARGET_DESKTOP) || defined (TARGET_EMULATOR))
+#if (defined(TARGET_DESKTOP) || defined(TARGET_EMULATOR))
     g_warning("%s: not turning off display on emulator or desktop", __PRETTY_FUNCTION__);
     changeDisplayState (DisplayStateOnLocked, DisplayEventTimeout, NULL);
 #else
@@ -1149,7 +1149,7 @@ bool DisplayOnLocked::timeout()
     }
     else
     {
-#if (defined(TARGET_DESKTOP) || defined (TARGET_EMULATOR))
+#if (defined(TARGET_DESKTOP) || defined(TARGET_EMULATOR))
     g_warning ("%s: not turning off display on emulator or desktop", __PRETTY_FUNCTION__);
 #else
 	g_message ("%s: going to off from onlocked state", __FUNCTION__);
@@ -2085,7 +2085,7 @@ void DisplayOffSuspended::handleEvent (DisplayEvent displayEvent, sptr<Event> ev
 	    break;
 
 	case DisplayEventProximityOff:
-#if defined (MACHINE_BROADWAY) || defined(MACHINE_MANTARAY)
+#if defined(MACHINE_BROADWAY) || defined(MACHINE_MANTARAY)
 	    if (isOnPuck()) {
 		    g_message ("%s: proximity off event on puck, moving to OnPuck", __PRETTY_FUNCTION__);
 		m_restoreState = DisplayStateOnPuck;

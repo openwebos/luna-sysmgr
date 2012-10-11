@@ -83,7 +83,7 @@ void CardWebApp::paintEvent(QPaintEvent* event)
         // clear IPC Buffer if we switched from software to direct rendering
         // but only after we finished painting!
         if (m_lastPaintIPCBuffer) {
-#if defined (HAVE_OPENGL)
+#if defined(HAVE_OPENGL)
             glFlush();
 #endif
             m_data->clear();

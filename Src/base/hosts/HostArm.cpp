@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <unistd.h>
-#include <string.h>          
+#include <string.h>
 #include <linux/fb.h>
 #include <linux/kd.h>
 #include <linux/input.h> 
@@ -60,8 +60,10 @@
 #include "Logging.h"
 #include "SystemUiController.h"
 
-#if defined(TARGET_DEVICE)
+#if defined(HAS_HIDLIB)
 #include "HidLib.h"
+// TODO: these should come from hidd headers
+#define MAX_HIDD_EVENTS 100
 #endif
 
 #define HOSTARM_LOG	"HostArm"
@@ -70,17 +72,16 @@
 #define FBIO_WAITFORVSYNC	_IOW('F', 0x20, u_int32_t)
 #endif
 
-// TODO: these should come from hidd headers
-#define MAX_HIDD_EVENTS 100 
 
-#if defined(TARGET_DEVICE)
-//TODO: Move me to a header!
+
+#if defined(HAS_QPA) && defined(TARGET_DEVICE)
+// From the Palm QPA
 extern "C" void setTransform(QTransform*);
 extern "C" InputControl* getTouchpanel(void);
 extern "C" void setBluetoothCallback(void (*fun)(bool));
 #endif
 
-#if defined(TARGET_DEVICE)
+#if defined(HAS_QPA) && defined(TARGET_DEVICE)
 static void bluetoothCallback(bool enable)
 {
     HostBase::instance()->setBluetoothKeyboardActive(enable);
@@ -90,7 +91,7 @@ static void bluetoothCallback(bool enable)
 HostArm::HostArm() :
       m_nyxLightNotifier(NULL)
 	, m_nyxProxNotifier(NULL)
-#if defined(TARGET_DEVICE)
+#if defined(HAS_HIDLIB)
 	, m_hwRev(HidHardwareRevisionEVT1)
 	, m_hwPlatform (HidHardwarePlatformCastle)
 #endif
@@ -110,9 +111,11 @@ HostArm::HostArm() :
     , m_bluetoothKeyboardActive(false)
     , m_OrientationSensor(0)
 {
-#if defined(TARGET_DEVICE)
+#if defined(HAS_HIDLIB)
 	m_hwRev = HidGetHardwareRevision();
 	m_hwPlatform = HidGetHardwarePlatform();
+#endif
+#if defined(HAS_QPA) && defined(TARGET_DEVICE)
 	setBluetoothCallback(&bluetoothCallback);
 #endif
 }
@@ -216,7 +219,8 @@ void HostArm::init(int w, int h)
 	m_fb1NumBuffers = fixinfo.smem_len / (rowBytes * varinfo.yres);
 
 	printf("Linux Fb0: Num Buffers: %d, Fb1: Num Buffers: %d\n", m_fb0NumBuffers, m_fb1NumBuffers);
-#ifdef TARGET_DEVICE
+#if defined(HAS_QPA) && defined(TARGET_DEVICE)
+// From the Palm QPA
 	setTransform(&m_trans);
 #endif
 }
@@ -506,7 +510,7 @@ void HostArm::show()
     disableScreenBlanking();
     startService();
     setupInput();
-#if defined(TARGET_DEVICE)
+#if defined(HAS_HIDLIB)
 	getInitialSwitchStates();
 #endif
 }
@@ -538,7 +542,7 @@ bool HostArm::getMsgValueInt(LSMessage* msg, int& value)
 }
 
 
-#if defined(TARGET_DEVICE)
+#if defined(HAS_HIDLIB)
 bool HostArm::switchStateCallback(LSHandle* handle, LSMessage* msg, void* data)
 {
 	int switchCode = (int)data;
@@ -775,7 +779,7 @@ InputControl* HostArm::getInputControlTouchpanel()
 {
     if (m_nyxInputControlTouchpanel)
         return m_nyxInputControlTouchpanel;
-#if defined(TARGET_DEVICE)
+#if defined(HAS_QPA) && defined(TARGET_DEVICE)
     m_nyxInputControlTouchpanel = getTouchpanel();
 #endif
     if (!m_nyxInputControlTouchpanel)

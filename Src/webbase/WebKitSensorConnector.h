@@ -28,12 +28,12 @@
 #include <string>
 #include "palmwebtypes.h"
 
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
     #include "nyx/NyxSensorConnector.h"
 #endif
 
 class WebKitSensorConnector
-        #if defined (TARGET_DEVICE)
+        #if defined(HAS_NYX)
             : public NYXConnectorObserver
         #endif
 {
@@ -70,7 +70,7 @@ public:
      */
     static std::string getSupportedSensors();
 
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
     /**
      * Map the WebKit Sensor Type to NYX Sensor Type
      */
@@ -88,7 +88,7 @@ protected:
      */
     void CallErrorCB(std::string aMsg);
 
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
     /**
      * Function gets called whenever there is some data
      * available from NYX.
@@ -109,7 +109,7 @@ private:
      */
     WebKitSensorConnector(Palm::SensorType aSensorType, Palm::fnSensorDataCallback aDataCB, Palm::fnSensorErrorCallback aErrCB, void *pUserData);
 
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
     //Data
     NYXConnectorBase*               m_Sensor;
     NYXConnectorBase::Sensor        m_NYXSensorType;

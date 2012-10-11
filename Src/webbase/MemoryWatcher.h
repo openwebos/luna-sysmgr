@@ -30,7 +30,7 @@
 #include "SignalSlot.h"
 #include "Timer.h"
 
-#if defined(TARGET_DEVICE)
+#if defined(HAS_MEMCHUTE)
 extern "C" {
 #include <memchute.h>
 }
@@ -67,7 +67,7 @@ private:
 	bool timerTicked();
 	int getCurrentRssUsage() const;
 
-#if defined(TARGET_DEVICE)    
+#if defined(HAS_MEMCHUTE)
     static void memchuteCallback(MemchuteThreshold threshold);
 #endif
 
@@ -90,7 +90,7 @@ private:
 	MemState m_lastNotifiedState;
 	
 
-#if defined(TARGET_DEVICE)
+#if defined(HAS_MEMCHUTE)
 	int m_memchuteCriticalThreshold;
 	MemchuteWatcher* m_memWatch;
 #endif	

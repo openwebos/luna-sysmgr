@@ -28,7 +28,7 @@
 #include "Settings.h"
 #include "Window.h"
 
-#if defined(HAVE_LUNA_PREF)
+#if defined(HAS_LUNA_PREF)
 #include <lunaprefs.h>
 #endif
 
@@ -64,7 +64,7 @@ std::string DeviceInfo::jsonString() const
 
 static bool getLunaPrefSystemValue(const char* key, std::string& value)
 {
-#if defined(HAVE_LUNA_PREF)
+#if defined(HAS_LUNA_PREF)
 
 	char* str = 0;
 	if (LP_ERR_NONE == LPSystemCopyStringValue(key, &str) && str) {

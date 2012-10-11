@@ -700,7 +700,7 @@ void EASPolicyManager::notifyPolicyChanged()
 
 	SystemService::instance()->postDeviceLockMode();
 
-#if !defined (TARGET_DESKTOP)
+#if !defined(TARGET_DESKTOP)
 	save();
 #endif
 }

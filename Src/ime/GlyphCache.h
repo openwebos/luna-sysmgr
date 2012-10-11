@@ -210,7 +210,7 @@ public:
 			return;
 		}
 		++m_cacheMissCount;
-#ifdef TARGET_DESKTOP
+#if defined(TARGET_DESKTOP)
 		g_warning("CachedGlyphRenderer::render: direct rendering of %s, size=%d, bold=%d...", textSpec.description().toUtf8().data(), font.pixelSize(), int(font.bold()));
 #endif
 #endif

@@ -166,7 +166,7 @@ bool PGLES2Context::initialize(Palm::WebView* view, WebGLES2Context* parent) {
 
 	bool result = m_data->isDirectRendering() ? renderOnScreen() : renderOffscreen();
 
-#if defined(TARGET_DEVICE)
+#if defined(PALM_DEVICE)
 	// Workaround for driver issue on qualcom 8660; to be removed eventually		
 #define GL_USE_UNCACHED_VBOS_HINT_QCOM						 0x8FC0	   
 	glHint(GL_USE_UNCACHED_VBOS_HINT_QCOM, GL_TRUE);

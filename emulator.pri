@@ -19,20 +19,16 @@
 MACHINE_NAME = $$(MACHINE)
 
 contains(MACHINE_NAME, "qemux86") {
-    DEFINES += MACHINE_QEMUX86
-    CONFIG_BUILD += webosemulator
+    CONFIG_BUILD += nyx webosemulator
 }
 contains(MACHINE_NAME, "qemuarm") {
-    DEFINES += MACHINE_QEMUARM
-    CONFIG_BUILD += webosemulator
+    CONFIG_BUILD += nyx webosemulator
 }
 contains(MACHINE_NAME, "qemuarmv7") {
-    DEFINES += MACHINE_QEMUARM
-    CONFIG_BUILD += webosemulator
+    CONFIG_BUILD += nyx webosemulator
 }
 contains(MACHINE_NAME, "qemuarmv7a") {
-    DEFINES += MACHINE_QEMUARM
-    CONFIG_BUILD += webosemulator
+    CONFIG_BUILD += nyx webosemulator
 }
 
 contains (CONFIG_BUILD, webosemulator) {
@@ -44,27 +40,17 @@ contains (CONFIG_BUILD, webosemulator) {
     CONFIG -= debug
     CONFIG += release
 
-    LIBS += -lluna-prefs -lPmLogLib -lrolegen 
+    LIBS += -lluna-prefs -lPmLogLib -lrolegen
+
+    HEADERS +=  HostArm.h
 
     #DEFINES += ENABLE_JS_DEBUG_VERBOSE
 
-    # emulator doesn't support these libraries
-    LIBS -= -ljemalloc_mt -lpowerd 
-    SOURCES += SoundPlayerDummy.cpp
-    HEADERS += SoundPlayerDummy.h
+    LIBS += -Wl,-rpath $$(STAGING_LIBDIR)
 
-    DEFINES += $$TARGET_TYPE HAVE_LUNA_PREF=1 PALM_DEVICE QT_PLUGIN QT_STATICPLUGIN
+    DEFINES += $$TARGET_TYPE HAS_LUNA_PREF=1 QT_PLUGIN QT_STATICPLUGIN
 
-    DEFINES += HAVE_QPA
-
-    HEADERS +=  HostArm.h \
-                NyxInputControl.h \
-                NyxLedControl.h \
-
-    VPATH += Src/input
-
-    SOURCES += NyxInputControl.cpp \
-               NyxLedControl.cpp \
+    DEFINES += HAS_QPA
 
     INCLUDEPATH += \
             $$(STAGING_INCDIR)/glib-2.0 \
@@ -74,8 +60,8 @@ contains (CONFIG_BUILD, webosemulator) {
             $$(STAGING_INCDIR)/sysmgr-ipc \
             $$(STAGING_INCDIR)/freetype2 \
             $$(STAGING_INCDIR)/PmLogLib/IncsPublic \
-            $$(STAGING_INCDIR)/napp \
             $$(STAGING_INCDIR)/ime \
+
 } else {
     warning($$MACHINE_NAME not matched in emulator.pri)
 }

@@ -27,19 +27,6 @@
 #include "lunaservice.h"
 #include <list>
 
-#if defined (MACHINE_CASTLE)
-// special case for castle
-#define ALS_INIT_SAMPLE_SIZE    8
-#define ALS_SAMPLE_SIZE  8
-#define ALS_REGION_COUNT        5
-
-#define ALS_REGION_UNDEFINED  0
-#define ALS_REGION_DARK       1
-#define ALS_REGION_INDOOR     3
-#define ALS_REGION_OUTDOOR    5
-
-#else
-// for all devices after castle
 #define ALS_INIT_SAMPLE_SIZE   10
 #define ALS_SAMPLE_SIZE 	   10
 #define ALS_REGION_COUNT       5
@@ -50,7 +37,6 @@
 #define ALS_REGION_INDOOR     3
 #define ALS_REGION_OUTDOOR    4
 
-#endif
 
 class AmbientLightSensor
 {
@@ -99,7 +85,6 @@ private:
     bool on();
     bool off ();
 
-    bool updateAlsCastle (int intensity);
     bool updateAls (int intensity);
 };
 

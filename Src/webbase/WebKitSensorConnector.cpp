@@ -27,7 +27,7 @@ WebKitSensorConnector::WebKitSensorConnector(Palm::SensorType aSensorType, Palm:
     , m_ErrCB(aErrCB)
     , m_UserData(pUserData)
 {
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
     m_NYXSensorType = WebKitToNYX(aSensorType);
 
     // Create the sensor
@@ -41,7 +41,7 @@ WebKitSensorConnector::WebKitSensorConnector(Palm::SensorType aSensorType, Palm:
 
 WebKitSensorConnector::~WebKitSensorConnector()
 {
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
     if (m_Sensor)
     {
         m_Sensor->scheduleDeletion();
@@ -54,7 +54,7 @@ WebKitSensorConnector* WebKitSensorConnector::createSensor(Palm::SensorType aTyp
 {
     WebKitSensorConnector *pWebKitSensor = 0;
 
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
     if ((aDataCB) && (aErrCB))
     {
         NYXConnectorBase::Sensor nyxSensorType = WebKitToNYX(aType);
@@ -68,7 +68,7 @@ WebKitSensorConnector* WebKitSensorConnector::createSensor(Palm::SensorType aTyp
     return pWebKitSensor;
 }
 
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
 NYXConnectorBase::Sensor WebKitSensorConnector::WebKitToNYX(Palm::SensorType aSensorType)
 {
     NYXConnectorBase::Sensor mappedSensor = NYXConnectorBase::SensorIllegal;
@@ -225,7 +225,7 @@ bool WebKitSensorConnector::on()
 {
     bool bRetValue = false;
 
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
     if (m_Sensor)
     {
         bRetValue = m_Sensor->on();
@@ -244,7 +244,7 @@ bool WebKitSensorConnector::off()
 {
     bool bRetValue = false;
 
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
     if (m_Sensor)
     {
         bRetValue = m_Sensor->off();
@@ -263,7 +263,7 @@ bool WebKitSensorConnector::setRate(Palm::SensorRate aRate)
 {
     bool bRetValue = false;
 
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
     if (m_Sensor)
     {
         NYXConnectorBase::SensorReportRate sensorRate = WebKitToNYX(aRate);
@@ -286,7 +286,7 @@ std::string WebKitSensorConnector::getSupportedSensors()
 {
     std::string strSensorList = "";
 
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
     strSensorList = NYXConnectorBase::getSupportedSensors(true);
     if (strSensorList.empty())
     {
@@ -299,7 +299,7 @@ std::string WebKitSensorConnector::getSupportedSensors()
 
 void WebKitSensorConnector::CallErrorCB(std::string aMsg)
 {
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
     if ((m_Sensor) && (m_ErrCB))
     {
         m_ErrCB(m_PalmSensorType, aMsg, m_UserData);

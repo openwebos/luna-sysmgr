@@ -1657,14 +1657,14 @@ bool CardWindow::touchEvent(QTouchEvent* event)
 void CardWindow::setPosition(const CardWindow::Position& pos)
 {
 	m_position = pos;
-        setTransform(m_position.toTransform());
+    setTransform(m_position.toTransform());
 #if defined(USE_ROUNDEDCORNER_SHADER)
-        if (m_roundedCornerShaderStage) {
-		m_roundedCornerShaderStage->setScale(pos.trans.z());
-	}
-        if(m_loadingAnim) {
-                m_loadingAnim->setScale(pos.trans.z());
-        }
+    if (m_roundedCornerShaderStage) {
+        m_roundedCornerShaderStage->setScale(pos.trans.z());
+    }
+    if(m_loadingAnim) {
+         m_loadingAnim->setScale(pos.trans.z());
+    }
 #endif
 }
 

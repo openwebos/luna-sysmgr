@@ -238,7 +238,7 @@ Example response for a succesful call:
     ]
 }
 \endcode
-/**
+ *
  * Called by the backup service for all four of our callback functions: preBackup, 
  * postBackup, preRestore, postRestore.
  */

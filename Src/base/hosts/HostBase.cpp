@@ -32,20 +32,14 @@
 
 #if defined(TARGET_DESKTOP)
 	#include "HostQtDesktop.h"
-#elif defined(TARGET_DEVICE)
+#else
 	#include "HostArm.cpp"
-	#ifdef MACHINE_CASTLE
-		#include "HostArmCastle.cpp"
-	#elif defined(MACHINE_PIXIE)
-		#include "HostArmPixie.cpp"
-	#elif defined(MACHINE_WINDSOR)
-		#include "HostArmWindsor.cpp"
+	#if defined(TARGET_EMULATOR)
+		#include "HostArmQemu.cpp"
 	#elif defined(MACHINE_BROADWAY)
 		#include "HostArmBroadway.cpp"
 	#elif defined(MACHINE_MANTARAY)
 		#include "HostArmMantaray.cpp"
-	#elif defined(MACHINE_CHILE)
-		#include "HostArmChile.cpp"
 	#elif defined(MACHINE_TOPAZ)
 		#include "HostArmTopaz.cpp"
 	#elif defined(MACHINE_OPAL)
@@ -55,9 +49,6 @@
 	#else
 		#include "HostArmUnknown.cpp"
 	#endif
-#elif defined(TARGET_EMULATOR)
-	#include "HostArm.cpp"
-	#include "HostArmQemu.cpp"
 #endif
 
 static HostBase* sInstance = 0;
@@ -98,28 +89,18 @@ HostBase* HostBase::instance()
 		new HostQtDesktop;
 #elif defined(TARGET_EMULATOR)
 		new HostArmQemu;
-#elif defined(TARGET_DEVICE)
-	#ifdef MACHINE_CASTLE
-		new HostArmCastle;
-	#elif defined(MACHINE_PIXIE)
-		new HostArmPixie;
-	#elif defined (MACHINE_WINDSOR)
-		new HostArmWindsor;
-	#elif defined(MACHINE_BROADWAY)
+#elif defined(MACHINE_BROADWAY)
 		new HostArmBroadway;
-	#elif defined (MACHINE_MANTARAY)
+#elif defined(MACHINE_MANTARAY)
 		new HostArmMantaray;
-	#elif defined(MACHINE_CHILE)
-		new HostArmChile;
-	#elif defined(MACHINE_TOPAZ)
+#elif defined(MACHINE_TOPAZ)
 		new HostArmTopaz;
-	#elif defined(MACHINE_OPAL)
+#elif defined(MACHINE_OPAL)
 		new HostArmOpal;
-	#elif defined(MACHINE_WINDSORNOT)
+#elif defined(MACHINE_WINDSORNOT)
 		new HostArmWindsorNot;
-	#else
+#else
 		new HostArmUnknown;
-	#endif
 #endif
 	}
 

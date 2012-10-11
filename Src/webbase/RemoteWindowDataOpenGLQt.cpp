@@ -167,7 +167,7 @@ void RemoteWindowDataOpenGLQt::sendWindowUpdate(int x, int y, int w, int h)
 
 bool RemoteWindowDataOpenGLQt::hasDirectRendering() const
 {
-#if defined(TARGET_DEVICE)
+#if defined(DIRECT_RENDERING)
     return true;
 #else
     return false;

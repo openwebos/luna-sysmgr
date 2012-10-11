@@ -15,7 +15,10 @@
 # limitations under the License.
 #
 # LICENSE@@@
-TARGET_TYPE = TARGET_DEVICE
+
+########################################################
+## Start of the standard assignments across all devices
+## Don't change this block !!!!
 
 QMAKE_MAKEFILE = Makefile
 
@@ -23,96 +26,67 @@ BUILD_TYPE = release
 CONFIG -= debug
 CONFIG += release
 
-LIBS += -lluna-prefs -lPmLogLib -lrolegen -Wl,-rpath,$$(QT_CONFIGURE_PLUGINS_PATH)/platforms
+LIBS += -lluna-prefs -lPmLogLib -lrolegen
+
+HEADERS += HostArm.h
+
+TARGET_TYPE = TARGET_DEVICE
 
 MACHINE_NAME = $$(MACHINE)
 
-contains(MACHINE_NAME, "chile") {
-	DEFINES += MACHINE_CHILE
-	CONFIG_BUILD += opengl webosdevice
-    LIBS += -lqpalm
-}
-contains(MACHINE_NAME, "broadway") {
-	DEFINES += MACHINE_BROADWAY
-	CONFIG_BUILD += opengl texturesharing directrendering
-	CONFIG_BUILD += haptics webosdevice
-    LIBS += -lqpalm
-}
-contains(MACHINE_NAME, "mantaray") {
-	DEFINES += MACHINE_MANTARAY
-	CONFIG_BUILD += opengl openglcomposited directrendering
-	CONFIG_BUILD += haptics webosdevice
-    LIBS += -lqpalm
-}
-contains(MACHINE_NAME, "windsornot") {
-	DEFINES += MACHINE_WINDSORNOT
-	CONFIG_BUILD += opengl openglcomposited directrendering webosdevice
-    LIBS += -lqpalm
-}
-contains(MACHINE_NAME, "topaz") {
-	DEFINES += MACHINE_TOPAZ
-        #DEFINES += ENABLE_JS_DEBUG_VERBOSE
-
-###### Uncomment the following for debug building, e.g. for source debugging via eclipse, etc. 
-###### Note that this is all really adhoc and quick'n'dirty, and not meant to be a robust method
-#	CONFIG -= release
-#	CONFIG += debug
-#	QMAKE_CXXFLAGS -= $$QMAKE_CXXFLAGS_RELEASE -fomit-frame-pointer -frename-registers -finline-functions
-#	QMAKE_CXXFLAGS += -O0 -pg -fno-omit-frame-pointer -fno-rename-registers -fno-inline-functions -fno-exceptions -fno-rtti
-#	PALM_CC_OPT =
-#	PALM_CXX_OPT =
-#	PALM_CXX_EXTRA =
-#	QMAKE_LFLAGS -= $$QMAKE_LFLAGS_RELEASE
-#	QMAKE_LFLAGS +=  
-############
-
-	CONFIG_BUILD += opengl directrendering # texturesharing fb1poweroptimization
-	CONFIG_BUILD += haptics webosdevice
-    LIBS += -lqpalm
-}
-contains(MACHINE_NAME, "opal") {
-	DEFINES += MACHINE_OPAL
-	CONFIG_BUILD += opengl texturesharing directrendering
-	CONFIG_BUILD += haptics webosdevice
-    LIBS += -lqpalm
-}
-contains(MACHINE_NAME, "pyramid") {
-	DEFINES += MACHINE_PYRAMID
-	CONFIG_BUILD += opengl 
-	CONFIG_BUILD += haptics webosdevice
-    LIBS += -lqpalm
-}
-
-DEFINES += $$TARGET_TYPE HAVE_LUNA_PREF=1 PALM_DEVICE QT_PLUGIN QT_STATICPLUGIN
-
-DEFINES += HAVE_QPA
-
-HEADERS +=  HostArm.h \
-            NyxInputControl.h \
-            NyxLedControl.h \
-
-VPATH += Src/input
-
-SOURCES += NyxInputControl.cpp \
-           NyxLedControl.cpp \
-
 INCLUDEPATH += \
-		$$(STAGING_INCDIR)/glib-2.0 \
-		$$(STAGING_INCDIR)/webkit \
+        $$(STAGING_INCDIR)/glib-2.0 \
+        $$(STAGING_INCDIR)/webkit \
         $$(STAGING_INCDIR)/QtWebKit \
         $$(STAGING_INCDIR)/webkit/npapi \
-		$$(STAGING_INCDIR)/sysmgr-ipc \
-		$$(STAGING_INCDIR)/freetype2 \
-		$$(STAGING_INCDIR)/PmLogLib/IncsPublic \
-		$$(STAGING_INCDIR)/napp \
-		$$(STAGING_INCDIR)/ime \
+        $$(STAGING_INCDIR)/sysmgr-ipc \
+        $$(STAGING_INCDIR)/freetype2 \
+        $$(STAGING_INCDIR)/PmLogLib/IncsPublic \
+        $$(STAGING_INCDIR)/ime \
+
+
+DEFINES += $$TARGET_TYPE HAS_LUNA_PREF=1 QT_PLUGIN QT_STATICPLUGIN HAS_QPA
+
+## End of standard assignments across all devices
+########################################################
+
+
+
+########################################################
+## Check for known build targets
+
+include(device-known.pri)
+
+##
+########################################################
+
+
+
+########################################################
+## Handle custom configuration for unknown build target
 
 contains(CONFIG_BUILD, webosdevice) {
-    INCLUDEPATH +=  $$(STAGING_INCDIR)/hid/IncsPublic
-    SOURCES += SoundPlayer.cpp
-    HEADERS += SoundPlayer.h
-    LIBS += -lmedia-api  -lserviceinstall -laffinity -lhid -lmemchute
+    ## Known Device
+    LIBS += -lserviceinstall
 } else {
-    warning($$MACHINE_NAME not matched in device.pri)
+    warning($$MACHINE_NAME not matched in device-known.pri)
+
+    ##  Set this if you have nyx-modules for your build target (Highly recommended)
+    CONFIG_BUILD += nyx
+
+    ##  Set this if you have media-api to handle sound
+    # CONFIG_BUILD += mediaapi
+
+    ##  You must have a QPA or can use the standard QPA (change the LIBS value to your QPA library)
+    LIBS += -lqpalm
+
+    ##  Activate ServiceInstaller, if available for your build target
+    # LIBS += -lserviceinstall
+
+    ##  Set this if you have libnapp and nrwindow available for your build target
+    # CONFIG_BUILD += napp
 
 }
+
+## End of custom configuration for unknown build target
+########################################################

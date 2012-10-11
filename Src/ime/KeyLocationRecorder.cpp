@@ -29,7 +29,7 @@
 #include "Logging.h"
 #include <sys/stat.h>
 
-#ifdef TARGET_DEVICE
+#if defined(TARGET_DEVICE)
 #define PATH_PREFIX "/media/internal"
 #else
 #define PATH_PREFIX getenv("HOME")

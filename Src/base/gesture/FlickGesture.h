@@ -48,7 +48,7 @@ private:
 
 	friend class FlickGestureRecognizer;
 
-#if defined(HAVE_QPA)
+#if defined(HAS_QPA)
 	friend class QPAHiddTpHandler;
 #else
 	friend class QWSHiddTpHandlerPrivate;

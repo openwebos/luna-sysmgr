@@ -33,7 +33,7 @@
 #include "NyxInputControl.h"
 #include "NyxLedControl.h"
 
-#if defined(TARGET_DEVICE)
+#if defined(HAS_HIDLIB)
 #include "HidLib.h"
 #endif
 #include "lunaservice.h"
@@ -110,7 +110,7 @@ public:
 	virtual void show();
 
 	virtual int getNumberOfSwitches() const;
-#if defined(TARGET_DEVICE)
+#if defined(HAS_HIDLIB)
 	virtual void getInitialSwitchStates(void);
 #endif
 	int readHidEvents(int fd, struct input_event* eventBuf, int bufSize);
@@ -145,7 +145,7 @@ protected:
 
 	virtual void setCentralWidget(QWidget* view);
 
-#if defined(TARGET_DEVICE)
+#if defined(HAS_HIDLIB)
 	HidHardwareRevision_t m_hwRev;
 	HidHardwarePlatform_t m_hwPlatform;
 #endif
@@ -186,7 +186,7 @@ protected:
 	virtual void setRenderingLayerEnabled(bool enable);
 
 	static bool getMsgValueInt(LSMessage* msg, int& value);
-#if defined(TARGET_DEVICE)
+#if defined(HAS_HIDLIB)
 	static bool switchStateCallback(LSHandle* handle, LSMessage* msg, void* data);
 #endif
     /**

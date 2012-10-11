@@ -1714,7 +1714,7 @@ bool PhoneKeyboard::idle()
 	//g_debug("PhoneKeyboard background init complete!");
 
 #if 0
-#ifdef TARGET_DEVICE
+#if defined(TARGET_DEVICE)
 	m_glyphCache.pixmap().toImage().save("/media/internal/glyphcache.png");
 #else
 	m_glyphCache.pixmap().toImage().save(QString(getenv("HOME")) + "/Desktop/glyphcache.png");

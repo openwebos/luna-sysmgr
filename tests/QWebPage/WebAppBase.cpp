@@ -4,7 +4,7 @@ WebAppBase::WebAppBase() : m_page(0),
                            m_inCache(false),
                            m_keepAlive(false),
 {
-#if defined(TARGET_DEVICE)
+#if defined(HAS_NYX)
     m_OrientationAngle = INVALID_ANGLE
 #endif
 }

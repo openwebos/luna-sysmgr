@@ -25,7 +25,7 @@
 #include "Preferences.h"
 #include "Settings.h"
 
-#if defined (MACHINE_PIXIE) || defined(MACHINE_BROADWAY)
+#if defined(MACHINE_BROADWAY)
 #define MINIMUM_BRIGHTNESS 5
 #define MAXIMUM_BRIGHTNESS 100
 #else

@@ -95,7 +95,7 @@ class WebAppBase : public QObject {
 
         ApplicationDescription* m_appDesc;
         LSMessageToken m_activityManagerToken;
-#if defined (TARGET_DEVICE)
+#if defined(HAS_NYX)
         int m_OrientationAngle;
 #endif
 };
