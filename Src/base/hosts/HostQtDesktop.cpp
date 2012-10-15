@@ -95,8 +95,8 @@ public:
 		setAttribute(Qt::WA_AcceptTouchEvents);
 
 		m_homeButton = new QPushButton(this);
-		m_homeButton->setFixedSize(GESTURE_AREA_HEIGHT / 2,
-								   GESTURE_AREA_HEIGHT / 2);
+        m_homeButton->setFixedSize((2*GESTURE_AREA_HEIGHT) / 3,
+               (2*GESTURE_AREA_HEIGHT) / 3);
 
 		m_homeButton->setAttribute(Qt::WA_AcceptTouchEvents);
 		m_homeButton->setFocusPolicy(Qt::NoFocus);
