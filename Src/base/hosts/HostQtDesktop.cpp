@@ -41,7 +41,7 @@
 #include "FlickGesture.h"
 #include "FlickGestureRecognizer.h"
 
-static const int GESTURE_AREA_HEIGHT = Settings::LunaSettings()->gestureAreaHeight || 50;
+static const int GESTURE_AREA_HEIGHT = Settings::LunaSettings()->gestureAreaHeight;
 
 static QWidget *viewport(QWidget *widget)
 {
@@ -511,6 +511,7 @@ void HostQtDesktop::setCentralWidget(QWidget* view)
 	strip->setFixedSize(m_widget->width(), GESTURE_AREA_HEIGHT);
 
 	QVBoxLayout* layout = new QVBoxLayout(m_widget);
+    layout->setSizeConstraint(QLayout::SetFixedSize);
 	layout->setSpacing(0);
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->addWidget(view);
