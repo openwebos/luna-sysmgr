@@ -50,7 +50,6 @@ contains (CONFIG_BUILD, webosemulator) {
 
     # emulator doesn't support these libraries
     LIBS -= -ljemalloc_mt -lpowerd 
-    LIBS += -Wl,-rpath $$(STAGING_LIBDIR)
     SOURCES += SoundPlayerDummy.cpp
     HEADERS += SoundPlayerDummy.h
 
