@@ -10,7 +10,7 @@ respawn
 pre-start script
 	echo "1" > /proc/sys/vm/overcommit_memory
 	mkdir -p /var/luna/preferences
-	if grep -qs "qemux86" /etc/hostname ; then
+	if grep -qs "qemu" /etc/hostname ; then
 		touch /var/luna/preferences/ran-first-use
 	fi
 	if [ ! -f /var/luna/preferences/ran-first-use ]
@@ -24,7 +24,7 @@ end script
 script
 
 	# Choose our malloc
-    if grep -qs "qemux86" /etc/hostname ; then
+    if grep -qs "qemu" /etc/hostname ; then
         export LD_PRELOAD="/usr/lib/libptmalloc3.so"
         export HOME=/var/home/root
     else
@@ -42,7 +42,7 @@ script
 			exec /usr/bin/LunaSysMgr -s `cat /var/luna/preferences/sysmgr-args`
 		fi
 	fi
-	#if grep -qs "qemux86" /etc/hostname ; then
+	#if grep -qs "qemu" /etc/hostname ; then
 	#	export HOME=/var/home/root
 	#fi
 	exec ionice -c 2 -n 0 /usr/bin/LunaSysMgr -s `cat /var/luna/preferences/sysmgr-args`
