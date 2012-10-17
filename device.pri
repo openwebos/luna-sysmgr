@@ -23,8 +23,7 @@ BUILD_TYPE = release
 CONFIG -= debug
 CONFIG += release
 
-LIBS += -lluna-prefs -lPmLogLib -lrolegen 
-
+LIBS += -lluna-prefs -lPmLogLib -lrolegen -Wl,-rpath,$$(QT_CONFIGURE_PLUGINS_PATH)/platforms
 
 MACHINE_NAME = $$(MACHINE)
 
