@@ -90,6 +90,7 @@ public:
 	void postAppRestoredNeeded();
 	
 	void postMessageToSystemUI(const char* jsonStr);
+	void postMessageToSystemUIResponses(const char* jsonStr);
 
     void postSystemStatus();
 	

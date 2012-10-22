@@ -125,6 +125,8 @@ static bool cbPublishToSystemUI(LSHandle* lsHandle, LSMessage *message,
 							void *user_data);
 static bool cbSubscribeToSystemUI(LSHandle* lsHandle, LSMessage *message,
 							void *user_data);
+static bool cbSubscribeToSystemUIResponses(LSHandle* lsHandle, LSMessage *message,
+                                           void *user_data);
 #ifdef USE_HEAP_PROFILER
 static bool cbDumpHeapProfiler(LSHandle* lsHandle, LSMessage *message,
 								 void *user_data);
@@ -226,6 +228,7 @@ static LSMethod s_methods[]  = {
 	{ "getAnimationValues", cbGetAnimationValues },
 	{ "publishToSystemUI", cbPublishToSystemUI },
 	{ "subscribeToSystemUI", cbSubscribeToSystemUI },
+        { "subscribeToSystemUIResponses", cbSubscribeToSystemUIResponses },
 #ifdef USE_HEAP_PROFILER
 	{ "dumpHeapProfile", cbDumpHeapProfiler },
 #endif
@@ -3178,13 +3181,95 @@ bool cbSubscribeToSystemUI(LSHandle* handle, LSMessage* message, void *user_data
 /*!
 \page com_palm_systemmanager
 \n
+\section com_palm_systemmanager_subscribe_to_system_ui_responses - subscribeToSystemUIResponses
+
+\e Public.
+
+com.palm.systemmanager/subscribeToSystemUIResponses
+
+Subscribe to messages published by SystemUI.
+
+\subsection com_palm_systemmanager_subscribe_to_system_ui_responses_syntax Syntax:
+\code
+{
+    "subscribe": boolean
+}
+\endcode
+
+
+\subsection com_palm_systemmanager_subscribe_to_system_ui_responses_returns Returns:
+\code
+{
+    "returnValue": boolean,
+    "subscribed": boolean
+}
+\endcode
+
+\param returnValue Indicates if the call was succesful.
+\param subscribed True if subscribed to system UI events.
+
+\subsection com_palm_systemmanager_subscribe_to_system_ui_responses_examples Examples:
+\code
+luna-send -n 1 -f luna://com.palm.systemmanager/subscribeToSystemUIResponses '{ }'
+\endcode
+
+Example response for a succesful call:
+\code
+{
+    "returnValue": true
+    "subscribed": true
+}
+\endcode
+
+Example response for a failed call:
+\code
+{
+    "returnValue": false,
+    "subscribed": false
+}
+\endcode
+*/
+bool cbSubscribeToSystemUIResponses(LSHandle* handle, LSMessage* message, void *user_data)
+{
+    SUBSCRIBE_SCHEMA_RETURN(handle, message);
+
+    bool success = true;
+    bool subscribed = false;
+    LSError lsError;
+    json_object* response = json_object_new_object();
+
+    LSErrorInit(&lsError);
+
+    if (LSMessageIsSubscription(message)) {
+        success = LSSubscriptionProcess(handle, message, &subscribed, &lsError);
+        if (!success) {
+            LSErrorFree(&lsError);
+        }
+    }
+
+    json_object_object_add(response, "returnValue", json_object_new_boolean(success));
+    json_object_object_add(response, "subscribed", json_object_new_boolean(subscribed));
+
+    if (!LSMessageReply(handle, message, json_object_to_json_string(response), &lsError))
+        LSErrorFree(&lsError);
+
+    if(response && !is_error(response))
+        json_object_put(response);
+
+    return true;
+}
+
+/*!
+\page com_palm_systemmanager
+\n
 \section com_palm_systemmanager_publish_to_system_ui publishToSystemUI
 
 \e Public.
 
 com.palm.systemmanager/publishToSystemUI
 
-Publish messages to system UI.
+Publish messages to/from system UI. If message comes from system UI,
+the message will be published to listeners of subscribeToSystemUIResponses().
 
 \subsection com_palm_systemmanager_publish_to_system_ui_syntax Syntax:
 \code
@@ -3242,12 +3327,14 @@ bool cbPublishToSystemUI(LSHandle* handle, LSMessage* message, void *user_data)
                                SCHEMA_2(REQUIRED(event, string), REQUIRED(message, object)));
 	LSErrorInit(&lsError);
 
+        const char* appId;
 	const char* payload = LSMessageGetPayload( message );
 	if(!payload) {
 		success = false;
 		goto Done;
 	}
 
+        appId = LSMessageGetApplicationID( message );
 	root = json_tokener_parse(payload);
 	if(!root || is_error(root)) {
 		success = false;
@@ -3269,6 +3356,14 @@ bool cbPublishToSystemUI(LSHandle* handle, LSMessage* message, void *user_data)
 	}
 	//Posting to SystemUI client to process the message. If the event is unknown then the message will dropped at the client level.
 	SystemService::instance()->postMessageToSystemUI(payload);
+
+        // If the message is posted from SystemUI we broadcast it to all subscribers of its responses.
+        if(appId != NULL && strlen(appId) > 0) {
+            std::string appStr;
+            appStr = appId;
+            if(appStr.find("com.palm.systemui", 0) != std::string::npos)
+                SystemService::instance()->postMessageToSystemUIResponses(payload);
+        }
 
 	Done:
 
@@ -3308,6 +3403,56 @@ void SystemService::postMessageToSystemUI(const char* jsonStr)
 		LSErrorFree (&lsError);
 
 	json_object_put(json);
+
+}
+
+void SystemService::postMessageToSystemUIResponses(const char* jsonStr)
+{
+    bool    retVal;
+    LSError lsError;
+    json_object* json = 0;
+
+    LSErrorInit(&lsError);
+
+    json = json_tokener_parse(jsonStr);
+    if(!json || is_error(json)) {
+	g_warning("SysMgr::postMessageToSystemUIResponses - Message Parsing error! ");
+	return;
+    }
+
+    retVal = LSSubscriptionPost(m_service, "/", "subscribeToSystemUIResponses",
+				json_object_to_json_string(json), &lsError);
+
+    if (!retVal)
+	LSErrorFree (&lsError);
+
+
+    LSSubscriptionIter* iter;
+    if (!LSSubscriptionAcquire(m_service, "/subscribeToSystemUIResponses", &iter, &lsError)) {
+        g_warning("SysMgr::postMessageToSystemUIResponses - failed to retrieve subscription");
+        LSErrorFree(&lsError);
+        return;
+    }
+    while (LSSubscriptionHasNext(iter)) {
+        LSMessage* message = LSSubscriptionNext(iter);
+        const char* payload = LSMessageGetPayload(message);
+        const char* appId = LSMessageGetApplicationID(message);
+
+        json_object* payload_json = json_tokener_parse(payload);
+        if (payload_json) {
+            json_object* payload_message_json = json_object_object_get(payload_json, "message");
+            if (payload_message_json) {
+                json_object *payload_appId_json = json_object_object_get(payload_message_json, "appId");
+                if (payload_appId_json && json_object_get_string(payload_appId_json)) {
+                    if (g_strcmp0(json_object_get_string(payload_appId_json), appId) == 0)
+                        LSMessageReply(m_service, message, json_object_to_json_string(json), &lsError);
+                }
+            }
+            json_object_put(payload_json);
+        }
+    }
+
+    json_object_put(json);
 
 }
 
