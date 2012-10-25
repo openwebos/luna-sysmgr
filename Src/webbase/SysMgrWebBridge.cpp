@@ -258,6 +258,11 @@ void SysMgrWebBridge::addPalmSystemObject(void)
         qDebug() << "couldn't find the main frame?";
 
     m_jsObj = new PalmSystem(this);
+
+    if(!m_args.isEmpty()) {
+       m_jsObj->setLaunchParams(m_args);
+    }
+
     frame->addToJavaScriptWindowObject("PalmSystem", m_jsObj);
 
     frame->evaluateJavaScript("function palmGetResource(a,b) { return PalmSystem.getResource(a,b); }");
