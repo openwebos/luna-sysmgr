@@ -64,7 +64,6 @@ void SysMgrWebBridge::commonSetup()
 
     connect(frame, SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(slotJavaScriptWindowObjectCleared()));
 
-    // Listening on microFocusChanged() is an expensive operation that can be avoided.
     connect(m_page, SIGNAL(microFocusChanged()), this, SLOT(slotMicroFocusChanged()));
 
     // TODO: tell sysmgr that we want touch
