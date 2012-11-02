@@ -18,6 +18,9 @@
 
 MACHINE_NAME = $$(MACHINE)
 
+contains(MACHINE_NAME, "qemux86-64") {
+    CONFIG_BUILD += nyx webosemulator
+}
 contains(MACHINE_NAME, "qemux86") {
     CONFIG_BUILD += nyx webosemulator
 }

@@ -112,7 +112,6 @@ Settings::Settings()
         , backlightDarkScale (10)
 	, displayWidth(320)
 	, displayHeight(320)
-	, gestureAreaHeight(50)
 	, displayNumBuffers(3)
 	, ledPulseMaxBrightness (100)
 	, ledPulseDarkBrightness (50)
@@ -164,6 +163,10 @@ Settings::Settings()
 	, launcherScrim("/usr/lib/luna/system/luna-applauncher/images/launcher_scrim.png")
         , firstCardLaunch("/var/luna/preferences/used-first-card")
 	, atlasEnabled(false)
+	, uiScale(1.0)
+	, textScale(1.0)
+	, layoutScale(1.0)
+	, imeScale(1.0)
 	, cardGroupingXDistanceFactor(1.0)
 	, atlasMemThreshold(0)
 	, launcherAtlasStatistics(false)
@@ -185,7 +188,6 @@ Settings::Settings()
 	, dockModeUserPositions("/var/palm/user-exhibition-apps.json")
 	, dockModeMenuHeight (400)
 	, virtualKeyboardEnabled(false)
-	, showNotificationsAtTop(false)
 	, virtualCoreNaviEnabled(false)
 	, virtualCoreNaviHeight(0)
 	, uiType(UI_LUNA)
@@ -379,7 +381,6 @@ void Settings::load(const char* settingsFile)
 	KEY_BOOLEAN("General", "ShowReticle", showReticle);
 
 	KEY_INTEGER("General", "NotificationSoundDuration", notificationSoundDuration);
-	KEY_BOOLEAN("General", "ShowNotificationsAtTop", showNotificationsAtTop);
 
 	KEY_INTEGER( "CoreNavi", "ThrobberBrightnessInLight", ledPulseMaxBrightness);
 	KEY_INTEGER( "CoreNavi", "ThrobberBrightnessInDark", ledPulseDarkBrightness);
@@ -400,7 +401,6 @@ void Settings::load(const char* settingsFile)
 	KEY_INTEGER( "Memory", "CardLimit", cardLimit );
 	KEY_INTEGER( "General","DisplayWidth",displayWidth);
 	KEY_INTEGER( "General","DisplayHeight",displayHeight);
-	KEY_INTEGER( "General","GestureAreaHeight",gestureAreaHeight);
 	KEY_INTEGER( "General","DisplayNumBuffers", displayNumBuffers);
 	KEY_INTEGER("General", "MaxPenMoveFreq", maxPenMoveFreq);
 	KEY_INTEGER("General",  "MaxPaintLoad", maxPaintLoad);
@@ -501,6 +501,10 @@ void Settings::load(const char* settingsFile)
 	KEY_INTEGER("UI", "SplashIconSize", splashIconSize);
 	KEY_BOOLEAN("UI", "EnableSplashBackgrounds", enableSplashBackgrounds);
 	KEY_BOOLEAN("UI", "AtlasEnabled", atlasEnabled);
+	KEY_DOUBLE("UI", "UIScale", uiScale);
+	KEY_DOUBLE("UI", "TextScale", textScale);
+	KEY_DOUBLE("UI", "LayoutScale", layoutScale);
+	KEY_DOUBLE("UI", "IMEScale", imeScale);
 
 	KEY_INTEGER("UI", "ModalWindowWidth", modalWindowWidth);
 	KEY_INTEGER("UI", "ModalWindowHeight", modalWindowHeight);
@@ -689,6 +693,16 @@ void Settings::postLoad()
 	packageInstallBase = appInstallBase;
 
 	// Piranha flags
+	
+	//Virtual Gesture Area
+	if(!virtualCoreNaviEnabled)
+		virtualCoreNaviHeight = 0;
+
+	//UI Scaling for positive space padding
+	positiveSpaceTopPadding *= layoutScale;
+	positiveSpaceBottomPadding *= layoutScale;
+	statusBarTitleMaxWidth *= textScale;
+	gapBetweenCardGroups *= layoutScale;
 }
 
 // Expands "1MB" --> 1048576, "2k" --> 2048, etc.

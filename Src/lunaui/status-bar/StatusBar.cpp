@@ -88,7 +88,7 @@ StatusBar::StatusBar(StatusBarType type, int width, int height)
 
 	// Title Bar (a value of true on the third arg turns on non-tablet UI)
 	m_title = new StatusBarTitle(Settings::LunaSettings()->statusBarTitleMaxWidth, height, false);
-
+	
 	if(Settings::LunaSettings()->tabletUi) {
 		m_systemUiGroup = new StatusBarItemGroup(height, (m_type == TypeNormal || m_type == TypeDockMode), (m_type == TypeNormal || m_type == TypeDockMode), StatusBarItemGroup::AlignRight);
 		connect(m_systemUiGroup, SIGNAL(signalBoundingRectChanged()), this, SLOT(slotChildBoundingRectChanged()));
@@ -158,7 +158,7 @@ StatusBar::StatusBar(StatusBarType type, int width, int height)
 			}
 		}
 		if (m_type == TypeNormal || m_type == TypeDockMode || m_type == TypeFirstUse) {
-			m_titleGroup    = new StatusBarItemGroup(height, true, false, StatusBarItemGroup::AlignLeft);
+			m_titleGroup    = new StatusBarItemGroup(height, false, false, StatusBarItemGroup::AlignLeft);
 			if(m_titleGroup) {
 				m_titleGroup->setParentItem(this);
 				m_titleGroup->setActionable(false);
@@ -240,6 +240,8 @@ void StatusBar::init()
 	if(Settings::LunaSettings()->tabletUi) {
 		m_bkgPixmap = new QPixmap(statusBarImagesPath.c_str());
 		if(!m_bkgPixmap->isNull()) {
+			*m_bkgPixmap = m_bkgPixmap->scaledToHeight(m_bkgPixmap->height() * Settings::LunaSettings()->uiScale);
+			
 			m_barColor = s_defaultColor;
 			m_curColor = m_barColor;
 			m_newColor = m_barColor;
@@ -773,7 +775,7 @@ void StatusBar::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 			painter->fillRect(m_bounds, m_barColor);
 			painter->setOpacity(opacity);
 		}
-		painter->drawTiledPixmap(m_bounds, *m_bkgPixmap);
+		painter->drawPixmap(m_bounds, *m_bkgPixmap);
 	}
 }
 

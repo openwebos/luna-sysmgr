@@ -38,6 +38,8 @@
 #include "iconlayoutsettings.h"
 #include "gfxsettings.h"
 
+#include "Settings.h"
+
 #include <QPainter>
 #include <QEvent>
 #include <QGesture>
@@ -104,8 +106,9 @@ void ReorderablePage::commonCtor()
 	}
 
 	//load the empty page icon, if there is one
+	QSize emptySize = QSize(280, 220) * Settings::LunaSettings()->layoutScale;
 	PixmapObject * pEmptyPicPmo =
-			PixmapObjectLoader::instance()->quickLoad(QString(GraphicsSettings::DiUiGraphicsSettings()->graphicsAssetBaseDirectory + EMPTY_ICON_FILEPATH));
+			PixmapObjectLoader::instance()->quickLoad(QString(GraphicsSettings::DiUiGraphicsSettings()->graphicsAssetBaseDirectory + EMPTY_ICON_FILEPATH), emptySize, false);
 
 	if (pEmptyPicPmo)
 	{

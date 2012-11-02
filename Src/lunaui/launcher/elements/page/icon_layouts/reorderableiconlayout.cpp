@@ -31,6 +31,8 @@
 #include "pixmapobject.h"
 #include "dimensionslauncher.h"
 
+#include "Settings.h"
+
 #include <QPainter>
 #include <QTransform>
 #include <QParallelAnimationGroup>
@@ -1788,7 +1790,7 @@ qint32 ReorderableIconLayout::calculateAndSetHorizontalSpaceParameters()
 //	//qDebug() << "m_maxWidthForRows: " << m_maxWidthForRows << " , m_iconCellSize.width() * (m_maxIconsPerRow+1) = " << m_iconCellSize.width() * (m_maxIconsPerRow+1) << " , freeSpace = " << freeSpace;
 	qint32 spacing = ( freeSpace <= 0
 			? 0
-			: DimensionsGlobal::maxCellWidth(m_maxIconsPerRow-1,(quint32)qMax(0,freeSpace))
+			: DimensionsGlobal::maxCellWidth(m_maxIconsPerRow,(quint32)qMax(0,freeSpace))
 					);
 //	//qDebug() << "---> spacing: " << spacing;
 

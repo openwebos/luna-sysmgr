@@ -57,14 +57,15 @@
 
 #include <QDebug>
 
+#include "HostBase.h"
 #include "Settings.h"
 
 #define QUICKLAUNCH_BG_SOLID	QString("/quicklaunch-bg-solid.png")
 #define QUICKLAUNCH_BG_TRANSLUCENT QString("/quicklaunch-bg.png")
+#define QUICKLAUNCH_BG_SIZE	QSize(10,105)
 
 #define LA_BUTTON_FILEPATH QString("quicklaunch-button-launcher.png")
-#define LA_BUTTON_NORMAL_LOC QRect(0,0,64,64)
-#define LA_BUTTON_ACTIVE_LOC QRect(0,64,64,64)
+#define LA_BUTTON_SIZE 64 
 #define MOVING_ICON_Y_OFFSET 15
 
 
@@ -74,9 +75,11 @@ qint32 QuickLaunchBar::sEventCounter0 = 0;
 static PixButton2State * LoadLauncherAccessButton()
 {
 	QList<QRect> buttonStateCoords;
-	buttonStateCoords << LA_BUTTON_NORMAL_LOC << LA_BUTTON_ACTIVE_LOC;
+	int size = LA_BUTTON_SIZE * Settings::LunaSettings()->layoutScale;
+	buttonStateCoords << QRect(0,0,size,size) << QRect(0,size,size,size);
 	QList<PixmapObject *> buttonStatePmos =
 			PixmapObjectLoader::instance()->loadMulti(
+					Settings::LunaSettings()->uiScale,
 					buttonStateCoords,
 					GraphicsSettings::DiUiGraphicsSettings()->graphicsAssetBaseDirectory + LA_BUTTON_FILEPATH);
 
@@ -101,16 +104,22 @@ QuickLaunchBar::QuickLaunchBar(const QRectF& geom,Quicklauncher * p_quicklaunche
 , m_qp_iconInMotion(0)
 , m_iconInMotionCurrentIndex(-1)
 , m_iconShowingFeedback(0)
+, m_maxItems(0)
 , m_feedbackTimer(this)
 {
 
 	m_qp_backgroundTranslucent =
 			PixmapObjectLoader::instance()->quickLoad(
-					QString(GraphicsSettings::settings()->graphicsAssetBaseDirectory + QUICKLAUNCH_BG_TRANSLUCENT)
+					QString(GraphicsSettings::settings()->graphicsAssetBaseDirectory + QUICKLAUNCH_BG_TRANSLUCENT),
+					QUICKLAUNCH_BG_SIZE * Settings::LunaSettings()->layoutScale,
+					false
+					
 			);
 	m_qp_backgroundSolid =
 				PixmapObjectLoader::instance()->quickLoad(
-						QString(GraphicsSettings::settings()->graphicsAssetBaseDirectory + QUICKLAUNCH_BG_SOLID)
+						QString(GraphicsSettings::settings()->graphicsAssetBaseDirectory + QUICKLAUNCH_BG_SOLID),
+						QUICKLAUNCH_BG_SIZE * Settings::LunaSettings()->layoutScale,
+						false
 			);
 	m_qp_currentBg = m_qp_backgroundTranslucent;
 
@@ -122,6 +131,12 @@ QuickLaunchBar::QuickLaunchBar(const QRectF& geom,Quicklauncher * p_quicklaunche
 
 		connect(m_qp_launcherAccessButton,SIGNAL(signalContact()),this,SIGNAL(signalToggleLauncher()));
 	}
+	
+	//Calculate maximum items from smallest screen dimension and icon size
+	const HostInfo& info = HostBase::instance()->getInfo();
+	int size = LA_BUTTON_SIZE * Settings::LunaSettings()->layoutScale * 1.25;
+	m_maxItems =  (qMin(info.displayWidth, info.displayHeight) - size) / size;
+	
 	setAcceptTouchEvents(true);
 	grabGesture((Qt::GestureType) SysMgrGestureFlick);
 	grabGesture(Qt::TapAndHoldGesture);
@@ -141,7 +156,7 @@ QuickLaunchBar::~QuickLaunchBar()
 //virtual
 bool QuickLaunchBar::canAcceptIcons()
 {
-	if ((quint32)(m_iconItems.size()) >= LayoutSettings::settings()->quickLaunchMaxItems)
+	if ((quint32)(m_iconItems.size()) >= m_maxItems)
 	{
 		return false;
 	}
@@ -312,33 +327,32 @@ bool QuickLaunchBar::resize(const QSize& s)
 	}
 	ThingPaintable::resize(s);	//this will take care of geom and b-rect computation
 
+	//the settings spec is relative to the top but m_itemsY will be used as a coordinate in ICS, so remap it so
+	// that it's center-origin based (i.e. it's in ICS)
+	m_itemsY = 26;
+
 	//reposition the launcher access button
 	//TODO: hardcoded to reference topRight of QL
 	if (m_qp_launcherAccessButton)
 	{
 		// Changing this for now so that we treat the launcher icon as having the same size of a regular icon, so we can have
 		// everything ordered symmetrically in the QL bar.
-		m_qp_launcherAccessButton->setPos(
-				m_geom.topRight()
-				+QPoint(-IconGeometrySettings::settings()->absoluteGeomSizePx.width()/2, LayoutSettings::settings()->quickLaunchBarLauncherAccessButtonOffsetPx.y() + m_qp_launcherAccessButton->geometry().height()/2));
+		m_qp_launcherAccessButton->setPos(QPoint(
+				m_geom.right() - m_qp_launcherAccessButton->geometry().width()/1.5
+				, m_itemsY + LayoutSettings::settings()->quickLaunchBarLauncherAccessButtonOffsetPx.y()));
 
 		m_qp_launcherAccessButton->setVisible(true);
 	}
-
+	
 	//item area recalc...item area starts at either:
 	// 1. geom.topLeft   (if the access button is on the right edge)
 	// 2. Point(button.right,geom.top)     (if the access button is on the left edge)
 	//  + settings.quickLaunchItemAreaOffsetPx
 
 	//TODO: for now, access button is hardcoded to the right edge, so it's always (1)
-
-	m_itemAreaXrange.first = (qint32)(geometry().left()) + LayoutSettings::settings()->quickLaunchItemAreaOffsetPx.x();
-	m_itemAreaXrange.second = (qint32)(geometry().right())
-								-(qint32)(IconGeometrySettings::settings()->absoluteGeomSizePx.width());
-
-	//the settings spec is relative to the top but m_itemsY will be used as a coordinate in ICS, so remap it so
-	// that it's center-origin based (i.e. it's in ICS)
-	m_itemsY = m_geom.top()+LayoutSettings::settings()->quickLaunchItemAreaOffsetPx.y();
+	
+	m_itemAreaXrange.first = (qint32)(geometry().left());
+	m_itemAreaXrange.second = (qint32)(m_qp_launcherAccessButton->pos().x() - m_qp_launcherAccessButton->geometry().width()/2);
 
 	//recompute the position of all the items currently here
 	rearrangeIcons(false);
@@ -446,7 +460,7 @@ bool QuickLaunchBar::restoreFromSave()
 	//restore only up to the max allowable icons
 	int restoredCount = 0;
 	for (WebOSRestoreObjectList::const_iterator app_it = restoredAppsList.constBegin();
-			((app_it != restoredAppsList.constEnd()) && ((quint32)restoredCount < LayoutSettings::settings()->quickLaunchMaxItems));++app_it)
+			((app_it != restoredAppsList.constEnd()) && ((quint32)restoredCount < m_maxItems));++app_it)
 	{
 		//This is the quicklaunch, which means that the icons here must be CLONES. So each one needs to be cloned before being added here
 		DimensionsSystemInterface::WebOSAppRestoreObject const& pRestoreObj = *app_it;
@@ -627,7 +641,7 @@ QSize QuickLaunchBar::QuickLaunchSizeFromScreenSize(int screenWidth,int screenHe
 {
 	if (LayoutSettings::settings()->quickLaunchBarUseAbsoluteSize)
 	{
-		return QSize(screenWidth,qMin(LayoutSettings::settings()->quickLaunchBarHeightAbsolute,(quint32)screenHeight));
+		return QSize(screenWidth,qMin(LayoutSettings::settings()->quickLaunchBarHeightAbsolute,(quint32)screenHeight) * Settings::LunaSettings()->layoutScale);
 	}
 	QSize r = QSize(
 			qBound((quint32)2,
@@ -641,6 +655,11 @@ QSize QuickLaunchBar::QuickLaunchSizeFromScreenSize(int screenWidth,int screenHe
 	//make evenly divisible (multiple of 2)
 	r.setWidth(r.width() - (r.width() % 2));
 	r.setHeight(r.height() - (r.height() % 2));
+	
+	//obey layoutScale
+	r.setWidth(r.width() * Settings::LunaSettings()->layoutScale);
+	r.setHeight(r.height() * Settings::LunaSettings()->layoutScale);
+	
 	return r;
 
 }
@@ -648,7 +667,6 @@ QSize QuickLaunchBar::QuickLaunchSizeFromScreenSize(int screenWidth,int screenHe
 //virtual
 void QuickLaunchBar::rearrangeIcons(bool animate)
 {
-	qint32 itemSpace = 0;
 	qint32 nItems = 0;
 	//calc the total size taken up by the items in the list
 	for (QList<QPointer<IconBase> >::iterator it = m_iconItems.begin();
@@ -660,7 +678,6 @@ void QuickLaunchBar::rearrangeIcons(bool animate)
 			continue;
 		}
 		++nItems;
-		itemSpace += (qint32)pIcon->geometry().width();
 	}
 
 	if(!nItems)
@@ -677,19 +694,12 @@ void QuickLaunchBar::rearrangeIcons(bool animate)
 		m_qp_reorderAnimationGroup = new QParallelAnimationGroup(this);
 	}
 
-	qint32 interSpace = qMax((int)0,(int)(((m_itemAreaXrange.second - m_itemAreaXrange.first)-itemSpace)/(nItems)));
-
-	m_layoutAnchorsXcoords.clear();
-	if (itemSpace == 0)
-	{
-		//nothing to do
-		return;
-	}
-
-	qint32 xoffs = 0;
+	m_layoutAnchorsCoords.clear();
+	
 	int idx=0;
 	QPointF iconPos;
-	iconPos.setY(m_itemsY);
+	qint32 barFullW = (m_itemAreaXrange.second-m_itemAreaXrange.first); //Calculate bar width
+	qint32 barHalfW = barFullW/2;
 
 	for (QList<QPointer<IconBase> >::iterator it = m_iconItems.begin();
 			it != m_iconItems.end();++it)
@@ -699,10 +709,17 @@ void QuickLaunchBar::rearrangeIcons(bool animate)
 		{
 			continue;
 		}
-		qint32 iconHalfW = (qint32)(pIcon->geometry().width()/2.0);
-
+		
+		qint32 iconX = m_itemAreaXrange.first; //Start on the left
+		iconX += (barHalfW/m_iconItems.length()); //Offset from left
+		iconX += (barFullW/m_iconItems.length()) * idx; //How far to the right should we go?
+		qint32 iconY = 0.0;
+		iconY += m_itemsY; //Start at the normal Y position
+		pIcon->setLaunchFeedbackVisibility(false);
+			
 		if(pIcon != m_qp_iconInMotion) {// no need to move the icon that the user is dragging around
-			iconPos.setX(m_itemAreaXrange.first+xoffs+iconHalfW);
+			iconPos.setX(iconX);
+			iconPos.setY(iconY);
 
 			if(pIcon->pos() != iconPos) {
 				if(!animate) {
@@ -717,9 +734,12 @@ void QuickLaunchBar::rearrangeIcons(bool animate)
 				}
 			}
 		}
-
-		m_layoutAnchorsXcoords << m_itemAreaXrange.first+xoffs+iconHalfW;
-		xoffs+=interSpace+pIcon->geometry().width();
+		
+		//Pipe the current position into m_layoutAnchorsCoords
+		//This determines the icon positions for tap checks
+		m_layoutAnchorsCoords << iconPos;
+		
+		idx++;
 	}
 
 	if(animate && !m_qp_reorderAnimationGroup.isNull() && m_qp_reorderAnimationGroup->animationCount()) {
@@ -769,9 +789,9 @@ bool QuickLaunchBar::addIcon(quint32 index,IconBase * p_icon, bool animate)
 		return false;
 	}
 
-	if ((quint32)(m_iconItems.size()) >= LayoutSettings::settings()->quickLaunchMaxItems)
+	if ((quint32)(m_iconItems.size()) >= m_maxItems)
 	{
-		g_warning("%s: early-exit: max items (%d) reached",__FUNCTION__,LayoutSettings::settings()->quickLaunchMaxItems);
+		g_warning("%s: early-exit: max items (%d) reached",__FUNCTION__,m_maxItems);
 		return false;
 	}
 
@@ -1098,8 +1118,9 @@ IconBase* QuickLaunchBar::iconAtCoordinate(const QPointF& coord)
 	// determine if the provided coordinates falls into the bounds of any of the icons in the m_iconItems list
 	for (IconListIter it = m_iconItems.begin(); it != m_iconItems.end(); ++it)
 	{
-		qint32 slotX = m_layoutAnchorsXcoords.value(index);
-		QRectF target = (*it)->geometry().translated(QPoint(slotX, m_itemsY));
+		qint32 slotX = m_layoutAnchorsCoords.value(index).x();
+		qint32 slotY = m_layoutAnchorsCoords.value(index).y();
+		QRectF target = (*it)->geometry().translated(QPoint(slotX, slotY));
 
 		if (target.contains(coord))
 		{
@@ -1115,7 +1136,7 @@ IconBase* QuickLaunchBar::iconAtCoordinate(const QPointF& coord)
 //virtual
 qint32 QuickLaunchBar::iconSlotForInsertingAtXCoord(qint32 x)
 {
-	if ((quint32)(m_iconItems.size()) >= LayoutSettings::settings()->quickLaunchMaxItems)
+	if ((quint32)(m_iconItems.size()) >= m_maxItems)
 		return -1;
 
 	// returns the most likely slot a new icon will end up when inserted at the provided X coord

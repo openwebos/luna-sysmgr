@@ -25,6 +25,8 @@
 #include "gfxsettings.h"
 #include "stringtranslator.h"
 
+#include "iconlayoutsettings.h"
+
 #include "Settings.h"
 
 QPointer<IconHeap> IconHeap::s_qp_instance = 0;
@@ -324,13 +326,17 @@ IconBase * IconHeap::makeIconConstrained(const QString& mainIconFilePath,const Q
 	{
 		return 0;
 	}
-	PixmapObject * pFrameIconPmo = PixmapObjectLoader::instance()->quickLoad(frameIconFilePath);
+	
+	quint32 frameSize = qMin(IconLayoutSettings::settings()->reorderablelayout_fixedIconCellSize.width(),
+				IconLayoutSettings::settings()->reorderablelayout_fixedIconCellSize.height());
+	
+	PixmapObject * pFrameIconPmo = PixmapObjectLoader::instance()->quickLoad(frameIconFilePath, QSize(frameSize, frameSize), false);
 	if (!pFrameIconPmo)
 	{
 		return 0;
 		//TODO: MEMLEAK: pMainIconPmo?????
 	}
-	PixmapObject * pLaunchFeedbackPmo = PixmapObjectLoader::instance()->quickLoad(feedbackIconFilePath);
+	PixmapObject * pLaunchFeedbackPmo = PixmapObjectLoader::instance()->quickLoad(feedbackIconFilePath, QSize(frameSize, frameSize), false);
 	if (!pLaunchFeedbackPmo)
 	{
 		return 0;

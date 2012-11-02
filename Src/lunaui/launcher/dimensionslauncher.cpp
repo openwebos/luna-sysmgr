@@ -102,6 +102,7 @@ static PixButton2State * LoadDoneButton()
 	buttonStateCoords << DONE_BUTTON_NORMAL_LOC << DONE_BUTTON_ACTIVE_LOC;
 	QList<PixmapObject *> buttonStatePmos =
 			PixmapObjectLoader::instance()->loadMulti(
+					Settings::LunaSettings()->uiScale,
 					buttonStateCoords,
 					GraphicsSettings::DiUiGraphicsSettings()->graphicsAssetBaseDirectory + DONE_BUTTON_FILEPATH);
 
@@ -121,10 +122,14 @@ static OverlayLayer * LoadOverlayLayer(LauncherObject * p_launcher)
 	PixmapObject * pTabBarShadowPmo =
 			PixmapObjectLoader::instance()->quickLoad(
 					GraphicsSettings::DiUiGraphicsSettings()->graphicsAssetBaseDirectory + TAB_SHADOW_FILEPATH
+					, QSize(10 * Settings::LunaSettings()->layoutScale, 10 * Settings::LunaSettings()->layoutScale)
+					, false
 			);
 	PixmapObject * pQuickLaunchShadowPmo =
 			PixmapObjectLoader::instance()->quickLoad(
 					GraphicsSettings::DiUiGraphicsSettings()->graphicsAssetBaseDirectory + QUICKLAUNCH_SHADOW_FILEPATH
+					, QSize(20 * Settings::LunaSettings()->layoutScale, 20 * Settings::LunaSettings()->layoutScale)
+					, false
 			);
 	OverlayLayer * pOverlay = new OverlayLayer(p_launcher->geometry());
 	pOverlay->setParentItem(p_launcher);
@@ -1281,7 +1286,7 @@ void LauncherObject::fullSizeInit(quint32 width,quint32 height)
 	QSize derivedLauncherSize = LauncherSizeFromScreenSize(width,height);
 	m_geom = DimensionsGlobal::realRectAroundRealPoint(derivedLauncherSize);
 
-	m_qp_background = new PixmapObject(GraphicsSettings::DiUiGraphicsSettings()->graphicsAssetBaseDirectory + TAB_LAUNCHER_BACKGROUND_FILEPATH);
+	m_qp_background = new PixmapObject(GraphicsSettings::DiUiGraphicsSettings()->graphicsAssetBaseDirectory + TAB_LAUNCHER_BACKGROUND_FILEPATH, QSize(180 * Settings::LunaSettings()->layoutScale, 180 * Settings::LunaSettings()->layoutScale), false);
 	if (m_qp_background)
 	{
 		m_drawBackground = true;

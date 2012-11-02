@@ -33,7 +33,6 @@
 
 #define NO_BORDER_TITLE_LEFT_PADDING    7
 #define BORDER_TITLE_LEFT_PADDING       (-4)
-#define TEXT_BASELINE_OFFSET            (-2)
 
 StatusBarTitle::StatusBarTitle(int width, int height, bool classicUi)
 	: StatusBarItem(StatusBarItem::AlignLeft)
@@ -51,37 +50,34 @@ StatusBarTitle::StatusBarTitle(int width, int height, bool classicUi)
 
 	m_curRect = m_bounds;
 	m_newRect = m_bounds;
+	
+	Settings* settings = Settings::LunaSettings();
 
-	const char* fontName = Settings::LunaSettings()->fontStatusBar.c_str();
-	m_font = new QFont(fontName, 14);
-	m_font->setPixelSize(14);
+	const char* fontName = settings->fontStatusBar.c_str();
+	m_font = new QFont(fontName, 14 * settings->textScale);
+	m_font->setPixelSize(14 * settings->textScale);
 
 	m_font->setLetterSpacing(QFont::PercentageSpacing, kStatusBarQtLetterSpacing);
 
 	if (m_font) {
 		m_font->setBold(true);
 	}
+	
+	m_baselineOffset = 0;
 
 	QFontMetrics fontMetrics (*m_font);
 
 	connect(&m_anim, SIGNAL(finished()), SLOT(slotAnimFinished()));
-
-	Settings* settings = Settings::LunaSettings();
+	
 	std::string statusBarImagesPath = settings->lunaSystemResourcesPath + "/statusBar/";
 
 	std::string filePath = statusBarImagesPath + "appname-background.png";
 	m_titleBackground = QPixmap (filePath.c_str());
 	if (m_titleBackground.isNull())
 		g_warning ("Unable to open %s", filePath.c_str());
-
-
-	if(!Settings::LunaSettings()->tabletUi || m_forceClassicUi) {
-		m_newTitle = QPixmap(width + BKGD_LEFT_WIDTH + BKGD_RIGHT_WIDTH, height);
-		m_currentTitle = QPixmap(width + BKGD_LEFT_WIDTH + BKGD_RIGHT_WIDTH, height);
-	} else {
-		m_newTitle     = QPixmap(width, height);
-		m_currentTitle = QPixmap(width, height);
-	}
+	
+	m_newTitle     = QPixmap(width, height);
+	m_currentTitle = QPixmap(width, height);
 
 	m_originalText = " ";
 	setTitleString(std::string("Unknown"), false);
@@ -101,6 +97,7 @@ QRectF StatusBarTitle::boundingRect() const
 
 void StatusBarTitle::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
+	painter->translate(0,m_bounds.height()/4);
 	if(!m_inTransition) {
 		painter->drawPixmap(m_bounds, m_currentTitle, QRectF(0, 0, m_bounds.width(), m_bounds.height()));
 	} else {
@@ -116,14 +113,13 @@ void StatusBarTitle::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
 
 		painter->setOpacity(oldOpacity);
 	}
+	painter->translate(0,-m_bounds.height()/4);
 }
 
 void StatusBarTitle::setTitleString (std::string title, bool showTitleBorder)
 {
 	bool showBorder;
-	if(!Settings::LunaSettings()->tabletUi) {
-		showBorder = showTitleBorder;
-	} else if (m_forceClassicUi) {
+	if (m_forceClassicUi) {
 		showBorder = true;
 	} else {
 		showBorder = false;
@@ -163,7 +159,7 @@ void StatusBarTitle::createTitlePixmap(QPixmap *pix, QRectF &rect)
 	QPainter painter;
 	QFontMetrics fontMetrics(*m_font);
 
-	int baseLine = pix->height()/2 + m_titleRect.height()/2 - fontMetrics.descent() + TEXT_BASELINE_OFFSET;
+	int baseLine = pix->height()/2 + m_titleRect.height()/2 - fontMetrics.descent() + m_baselineOffset;
 
 	pix->fill(Qt::transparent);
 
@@ -212,11 +208,7 @@ void StatusBarTitle::animateTitleTransition()
 
 		m_inTransition = true;
 
-		if(!Settings::LunaSettings()->tabletUi) {
-			m_bounds = m_curRect.united(m_newRect);
-		} else {
-			m_bounds = m_curRect;
-		}
+		m_bounds = m_curRect;
 
 		m_anim.start();
 	}
@@ -228,10 +220,8 @@ void StatusBarTitle::animValueChanged(const QVariant& value)
 	{
 		m_newTitleOpacity = (qreal)((qreal)(value.toInt())/ 100.0);
 
-		if(Settings::LunaSettings()->tabletUi) {
-			int width = (int)(((1.0 - m_newTitleOpacity) * (qreal)(m_curRect.width())) + (m_newTitleOpacity * (qreal)(m_newRect.width())));
-			m_bounds.setRect(m_curRect.x(), m_curRect.y(), width, m_curRect.height());
-		}
+		int width = (int)(((1.0 - m_newTitleOpacity) * (qreal)(m_curRect.width())) + (m_newTitleOpacity * (qreal)(m_newRect.width())));
+		m_bounds.setRect(m_curRect.x(), m_curRect.y(), width, m_curRect.height());
 
 		update();
 		Q_EMIT signalBoundingRectChanged();

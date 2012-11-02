@@ -63,22 +63,22 @@ const uint64_t cWordDeleteDelay = cFirstRepeatDelay + 1500;
 const QPainter::RenderHints cRenderHints = QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing;
 
 // constants used to draw the popup for extended keys
-const int cPopupFontSize = 22;
+const int cPopupFontSize = 22 * Settings::LunaSettings()->imeScale;
 const int cPopupLeftSide = 11;
 const int cPopupRightSide = 10;
 const int cPopupSide = 20;
 const int cPopupPointerStart = 37;
 const int cPopupPointerWidth = 25;
-const int cPopupTopToKey = 10;
+const int cPopupTopToKey = 10 * Settings::LunaSettings()->imeScale;
 const int cPopupSingleLineMax = 5;	// if more extended chars that this, break-up in two lines
 const int cPressedTranslateH = 0;
 const int cPressedTranslateV = 0;
 
 static QFont sFont("Prelude");
-static QFont sPopoutFont("Prelude", 32);
+static QFont sPopoutFont("Prelude", 32 * Settings::LunaSettings()->imeScale);
 
 static QString sElipsis(QChar(0x2026 /* … */));
-const int cElipsisFontSize = 14;
+const int cElipsisFontSize = 14 * Settings::LunaSettings()->imeScale;
 
 const QColor cActiveColor(0xd2, 0xd2, 0xd2);
 const QColor cActiveColor_back(0xd2, 0xd2, 0xd2);
@@ -99,7 +99,7 @@ public:
 	EVirtualKeyboardSupport	getSupport(int maxWidth, int maxHeight)
 	{
 //		return eVirtualKeyboardSupport_Preferred_SizeAndLocale;		// force phone keyboard for testing!
-		if (maxWidth < 1024 && maxHeight < 1024)
+		if (maxWidth < 1024 * Settings::LunaSettings()->imeScale && maxHeight < 1024 * Settings::LunaSettings()->imeScale)
 			return eVirtualKeyboardSupport_Preferred_Size;
 		return eVirtualKeyboardSupport_Poor;
 	}
@@ -172,8 +172,8 @@ PhoneKeyboard::PhoneKeyboard(IMEDataInterface * dataInterface) : VirtualKeyboard
 	for (int r = 0; r < PhoneKeymap::cKeymapRows; ++r)
 		m_keymap.setRowHeight(r, m_white_key.height() / 2);
 
-	m_presetHeight[0] = 377;	// portrait
-	m_presetHeight[1] = 260;	// landscape
+	m_presetHeight[0] = 377 * Settings::LunaSettings()->imeScale;	// portrait
+	m_presetHeight[1] = 260 * Settings::LunaSettings()->imeScale;	// landscape
 
 	connect(&m_IMEDataInterface->m_availableSpace, SIGNAL(valueChanged(const QRect &)), SLOT(availableSpaceChanged(const QRect &)));
 	connect(&m_IMEDataInterface->m_visible, SIGNAL(valueChanged(const bool &)), SLOT(visibleChanged(const bool &)));
@@ -181,7 +181,7 @@ PhoneKeyboard::PhoneKeyboard(IMEDataInterface * dataInterface) : VirtualKeyboard
 	connect(&m_IMEDataInterface->m_autoCap, SIGNAL(valueChanged(const bool &)), SLOT(autoCapChanged(const bool &)));
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(repeatChar()));
 
-	m_candidateBar.font().setPixelSize(24);
+	m_candidateBar.font().setPixelSize(24 * Settings::LunaSettings()->imeScale);
 
 	connect(&m_candidateBar, SIGNAL(needsRedraw()), SLOT(triggerRepaint()));
 	connect(&m_candidateBar, SIGNAL(resized()), SLOT(candidateBarResized()));
@@ -1453,7 +1453,7 @@ void PhoneKeyboard::drawKeyCap(QPainter * painter, GlyphRenderer<GlyphSpec> & re
 		sFont.setBold(useExtraLarge(use));
 		bool forceAlignHCenter = false;		// if too tight, center text for better looking results
 		int height = location.height();
-		int fontSize = useExtraLarge(use) ? 32 : 24;
+		int fontSize = useExtraLarge(use) ? 32 * Settings::LunaSettings()->imeScale : 24 * Settings::LunaSettings()->imeScale;
 		int centerOffset = 1;
 		if (useTwo && use == eUse_preview)
 			twoHorizontal = true, centerOffset = 2;
@@ -1463,7 +1463,7 @@ void PhoneKeyboard::drawKeyCap(QPainter * painter, GlyphRenderer<GlyphSpec> & re
 		{
 			if (!useExtraLarge(use))
 				sFont.setBold(UKeyIsFunctionKey(key) && !UKeyIsTextShortcutKey(key));
-			fontSize = qMin<int>(fontSize, 22);
+			fontSize = qMin<int>(fontSize, 22 * Settings::LunaSettings()->imeScale);
 			sFont.setPixelSize(fontSize);
 			int gap;
 			while ((gap = QFontMetrics(sFont).width(text) + 16 - location.width()) > 0) {

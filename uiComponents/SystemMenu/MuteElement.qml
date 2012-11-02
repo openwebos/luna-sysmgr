@@ -8,6 +8,9 @@ MenuListEntry {
     property bool   delayUpdate:   false
     property string newText:       ""
     property bool   newMuteStatus: false
+    property real uiScale;
+    property real textScale;
+    property real layoutScale;
 
     property int iconSpacing : 4
     property int rightMarging: 8
@@ -23,7 +26,7 @@ MenuListEntry {
                 text: runtime.getLocalizedString("Mute Sound")
                 color: "#FFF";
                 font.bold: false;
-                font.pixelSize: 18
+                font.pixelSize: 18 * textScale;
                 font.family: "Prelude"
             }
 
@@ -32,6 +35,8 @@ MenuListEntry {
                 visible: !mute
                 x: parent.width - width - iconSpacing - rightMarging
                 anchors.verticalCenter: parent.verticalCenter
+                scale: uiScale
+                smooth: true
 
                 source: "/usr/palm/sysmgr/images/statusBar/icon-mute.png"
              }
@@ -41,6 +46,8 @@ MenuListEntry {
                 visible: mute
                 x: parent.width - width - iconSpacing - rightMarging
                 anchors.verticalCenter: parent.verticalCenter
+                scale: uiScale
+                smooth: true
 
                 source: "/usr/palm/sysmgr/images/statusBar/icon-mute-off.png"
              }

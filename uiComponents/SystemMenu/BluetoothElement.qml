@@ -5,6 +5,9 @@ Drawer {
     id: bluetoothMenu
     property int ident:        0
     property int internalIdent: 0
+    property real uiScale;
+    property real textScale;
+    property real layoutScale;
 
     property bool isBluetoothOn: false
     property bool btTurningOn:   false
@@ -140,6 +143,7 @@ Drawer {
     drawerHeader:
     MenuListEntry {
         selectable: bluetoothMenu.active
+        layoutScale: bluetoothMenu.layoutScale;
         content: Item {
                     width: parent.width;
 
@@ -150,7 +154,7 @@ Drawer {
                         text: runtime.getLocalizedString("Bluetooth");
                         color: bluetoothMenu.active ? "#FFF" : "#AAA";
                         font.bold: false;
-                        font.pixelSize: 18
+                        font.pixelSize: 18 * textScale;
                         font.family: "Prelude"
                     }
 
@@ -160,6 +164,7 @@ Drawer {
                         x: bluetoothTitle.width + 20;
                         y:-17
                         on: btTurningOn && bluetoothMenu.isOpen();
+                        scale:uiScale
                     }
 
                     Text {
@@ -171,7 +176,7 @@ Drawer {
                         anchors.verticalCenter: parent.verticalCenter
                         text: runtime.getLocalizedString("init");
                         color: "#AAA";
-                        font.pixelSize: 13
+                        font.pixelSize: 13 * textScale;
                         font.capitalization: Font.AllUppercase
                     }
                 }
@@ -182,18 +187,19 @@ Drawer {
         spacing: 0
         width: parent.width
 
-        MenuDivider { id: separator }
+        MenuDivider { id: separator; uiScale: bluetoothMenu.uiScale; }
 
         MenuListEntry {
             id: bluetoothOnOff
             selectable: true
+            layoutScale: bluetoothMenu.layoutScale;
             content: Text {
                          id: bluetoothOnOffText;
                          x: ident + internalIdent;
                          text: runtime.getLocalizedString("Turn off Bluetooth");
                          color: "#FFF";
                          font.bold: false;
-                         font.pixelSize: 18;
+                         font.pixelSize: 18 * textScale;
                          font.family: "Prelude"
                      }
             onAction: {
@@ -204,7 +210,7 @@ Drawer {
             }
         }
 
-        MenuDivider  { }
+        MenuDivider  { uiScale: bluetoothMenu.uiScale; }
 
         ListView {
 	    id: bluetoothListView
@@ -218,12 +224,13 @@ Drawer {
 
         MenuListEntry {
             selectable: true
+            layoutScale: bluetoothMenu.layoutScale;
             content: Text {
 		x: ident + internalIdent;
 		text: runtime.getLocalizedString("Bluetooth Preferences");
 		color: "#FFF";
 	        font.bold: false;
-		font.pixelSize: 18; 
+		font.pixelSize: 18 * textScale;
 		font.family: "Prelude";
 	    }
             onAction: {
@@ -243,6 +250,7 @@ Drawer {
             MenuListEntry {
                 id: entry
                 selectable: true
+                layoutScale: bluetoothMenu.layoutScale;
                 forceSelected: showSelected
 
                 content: BluetoothEntry {
@@ -255,6 +263,9 @@ Drawer {
                             connStatus:   connectionStatus;
                             status:       itemStatus;
                             connected:    isConnected;
+                            uiScale: bluetoothMenu.uiScale;
+                            textScale: bluetoothMenu.textScale;
+                            layoutScale: bluetoothMenu.layoutScale;
                          }
 
                 onAction: {
@@ -275,7 +286,7 @@ Drawer {
                 }
             }
 
-            MenuDivider  { }
+            MenuDivider  { uiScale: bluetoothMenu.uiScale; }
 
         }
 

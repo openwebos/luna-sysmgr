@@ -4,6 +4,8 @@ MenuListEntry {
     id: thisElement
     property int ident: 0
     property string batteryText;
+    property real textScale;
+    property real layoutScale;
 
     Connections {
         target: NativeSystemMenuHandler
@@ -18,14 +20,14 @@ MenuListEntry {
             Text {
                 text: runtime.getLocalizedString("Battery: ");
                 color: "#AAA";
-                font.pixelSize: 18
+                font.pixelSize: 18 * textScale;
                 font.family: "Prelude"
             }
 
             Text {
                 text: batteryText;
                 color: "#AAA";
-                font.pixelSize: 18;
+                font.pixelSize: 18 * textScale;
                 font.family: "Prelude"
             }
         }

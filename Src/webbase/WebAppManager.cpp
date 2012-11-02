@@ -211,7 +211,7 @@ WebAppManager::WebAppManager()
     setenv("QT_PLUGIN_PATH", "/usr/plugins", 1);
     setenv("QT_DEBUG_PLUGINS", "1", 1);
 
-#if defined(TARGET_DEVICE)
+#if defined(TARGET_DEVICE) && !defined(MACHINE_TUNA)
     static const char *argv[] = { "./WebAppManager", "-platform", "webos", NULL };
 #else
     static const char *argv[] = { "./WebAppManager", "-platform", "minimal", NULL };

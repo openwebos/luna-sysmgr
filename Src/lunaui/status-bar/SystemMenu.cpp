@@ -83,7 +83,7 @@ SystemMenu::SystemMenu(int width, int height, bool restricted)
 {
 	qmlRegisterType<AnimatedSpinner>("SystemMenu", 1,0, "AnimatedSpinner");
 
-	m_bounds = QRect(-160, -240, 320, 480);
+	m_bounds = QRect(-width/2, -height/2, width, height);
 
 	m_menuHandler = new MenuHandler(this);
 
@@ -163,6 +163,14 @@ void SystemMenu::init()
 			 m_menuObject = qobject_cast<QGraphicsObject *>(m_qmlMenu->create());
 			 if(m_menuObject) {
 				 m_menuObject->setParentItem(this);
+				 
+				 // scale the system menu
+				 QMetaObject::invokeMethod(m_menuObject, "setUiScale", Q_ARG(QVariant, Settings::LunaSettings()->uiScale));
+				 QMetaObject::invokeMethod(m_menuObject, "setTextScale", Q_ARG(QVariant, Settings::LunaSettings()->textScale));
+				 QMetaObject::invokeMethod(m_menuObject, "setLayoutScale", Q_ARG(QVariant, Settings::LunaSettings()->layoutScale));
+				 
+				 
+				 // setup geometry and positioning
 				 m_rightEdgeOffset = m_menuObject->property("edgeOffset").toInt();
 				 prepareGeometryChange();
 				 m_bounds = QRect(-m_menuObject->boundingRect().width()/2, -m_menuObject->boundingRect().height()/2,

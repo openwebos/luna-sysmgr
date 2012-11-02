@@ -62,13 +62,13 @@ public:
 		}
 		positionIconWithin();
 
-		QFont font(qFromUtf8Stl(Settings::LunaSettings()->fontQuicklaunch), 18);
-		font.setPixelSize(18);
+		QFont font(qFromUtf8Stl(Settings::LunaSettings()->fontQuicklaunch), 18 * Settings::LunaSettings()->textScale);
+		font.setPixelSize(18 * Settings::LunaSettings()->textScale);
 		font.setStyle(QFont::StyleOblique);
 		QString title = qFromUtf8Stl(LOCALIZED("Just type..."));
 
 		QRect textBounds(0, 0, m_boundingRect.width(), m_boundingRect.height());
-		textBounds.adjust(20,0,-45,0);
+		textBounds.adjust(20 * Settings::LunaSettings()->textScale,0,-45 * Settings::LunaSettings()->textScale,0);
 
 		QFontMetrics metrics(font);
 		title = metrics.elidedText(title, Qt::ElideRight, textBounds.width());
@@ -137,7 +137,7 @@ public:
 		}
 
 		QRectF iconGeom = DimensionsGlobal::realRectAroundRealPoint(m_qp_iconPmo->size());
-		qreal rightOffset = (qreal)qMin(LayoutSettings::settings()->searchPillInnerIconRightOffset,(quint32)(m_geom.right()-iconGeom.width()));
+		qreal rightOffset = (qreal)qMin((quint32)(LayoutSettings::settings()->searchPillInnerIconRightOffset * Settings::LunaSettings()->layoutScale),(quint32)(m_geom.right()-iconGeom.width()));
 		m_iconPos = QPointF(m_geom.right()-iconGeom.width()-rightOffset,
 				m_geom.top()+(m_geom.height()-iconGeom.height())/2.0);
 	}

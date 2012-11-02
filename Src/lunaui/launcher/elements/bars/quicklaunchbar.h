@@ -245,12 +245,14 @@ protected:
 
 	QPointer<PixButton2State> m_qp_launcherAccessButton;
 
+	quint32 m_maxItems;
+
 	//items are constrained to within this x range in ICS
 	QPair<qint32,qint32>	m_itemAreaXrange;
 	//...and this is the centerline
 	qint32					m_itemsY;
 
-	QList<qint32>			m_layoutAnchorsXcoords;
+	QList<QPointF>			m_layoutAnchorsCoords;
 	QList<QPointer<IconBase> > m_iconItems;				//must be IN ORDER, as arranged on the QL. ==> when a reorder on the QL happens, this list needs to be shuffled to match
 	typedef QList<QPointer<IconBase> >::iterator IconListIter;
 

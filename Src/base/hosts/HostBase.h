@@ -21,8 +21,6 @@
 
 #include "Common.h"
 
-
-
 #include "TaskBase.h"
 #include "Mutex.h"
 #include "CustomEvents.h"

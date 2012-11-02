@@ -41,8 +41,6 @@
 #include "FlickGesture.h"
 #include "FlickGestureRecognizer.h"
 
-static const int GESTURE_AREA_HEIGHT = Settings::LunaSettings()->gestureAreaHeight;
-
 static QWidget *viewport(QWidget *widget)
 {
 	QGraphicsView *gView = qobject_cast<QGraphicsView *>(widget);
@@ -79,186 +77,6 @@ public:
 
 public:
     QRect maxGeometry;
-};
-
-
-class GestureStrip : public QWidget
-{
-	Q_OBJECT
-
-public:
-
-	GestureStrip(QWidget *mainView)
-		: m_mainView(mainView)
-	{
-		setFocusPolicy(Qt::NoFocus);
-		setAttribute(Qt::WA_AcceptTouchEvents);
-
-		m_homeButton = new QPushButton(this);
-        m_homeButton->setFixedSize((2*GESTURE_AREA_HEIGHT) / 3,
-               (2*GESTURE_AREA_HEIGHT) / 3);
-
-		m_homeButton->setAttribute(Qt::WA_AcceptTouchEvents);
-		m_homeButton->setFocusPolicy(Qt::NoFocus);
-
-		QHBoxLayout* layout = new QHBoxLayout;
-		layout->addStretch();
-		layout->addWidget(m_homeButton);
-		layout->addStretch();
-		setLayout(layout);
-
-		m_seenGesture = false;
-
-		grabGesture((Qt::GestureType) SysMgrGestureFlick);
-
-		connect(m_homeButton, SIGNAL(clicked()), SLOT(slotHomeButtonClicked()));
-
-		m_quickLaunch = false;
-		m_quickLaunchFire.setInterval(250);
-		m_quickLaunchFire.setSingleShot(true);
-		connect(&m_quickLaunchFire, SIGNAL(timeout()), SLOT(slotQuickLaunchGesture()));
-	}
-
-	bool event(QEvent* e) {
-
-		if (e->type() == QEvent::Gesture) {
-
-			QGestureEvent* ge = static_cast<QGestureEvent*>(e);
-			if (QGesture* gesture = ge->gesture((Qt::GestureType) SysMgrGestureFlick)) {
-				if (gesture->state() == Qt::GestureFinished) {
-					FlickGesture* fg = static_cast<FlickGesture*>(gesture);
-					flickGesture(fg->velocity(), fg->hotSpot().toPoint());
-				}
-				return true;
-			}
-		}
-
-		return QWidget::event(e);
-	}
-
-	void flickGesture(const QPoint& velocity, const QPoint& startPos) {
-
-		if ((velocity.y() * velocity.y()) > (velocity.x() * velocity.x())) {
-
-			if (velocity.y() > 0)
-				postGesture(Qt::Key_CoreNavi_SwipeDown);
-			else
-				postGesture(Qt::Key_CoreNavi_Launcher);
-
-			m_seenGesture = true;
-		}
-	}
-
-	virtual void mousePressEvent(QMouseEvent* event) {
-		m_mouseDownPos = event->pos();
-		m_currentMousePos = event->pos();
-		m_quickLaunchFire.stop();
-		m_quickLaunch = false;
-		m_seenGesture = false;
-	}
-
-	virtual void mouseMoveEvent(QMouseEvent* event) {
-		m_currentMousePos = event->pos();
-		if (m_currentMousePos.y() < 0) {
-			if (!m_quickLaunch && !m_quickLaunchFire.isActive())
-				m_quickLaunchFire.start();
-		} else {
-			m_quickLaunchFire.stop();
-		}
-	}
-
-	virtual void mouseReleaseEvent(QMouseEvent* event) {
-		m_quickLaunchFire.stop();
-		m_quickLaunch = false;
-
-		if (m_mouseDownPos.isNull() || m_seenGesture) {
-			m_mouseDownPos = QPoint();
-			m_currentMousePos = QPoint();
-			m_seenGesture = false;
-			return;
-		}
-
-		int x = event->pos().x();
-		int y = event->pos().y();
-
-		x = CLAMP(x, 0, width());
-		y = CLAMP(y, 0, height());
-
-		int deltaX = x - m_mouseDownPos.x();
-		int deltaY = y - m_mouseDownPos.y();
-
-		if ((deltaX * deltaX + deltaY * deltaY) > 100) {
-
-			if (deltaX * deltaX > deltaY * deltaY) {
-
-				// Horizontal movement
-				if (deltaX > 0) {
-					if (deltaX > width()/2) {
-						postGesture(Qt::Key_CoreNavi_Next);
-					}
-					else {
-						postGesture(Qt::Key_CoreNavi_Menu);
-					}
-				}
-				else {
-					if (-deltaX > width()/2) {
-						postGesture(Qt::Key_CoreNavi_Previous);
-					}
-					else {
-						postGesture(Qt::Key_CoreNavi_Back);
-					}
-				}
-			}
-		}
-
-		m_mouseDownPos = QPoint();
-		m_currentMousePos = QPoint();
-		m_seenGesture = false;
-	}
-
-	void postGesture(Qt::Key key) {
-		QWidget* window = QApplication::focusWidget();
-		if (window) {
-			QApplication::postEvent(window, new QKeyEvent(QEvent::KeyPress, key,
-														  Qt::NoModifier));
-			QApplication::postEvent(window, new QKeyEvent(QEvent::KeyRelease, key,
-														  Qt::NoModifier));
-		}
-	}
-
-	void postMouseUpdate(QPoint pos) {
-		QWidget* window = QApplication::focusWidget();
-		if (window) {
-			pos = mapToGlobal(pos);
-			pos = window->mapFromGlobal(pos);
-			QApplication::sendEvent(window, new QMouseEvent(QEvent::MouseMove, pos, Qt::LeftButton, Qt::LeftButton,
-														  Qt::NoModifier));
-		}
-	}
-
-private Q_SLOTS:
-
-	void slotHomeButtonClicked() {
-		postGesture(Qt::Key_CoreNavi_Home);
-	}
-
-	void slotQuickLaunchGesture() {
-		m_quickLaunch = true;
-		m_seenGesture = true;
-		viewport(m_mainView)->grabMouse();
-		postGesture(Qt::Key_CoreNavi_QuickLaunch);
-		postMouseUpdate(m_currentMousePos);
-	}
-
-private:
-
-	QWidget *m_mainView;
-	QPushButton* m_homeButton;
-	QPoint m_mouseDownPos;
-	bool m_seenGesture;
-	QPoint m_currentMousePos;
-	QTimer m_quickLaunchFire;
-	bool m_quickLaunch;
 };
 
 class HostQtDesktopMouseFilter : public QObject
@@ -466,16 +284,12 @@ void HostQtDesktop::init(int w, int h)
 
         windowWidth = tmp.maxGeometry.width();
         windowHeight = tmp.maxGeometry.height();
-        qDebug() << __PRETTY_FUNCTION__ << "Going fullscreen with width" << windowWidth << "height" << (windowHeight - GESTURE_AREA_HEIGHT);
-    }
-
-    if (GESTURE_AREA_HEIGHT != 0 && (GESTURE_AREA_HEIGHT < (windowHeight/30) || GESTURE_AREA_HEIGHT > (windowHeight/10))) {
-        Settings::LunaSettings()->gestureAreaHeight = (windowHeight/16);
+        qDebug() << __PRETTY_FUNCTION__ << "Going fullscreen with width" << windowWidth << "height" << windowHeight;
     }
 
     m_info.displayBuffer = 0;
     m_info.displayWidth = windowWidth;
-    m_info.displayHeight = windowHeight - GESTURE_AREA_HEIGHT;
+    m_info.displayHeight = windowHeight;
     m_info.displayDepth = 32;
 }
 
@@ -491,7 +305,7 @@ void HostQtDesktop::show()
 	m_widget->setAttribute(Qt::WA_AcceptTouchEvents);
     m_widget->setWindowTitle("Open webOS");
 
-	m_widget->setFixedSize(m_info.displayWidth, m_info.displayHeight + GESTURE_AREA_HEIGHT);
+	m_widget->setFixedSize(m_info.displayWidth, m_info.displayHeight);
 	m_widget->show();
 }
 
@@ -507,15 +321,11 @@ const char* HostQtDesktop::hardwareName() const
 
 void HostQtDesktop::setCentralWidget(QWidget* view)
 {
-	GestureStrip* strip = new GestureStrip(view);
-	strip->setFixedSize(m_widget->width(), GESTURE_AREA_HEIGHT);
-
 	QVBoxLayout* layout = new QVBoxLayout(m_widget);
     layout->setSizeConstraint(QLayout::SetFixedSize);
 	layout->setSpacing(0);
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->addWidget(view);
-	layout->addWidget(strip);
 
 	m_keyFilter = new HostQtDesktopKeyFilter;
 	qApp->installEventFilter(m_keyFilter);

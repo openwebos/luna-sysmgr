@@ -53,6 +53,7 @@ StatusBarItemGroup::StatusBarItemGroup(int height, bool hasArrow, bool showSepar
 	if(m_hasArrow) {
 		std::string filePath = statusBarImagesPath + "menu-arrow.png";
 		m_arrowPix = new QPixmap(filePath.c_str());
+		*m_arrowPix = m_arrowPix->scaledToHeight(m_arrowPix->height() * Settings::LunaSettings()->uiScale, Qt::SmoothTransformation);
 	} else {
 		m_arrowAnimProg = 1.0;
 	}
@@ -60,6 +61,7 @@ StatusBarItemGroup::StatusBarItemGroup(int height, bool hasArrow, bool showSepar
 	if(showSeparator && (align != StatusBarItem::AlignCenter)) {
 		std::string filePath = statusBarImagesPath + "status-bar-separator.png";
 		m_separatorPix = new QPixmap(filePath.c_str());
+		*m_separatorPix = m_separatorPix->scaledToHeight(m_separatorPix->height() * Settings::LunaSettings()->uiScale, Qt::SmoothTransformation);
 	}
 
 	layout();

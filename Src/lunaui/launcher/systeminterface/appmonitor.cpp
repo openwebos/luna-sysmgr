@@ -32,6 +32,8 @@
 
 #include "safefileops.h"
 
+#include "Settings.h"
+
 #include <QDebug>
 
 namespace DimensionsSystemInterface
@@ -396,7 +398,8 @@ IconBase * AppMonitor::createAppIcon(const QString& mainIconFile,const QString& 
 {
 	//try and load its main icon
 	qDebug() << __FUNCTION__ << ": entry: mainIconFile = " << mainIconFile << " , iconLabel = " << iconLabel;
-	IconBase * pMainIcon = IconHeap::makeIconConstrainedStandardFrameAndDecorators(mainIconFile,QSize(64,64));
+	int iconSize = 64 * Settings::LunaSettings()->layoutScale;
+	IconBase * pMainIcon = IconHeap::makeIconConstrainedStandardFrameAndDecorators(mainIconFile,QSize(iconSize, iconSize), false);
 	if (!pMainIcon)
 	{
 		//bail'amos!

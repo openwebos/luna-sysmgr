@@ -74,7 +74,7 @@ QFont IconBase::staticLabelFontForIcons()
 	if (!fontInitalized)
 	{
 		s_iconLabelFont = QFont(QString::fromStdString(Settings::LunaSettings()->fontQuicklaunch));
-		quint32 fontSize = qBound((quint32)2,IconGeometrySettings::settings()->labelFontSizePx,(quint32)100);
+		quint32 fontSize = qBound((quint32)2 * Settings::LunaSettings()->textScale,IconGeometrySettings::settings()->labelFontSizePx * Settings::LunaSettings()->textScale,(quint32)100 * Settings::LunaSettings()->textScale);
 		s_iconLabelFont.setPixelSize(fontSize);
 		s_iconLabelFont.setBold(IconGeometrySettings::settings()->labelFontEmbolden);
 	}
@@ -89,7 +89,7 @@ QRectF IconBase::GEOM(const QRectF& geom)
 		return geom;
 	}
 	return DimensionsGlobal::realRectAroundRealPoint(
-			IconGeometrySettings::settings()->absoluteGeomSizePx);
+			IconGeometrySettings::settings()->absoluteGeomSizePx * Settings::LunaSettings()->layoutScale);
 }
 
 //static
@@ -98,14 +98,14 @@ QRectF IconBase::AGEOM(const QRectF& geom)	//alignment geom, if used
 	if (IconGeometrySettings::settings()->useAlignmentGeom)
 	{
 		return DimensionsGlobal::realRectAroundRealPoint(
-					IconGeometrySettings::settings()->alignmentGeomSizePx);
+					IconGeometrySettings::settings()->alignmentGeomSizePx * Settings::LunaSettings()->layoutScale);
 	}
 	if (!(IconGeometrySettings::settings()->useAbsoluteGeom))
 	{
 		return geom;
 	}
 	return DimensionsGlobal::realRectAroundRealPoint(
-			IconGeometrySettings::settings()->absoluteGeomSizePx);
+			IconGeometrySettings::settings()->absoluteGeomSizePx * Settings::LunaSettings()->layoutScale);
 }
 
 //static
@@ -113,8 +113,8 @@ QRectF IconBase::LabelBoxGeomFromGeom(const QRectF& geom)
 {
 	if (!(IconGeometrySettings::settings()->useAbsoluteLabelBoxGeom))
 	{
-		quint32 w = geom.width() * IconGeometrySettings::settings()->labelBoxProportionToGeom.width();
-		quint32 h = geom.height() * IconGeometrySettings::settings()->labelBoxProportionToGeom.height();
+		quint32 w = geom.width() * IconGeometrySettings::settings()->labelBoxProportionToGeom.width() * Settings::LunaSettings()->layoutScale;
+		quint32 h = geom.height() * IconGeometrySettings::settings()->labelBoxProportionToGeom.height() * Settings::LunaSettings()->layoutScale;
 		return DimensionsGlobal::realRectAroundRealPoint(
 			QSize(DimensionsGlobal::Even(w),
 					DimensionsGlobal::Even(h)
@@ -122,15 +122,15 @@ QRectF IconBase::LabelBoxGeomFromGeom(const QRectF& geom)
 		);
 	}
 	return DimensionsGlobal::realRectAroundRealPoint(
-			IconGeometrySettings::settings()->labelBoxAbsoluteGeomSizePx);
+			IconGeometrySettings::settings()->labelBoxAbsoluteGeomSizePx * Settings::LunaSettings()->layoutScale);
 }
 //static
 QRectF IconBase::FrameGeomFromGeom(const QRectF& geom)
 {
 	if (!(IconGeometrySettings::settings()->useAbsoluteFrameGeom))
 	{
-		quint32 w = geom.width() * IconGeometrySettings::settings()->frameBoxProportionToGeom.width();
-		quint32 h = geom.height() * IconGeometrySettings::settings()->frameBoxProportionToGeom.height();
+		quint32 w = geom.width() * IconGeometrySettings::settings()->frameBoxProportionToGeom.width() * Settings::LunaSettings()->layoutScale;
+		quint32 h = geom.height() * IconGeometrySettings::settings()->frameBoxProportionToGeom.height() * Settings::LunaSettings()->layoutScale;
 		return DimensionsGlobal::realRectAroundRealPoint(
 			QSize(DimensionsGlobal::Even(w),
 					DimensionsGlobal::Even(h)
@@ -138,15 +138,15 @@ QRectF IconBase::FrameGeomFromGeom(const QRectF& geom)
 		);
 	}
 	return DimensionsGlobal::realRectAroundRealPoint(
-			IconGeometrySettings::settings()->frameBoxAbsoluteGeomSizePx);
+			IconGeometrySettings::settings()->frameBoxAbsoluteGeomSizePx * Settings::LunaSettings()->layoutScale);
 }
 //static
 QRectF IconBase::IconGeomFromGeom(const QRectF& geom)
 {
 	if (!(IconGeometrySettings::settings()->useAbsoluteMainIconGeom))
 	{
-		quint32 w = geom.width() * IconGeometrySettings::settings()->mainIconBoxProportionToGeom.width();
-		quint32 h = geom.height() * IconGeometrySettings::settings()->mainIconBoxProportionToGeom.height();
+		quint32 w = geom.width() * IconGeometrySettings::settings()->mainIconBoxProportionToGeom.width() * Settings::LunaSettings()->layoutScale;
+		quint32 h = geom.height() * IconGeometrySettings::settings()->mainIconBoxProportionToGeom.height() * Settings::LunaSettings()->layoutScale;
 		return DimensionsGlobal::realRectAroundRealPoint(
 				QSize(DimensionsGlobal::Even(w),
 						DimensionsGlobal::Even(h)
@@ -154,7 +154,7 @@ QRectF IconBase::IconGeomFromGeom(const QRectF& geom)
 		);
 	}
 	return DimensionsGlobal::realRectAroundRealPoint(
-			IconGeometrySettings::settings()->mainIconBoxAbsoluteGeomSizePx);
+			IconGeometrySettings::settings()->mainIconBoxAbsoluteGeomSizePx * Settings::LunaSettings()->layoutScale);
 }
 
 //static
@@ -162,8 +162,8 @@ QRectF IconBase::RemoveDeleteDecorGeomFromGeom(const QRectF& geom)
 {
 	if (!(IconGeometrySettings::settings()->useAbsoluteRemoveDeleteDecoratorGeom))
 	{
-		quint32 w = geom.width() * IconGeometrySettings::settings()->removeDeleteDecoratorBoxProportionToGeom.width();
-		quint32 h = geom.height() * IconGeometrySettings::settings()->removeDeleteDecoratorBoxProportionToGeom.height();
+		quint32 w = geom.width() * IconGeometrySettings::settings()->removeDeleteDecoratorBoxProportionToGeom.width() * Settings::LunaSettings()->layoutScale;
+		quint32 h = geom.height() * IconGeometrySettings::settings()->removeDeleteDecoratorBoxProportionToGeom.height() * Settings::LunaSettings()->layoutScale;
 		return DimensionsGlobal::realRectAroundRealPoint(
 				QSize(DimensionsGlobal::Even(w),
 						DimensionsGlobal::Even(h)
@@ -171,7 +171,7 @@ QRectF IconBase::RemoveDeleteDecorGeomFromGeom(const QRectF& geom)
 		);
 	}
 	return DimensionsGlobal::realRectAroundRealPoint(
-			IconGeometrySettings::settings()->removeDeleteDecoratorBoxAbsoluteGeomSizePx);
+			IconGeometrySettings::settings()->removeDeleteDecoratorBoxAbsoluteGeomSizePx * Settings::LunaSettings()->layoutScale);
 }
 
 //static
@@ -179,8 +179,8 @@ QRectF IconBase::InstallStatusGeomFromGeom(const QRectF& geom)
 {
 	if (!(IconGeometrySettings::settings()->useAbsoluteInstallStatusDecoratorGeom))
 	{
-		quint32 w = geom.width() * IconGeometrySettings::settings()->installStatusDecoratorBoxProportionToGeom.width();
-		quint32 h = geom.height() * IconGeometrySettings::settings()->installStatusDecoratorBoxProportionToGeom.height();
+		quint32 w = geom.width() * IconGeometrySettings::settings()->installStatusDecoratorBoxProportionToGeom.width() * Settings::LunaSettings()->layoutScale;
+		quint32 h = geom.height() * IconGeometrySettings::settings()->installStatusDecoratorBoxProportionToGeom.height() * Settings::LunaSettings()->layoutScale;
 		return DimensionsGlobal::realRectAroundRealPoint(
 				QSize(DimensionsGlobal::Even(w),
 						DimensionsGlobal::Even(h)
@@ -188,7 +188,7 @@ QRectF IconBase::InstallStatusGeomFromGeom(const QRectF& geom)
 		);
 	}
 	return DimensionsGlobal::realRectAroundRealPoint(
-			IconGeometrySettings::settings()->installStatusDecoratorBoxAbsoluteGeomSizePx);
+			IconGeometrySettings::settings()->installStatusDecoratorBoxAbsoluteGeomSizePx * Settings::LunaSettings()->layoutScale);
 }
 
 //static
@@ -223,8 +223,8 @@ IconBase * IconBase::iconFromPix(PixmapObject * p_framePix, PixmapObject * p_mai
 		return 0;	//except if there is no frame...
 	}
 	QRectF inferredGeom = DimensionsGlobal::realRectAroundRealPoint(
-			QSize((1.0/IconGeometrySettings::settings()->frameBoxProportionToGeom.width())*p_framePix->width(),
-					(1.0/IconGeometrySettings::settings()->frameBoxProportionToGeom.height())*p_framePix->height())
+			QSize((1.0/IconGeometrySettings::settings()->frameBoxProportionToGeom.width())*p_framePix->width() * Settings::LunaSettings()->layoutScale,
+					(1.0/IconGeometrySettings::settings()->frameBoxProportionToGeom.height())*p_framePix->height() * Settings::LunaSettings()->layoutScale)
 			);
 	return new IconBase(inferredGeom,p_framePix,p_mainPix,p_feedbackPix,p_belongsTo);
 }
@@ -255,7 +255,7 @@ IconBase::IconBase(const QRectF& iconGeometry)
 , m_showFeedback(false)
 , m_qp_iconFeedbackPixmap(0)
 {
-	m_alignmentGeomPrecomputed = DimensionsGlobal::realRectAroundRealPoint(IconGeometrySettings::settings()->alignmentGeomSizePx);
+	m_alignmentGeomPrecomputed = DimensionsGlobal::realRectAroundRealPoint(IconGeometrySettings::settings()->alignmentGeomSizePx * Settings::LunaSettings()->layoutScale);
 	setupFSM();
 	m_p_buttonFSM->start();
 }
@@ -287,7 +287,7 @@ IconBase::IconBase(const QRectF& iconGeometry,Page * p_belongsTo)
 , m_qp_iconFeedbackPixmap(0)
 {
 	m_qp_takerOwner = p_belongsTo;
-	m_alignmentGeomPrecomputed = DimensionsGlobal::realRectAroundRealPoint(IconGeometrySettings::settings()->alignmentGeomSizePx);
+	m_alignmentGeomPrecomputed = DimensionsGlobal::realRectAroundRealPoint(IconGeometrySettings::settings()->alignmentGeomSizePx * Settings::LunaSettings()->layoutScale);
 	//updateGeometry(iconGeometry,false);
 	geometryChanged();
 	recomputePainterHelpers();
@@ -334,7 +334,7 @@ IconBase::IconBase(const QRectF& iconGeometry,PixmapObject * p_framePix, PixmapO
 	m_qp_takerOwner = p_belongsTo;
 	setupFSM();
 	m_p_buttonFSM->start();
-	m_alignmentGeomPrecomputed = DimensionsGlobal::realRectAroundRealPoint(IconGeometrySettings::settings()->alignmentGeomSizePx);
+	m_alignmentGeomPrecomputed = DimensionsGlobal::realRectAroundRealPoint(IconGeometrySettings::settings()->alignmentGeomSizePx * Settings::LunaSettings()->layoutScale);
 	if (p_mainPix == 0)
 	{
 		return;   //cannot omit main icon pic
@@ -1770,9 +1770,9 @@ void IconBase::geometryChanged()
 	m_deleteDecoratorGeom = RemoveDeleteDecorGeomFromGeom(m_geom).toRect();
 	m_installStatusDecoratorGeom = InstallStatusGeomFromGeom(m_geom).toRect();
 	//position the frame, main icon, and decorators
-	m_iconPosICS = IconGeometrySettings::settings()->mainIconOffsetFromGeomOriginPx;
-	m_iconFramePosICS = IconGeometrySettings::settings()->frameOffsetFromGeomOriginPx;
-	m_iconFeedbackPosICS = IconGeometrySettings::settings()->feedbackOffsetFromGeomOriginPx;
+	m_iconPosICS = IconGeometrySettings::settings()->mainIconOffsetFromGeomOriginPx * Settings::LunaSettings()->layoutScale;
+	m_iconFramePosICS = IconGeometrySettings::settings()->frameOffsetFromGeomOriginPx * Settings::LunaSettings()->layoutScale;
+	m_iconFeedbackPosICS = IconGeometrySettings::settings()->feedbackOffsetFromGeomOriginPx * Settings::LunaSettings()->layoutScale;
 
 	//the name sounds inappropriate but it's common code that's applicable here
 	recalculateDecoratorPositionOnFrameChange();
@@ -1937,7 +1937,7 @@ void	IconBase::recalculateLabelPosition()
 	//reposition the text
 	m_labelPosICS = QPoint(0,m_iconGeom.translated(m_iconPosICS).bottom()
 			-m_labelGeom.top()
-			+IconGeometrySettings::settings()->labelVerticalSpacingPx);
+			+IconGeometrySettings::settings()->labelVerticalSpacingPx * Settings::LunaSettings()->layoutScale);
 
 }
 
@@ -1946,8 +1946,8 @@ void IconBase::recalculateDecoratorPositionOnFrameChange()
 {
 	if (IconGeometrySettings::settings()->useAbsoluteRemoveDeleteDecoratorOffsetFromGeomOrigin)
 	{
-		m_removeDecoratorPosICS = IconGeometrySettings::settings()->removeDeleteDecoratorOffsetFromGeomOriginPx;
-		m_deleteDecoratorPosICS = IconGeometrySettings::settings()->removeDeleteDecoratorOffsetFromGeomOriginPx;
+		m_removeDecoratorPosICS = IconGeometrySettings::settings()->removeDeleteDecoratorOffsetFromGeomOriginPx * Settings::LunaSettings()->layoutScale;
+		m_deleteDecoratorPosICS = IconGeometrySettings::settings()->removeDeleteDecoratorOffsetFromGeomOriginPx * Settings::LunaSettings()->layoutScale;
 	}
 	else if (!m_iconFramePixmapGeom.isEmpty())
 	{
@@ -1962,7 +1962,7 @@ void IconBase::recalculateDecoratorPositionOnFrameChange()
 
 	if (IconGeometrySettings::settings()->useAbsoluteInstallStatusDecoratorOffsetFromGeomOrigin)
 	{
-		m_installStatusDecoratorPosICS = IconGeometrySettings::settings()->installStatusDecoratorOffsetFromGeomOriginPx;
+		m_installStatusDecoratorPosICS = IconGeometrySettings::settings()->installStatusDecoratorOffsetFromGeomOriginPx * Settings::LunaSettings()->layoutScale;
 	}
 	else if (!m_iconFramePixmapGeom.isEmpty())
 	{

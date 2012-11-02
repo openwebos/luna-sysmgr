@@ -2450,8 +2450,18 @@ void CardWindowManager::slotPositiveSpaceChangeFinished(const QRect& r)
 void CardWindowManager::slotPositiveSpaceChanged(const QRect& r)
 {
 	static bool initialBounds = true;
-	static qreal kActiveWindowScale = Settings::LunaSettings()->activeCardWindowRatio;
-	static qreal kNonActiveWindowScale = Settings::LunaSettings()->nonActiveCardWindowRatio;
+	static qreal kActiveWindowScale;
+	static qreal kNonActiveWindowScale;
+	if(Settings::LunaSettings()->tabletUi)
+	{
+		kActiveWindowScale = Settings::LunaSettings()->activeCardWindowRatio;
+		kNonActiveWindowScale = Settings::LunaSettings()->nonActiveCardWindowRatio;
+	}
+	else
+	{
+		kActiveWindowScale = 0.7;
+		kNonActiveWindowScale = 0.65;
+	}
 
 	if (initialBounds) {
 		initialBounds = false;
@@ -2465,19 +2475,20 @@ void CardWindowManager::slotPositiveSpaceChanged(const QRect& r)
 		m_targetPositiveSpace = r;
 
 		// TODO: this is a temporary solution to fake the existence of the search pill
-		// 	which happens to be 48 pixels tall
-		kActiveScale = ((qreal) (r.height() - 48) * kActiveWindowScale) / (qreal) m_normalScreenBounds.height();
+		// 	which happens to be 50 pixels tall
+		quint32 pillOffset = 50 * Settings::LunaSettings()->layoutScale;
+		kActiveScale = ((qreal) (r.height() - pillOffset) * kActiveWindowScale) / (qreal) m_normalScreenBounds.height();
 		kActiveScale = qMax(kMinimumWindowScale, kActiveScale);
 
-		kNonActiveScale = ((qreal) (r.height() - 48) * kNonActiveWindowScale) / (qreal) m_normalScreenBounds.height();
+		kNonActiveScale = ((qreal) (r.height() - pillOffset) * kNonActiveWindowScale) / (qreal) m_normalScreenBounds.height();
 		kNonActiveScale = qMax(kMinimumWindowScale, kNonActiveScale);
 
 		// allow groups to shift up to a maximum so the tops of cards don't go off the screen
-		kWindowOriginMax = (boundingRect().y() + ((r.y() + 48) + (int) ((r.height() - 48) * kWindowOriginRatio))) -
+		kWindowOriginMax = (boundingRect().y() + ((r.y() + pillOffset) + (int) ((r.height() - pillOffset) * kWindowOriginRatio))) -
 						   Settings::LunaSettings()->positiveSpaceTopPadding -
 						   Settings::LunaSettings()->positiveSpaceBottomPadding;
 
-		kWindowOrigin = boundingRect().y() + ((r.y() + 48) + (int) ((r.height() - 48) * kWindowOriginRatio));
+		kWindowOrigin = boundingRect().y() + ((r.y() + pillOffset) + (int) ((r.height() - pillOffset) * kWindowOriginRatio));
 	}
 
 	QRect rect = r;

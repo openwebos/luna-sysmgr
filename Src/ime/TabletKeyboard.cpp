@@ -65,19 +65,19 @@ const uint64_t cWordDeleteDelay = cFirstRepeatDelay + 1500;
 const QPainter::RenderHints cRenderHints = QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing;
 
 // constants used to draw the popup for extended keys
-const int cPopupFontSize = 22;
+const int cPopupFontSize = 22 * Settings::LunaSettings()->imeScale;
 const int cPopupLeftSide = 11;
 const int cPopupRightSide = 10;
 const int cPopupSide = 20;
 const int cPopupPointerStart = 37;
 const int cPopupPointerWidth = 25;
-const int cPopupTopToKey = 10;
+const int cPopupTopToKey = 10 * Settings::LunaSettings()->imeScale;
 const int cPopupSingleLineMax = 5;	// if more extended chars that this, break-up in two lines
 
 static QFont sFont("Prelude");
 
 static QString sElipsis(QChar(0x2026 /* … */));
-const int cElipsisFontSize = 14;
+const int cElipsisFontSize = 14 * Settings::LunaSettings()->imeScale;
 
 const QColor cActiveColor(20, 20, 20);
 const QColor cActiveColor_back(0xe2, 0xe2, 0xe2);
@@ -95,7 +95,7 @@ public:
 	InputMethod *	create(IMEDataInterface * dataInterface)				{ return new TabletKeyboard(dataInterface); }
 	EVirtualKeyboardSupport	getSupport(int maxWidth, int maxHeight)
 	{
-		if (maxWidth >= 1024 || maxHeight >= 1024)
+		if (maxWidth >= 1024 * Settings::LunaSettings()->imeScale || maxHeight >= 1024 * Settings::LunaSettings()->imeScale)
 			return eVirtualKeyboardSupport_Preferred_Size;
 		return eVirtualKeyboardSupport_Poor;
 	}
@@ -180,10 +180,10 @@ TabletKeyboard::TabletKeyboard(IMEDataInterface * dataInterface) : VirtualKeyboa
 	for (int r = 1; r < TabletKeymap::cKeymapRows; ++r)
 		m_keymap.setRowHeight(r, m_white_key.height() / 2);
 
-	m_presetHeight[cKey_Resize_Tiny - cKey_Resize_First] = 243;
-	m_presetHeight[cKey_Resize_Small - cKey_Resize_First] = (340 + 243) / 2;
-	m_presetHeight[cKey_Resize_Default - cKey_Resize_First] = m_background.height();
-	m_presetHeight[cKey_Resize_Large - cKey_Resize_First] = 393;
+	m_presetHeight[cKey_Resize_Tiny - cKey_Resize_First] = 243 * Settings::LunaSettings()->imeScale;
+	m_presetHeight[cKey_Resize_Small - cKey_Resize_First] = ((340 + 243) / 2) * Settings::LunaSettings()->imeScale;
+	m_presetHeight[cKey_Resize_Default - cKey_Resize_First] = m_background.height() * Settings::LunaSettings()->imeScale;
+	m_presetHeight[cKey_Resize_Large - cKey_Resize_First] = 393 * Settings::LunaSettings()->imeScale;
 
 	connect(&m_IMEDataInterface->m_availableSpace, SIGNAL(valueChanged(const QRect &)), SLOT(availableSpaceChanged(const QRect &)));
 	connect(&m_IMEDataInterface->m_visible, SIGNAL(valueChanged(const bool &)), SLOT(visibleChanged(const bool &)));
@@ -1512,9 +1512,9 @@ void TabletKeyboard::drawKeyCap(QPainter * painter, GlyphRenderer<GlyphSpec> & r
 	{
 		bool forceAlignHCenter = false;		// if too tight, center text for better looking results
 		int height = location.height();
-		int fontSize = 24;
+		int fontSize = 24 * Settings::LunaSettings()->imeScale;
 		if (!twoVertical && !twoHorizontal && !UKeyIsFunctionKey(key))
-			fontSize = 26;
+			fontSize = 26 * Settings::LunaSettings()->imeScale;
 		int centerOffset = 1;
 		if (twoVertical && height / 3 < fontSize - 2)
 			twoHorizontal = true, centerOffset = 2;
@@ -1523,7 +1523,7 @@ void TabletKeyboard::drawKeyCap(QPainter * painter, GlyphRenderer<GlyphSpec> & r
 		if (text.size() > 1)
 		{
 			sFont.setBold(UKeyIsFunctionKey(key) && !UKeyIsTextShortcutKey(key));
-			fontSize = qMin<int>(fontSize, 22);
+			fontSize = qMin<int>(fontSize, 22 * Settings::LunaSettings()->imeScale);
 			sFont.setPixelSize(fontSize);
 			int gap;
 			while ((gap = QFontMetrics(sFont).width(text) + 16 - location.width()) > 0) {

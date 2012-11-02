@@ -72,7 +72,7 @@ SystemUiController* SystemUiController::instance()
 }
 
 SystemUiController::SystemUiController()
-	: m_dashboardOwnsNegativeSpace(Settings::LunaSettings()->virtualKeyboardEnabled ? false : (Settings::LunaSettings()->showNotificationsAtTop ? false : true))
+	: m_dashboardOwnsNegativeSpace(!Settings::LunaSettings()->tabletUi)
 	, m_anim(0)
 	, m_suspendBlocker(HostBase::instance()->mainLoop(),
 					   this, &SystemUiController::allowSuspend, &SystemUiController::setSuspended)
@@ -126,10 +126,10 @@ SystemUiController::SystemUiController()
 	m_suppressBannerMessages = false;
 	m_suppressGestures = false;
 	m_dockBrightness = 100;
-    
+
 	const HostInfo& info = HostBase::instance()->getInfo();
     m_uiWidth  = info.displayWidth;
-    m_uiHeight = info.displayHeight;
+    m_uiHeight = info.displayHeight - Settings::LunaSettings()->virtualCoreNaviHeight;
 
     m_currentlyDirectRenderingLayer  = -1;
     m_currentlyDirectRenderingWindow = NULL;
@@ -267,7 +267,7 @@ bool SystemUiController::handleGestureEvent (QGestureEvent* event)
 				handleScreenEdgeFlickGesture(t);
 		}
 	}
-	
+
 	return false;
 }
 
@@ -285,7 +285,7 @@ bool SystemUiController::handleCustomEvent(QEvent* event)
         }
         break;
     }
-    default: 
+    default:
         g_debug("%s: ignoring custom event type %d", __PRETTY_FUNCTION__, event->type());
         break;
     }
@@ -294,6 +294,7 @@ bool SystemUiController::handleCustomEvent(QEvent* event)
 
 bool SystemUiController::handleKeyEvent(QKeyEvent *event)
 {
+/* We don't have a preferences interface yet, commented out for testing Key_CoreNavi_Previous/Key_CoreNavi_Next
 #if !defined(TARGET_EMULATOR)
 	if (!Preferences::instance()->sysUiEnableNextPrevGestures()) {
 		if (event->key() == Qt::Key_CoreNavi_Previous) {
@@ -303,6 +304,7 @@ bool SystemUiController::handleKeyEvent(QKeyEvent *event)
 		}
 	}
 #endif
+*/
 
 	if (event->type() == QEvent::KeyPress) {
 		switch (event->key()) {
@@ -389,7 +391,7 @@ bool SystemUiController::handleKeyEvent(QKeyEvent *event)
 				Q_EMIT signalHideMenu();
 			}
 			if (!m_launcherShown) {
-				Q_EMIT signalChangeCardWindow(event->key() == Qt::Key_CoreNavi_Next);
+				Q_EMIT signalChangeCardWindow(event->key() == Qt::Key_CoreNavi_Previous);
 				return true;
 			}
 			break;
@@ -413,6 +415,11 @@ bool SystemUiController::handleKeyEvent(QKeyEvent *event)
 			if(m_deviceLocked && !m_inDockMode)
 				return false;
 
+			if (m_inDockMode) {
+				enterOrExitDockModeUi(false);
+				return true;
+			}
+
 			if (m_dashboardOpened) {
 				Q_EMIT signalCloseDashboard(true);
 				return true;
@@ -422,15 +429,27 @@ bool SystemUiController::handleKeyEvent(QKeyEvent *event)
 				Q_EMIT signalHideMenu();
 				return true;
 			}
+			
 			if (m_launcherShown && !m_universalSearchShown) {
 				Q_EMIT signalToggleLauncher();
 				return true;
 			}
+			
+			if (m_universalSearchShown) {
+				Q_EMIT signalHideUniversalSearch(false, false);
+				return true;
+			}
+			
+			if (IMEController::instance()->isIMEOpened())
+			{
+				IMEController::instance()->hideIME();
+				return true;
+            		}
 
 			break;
 
 		case (Qt::Key_CoreNavi_Launcher):
-        case (Qt::Key_Super_L): {
+		case (Qt::Key_Super_L): {
 
 			if (Settings::LunaSettings()->uiType == Settings::UI_MINIMAL) {
 				break;
@@ -458,10 +477,10 @@ bool SystemUiController::handleKeyEvent(QKeyEvent *event)
 				Q_EMIT signalHideMenu();
 			}
 
-            if (m_universalSearchShown) {
-                Q_EMIT signalHideUniversalSearch(false, false);
-                return true;
-            }
+			if (m_universalSearchShown) {
+			Q_EMIT signalHideUniversalSearch(false, false);
+			return true;
+			}
 
 			if (Preferences::instance()->sysUiNoHomeButtonMode()) {
 				if (m_launcherShown) {
@@ -526,7 +545,7 @@ bool SystemUiController::handleKeyEvent(QKeyEvent *event)
 				Q_EMIT signalEmergencyModeHomeButtonPressed();
 				return true;
 			}
-			
+
 			if (m_dashboardOpened) {
 				g_warning ("%s: %d", __PRETTY_FUNCTION__, __LINE__);
 				Q_EMIT signalCloseDashboard(true);
@@ -1076,17 +1095,17 @@ void SystemUiController::setDirectRenderingForWindow(DirectRenderingEnabledLayer
 {
 	DirectRenderingEnabledLayers layerToBeEnabled = (DirectRenderingEnabledLayers)-1;
 	CardWindow* windowToBeEnabled = NULL;
-	
+
 	if(layer >= NUMBER_OF_LAYERS) {
 		g_message("%s: Invalid Parameters", __PRETTY_FUNCTION__);
 		return;
 	}
-	
+
 	if (!force && enable && (layer == m_currentlyDirectRenderingLayer) && (win == m_currentlyDirectRenderingWindow)) {
 		g_message("%s: Requested Window already in DirectRendering", __PRETTY_FUNCTION__);
 		return;
 	}
-	
+
 	// update the current record for the layer
 	if(enable) {
 		m_directRenderLayers[layer].requestedDirectRendring = true;
@@ -1099,9 +1118,9 @@ void SystemUiController::setDirectRenderingForWindow(DirectRenderingEnabledLayer
                 m_directRenderLayers[x].activeWindow            = NULL;
                 break;
             }
-        }		
+        }
     }
-	
+
 	// scan for the layer to be enabled
 	for(int x = 0; x < NUMBER_OF_LAYERS; x++) {
 		if(m_directRenderLayers[x].requestedDirectRendring) {
@@ -1223,12 +1242,12 @@ void SystemUiController::resizeAndRotateUi(int width, int height, int rotationAn
 	int uiTop  = (info.displayHeight - m_uiHeight) / 2;
 	int uiLeft = (info.displayWidth - m_uiWidth) / 2;
 
-	m_requestedNegativeSpaceTop =  m_requestedNegativeSpaceTop - m_uiHeight + height;
+	m_requestedNegativeSpaceTop =  m_requestedNegativeSpaceTop - (m_uiHeight + Settings::LunaSettings()->virtualCoreNaviHeight) + height;
 
 	m_minimumPositiveSpaceHeight = m_uiHeight - Settings::LunaSettings()->positiveSpaceTopPadding;
 
 	m_uiWidth  = width;
-	m_uiHeight = height;
+	m_uiHeight = height - Settings::LunaSettings()->virtualCoreNaviHeight;
 
 	QRect targetPositiveSpace;
 	QRect targetNegativeSpace;
@@ -1284,7 +1303,7 @@ void SystemUiController::resizeAndRotateUi(int width, int height, int rotationAn
 	m_maximumPositiveSpaceHeight = m_uiHeight;
 
 	// now resize the Window Managers
-	WindowServer::instance()->resizeWindowManagers(width, height);
+	WindowServer::instance()->resizeWindowManagers(m_uiWidth, m_uiHeight);
 
 	Q_EMIT signalPositiveSpaceAboutToChange(targetPositiveSpace, m_statusBarAndNotificationShown == false, true);
 	Q_EMIT signalNegativeSpaceAboutToChange(targetNegativeSpace, m_statusBarAndNotificationShown == false, true);
@@ -1437,7 +1456,7 @@ bool SystemUiController::changeNegativeSpace(int newTop, bool openingDashboard, 
 
 	Q_EMIT signalPositiveSpaceAboutToChange(targetPositiveSpace, m_statusBarAndNotificationShown == false, false);
 	Q_EMIT signalNegativeSpaceAboutToChange(targetNegativeSpace, m_statusBarAndNotificationShown == false, false);
-	
+
 	if(!immediate) {
 		// animate
 		startPositiveSpaceAnimation(m_positiveSpace, targetPositiveSpace);
@@ -1690,6 +1709,9 @@ void SystemUiController::slotAnimFinished()
 
 void SystemUiController::setBootFinished()
 {
+	//Make sure the windows are positioned correctly
+	WindowServer::instance()->resizeWindowManagers(m_uiWidth, m_uiHeight);
+
 	m_bootFinished = true;
 	Q_EMIT signalBootFinished();
 }
@@ -1946,7 +1968,7 @@ void SystemUiController::launcherMenuOp(LauncherOperations op)
 	case SystemUiController::LAUNCHEROP_UNKNOWN:
 		break;			//do nothing...the Q_EMIT menu op end will do the right things for this case
 	}
-	
+
 	if(op != SystemUiController::LAUNCHEROP_INVOKERENAMECARD)
 		Q_EMIT signalLauncherMenuOpEnd();
 }
@@ -2059,7 +2081,7 @@ void SystemUiController::handleScreenEdgeFlickGesture(QGesture* gesture)
 		return;
 	}
 	}
-	
+
 	// enforce a larger minimum Y distance for the flick gesture when the keyboard is up
 	if(IMEController::instance()->isIMEOpened()) {
 		if(g->yDistance() < kFlickMinimumYLengthWithKeyboardUp)
@@ -2086,7 +2108,7 @@ void SystemUiController::handleScreenEdgeFlickGesture(QGesture* gesture)
 		Q_EMIT signalHideUniversalSearch(false, false);
 		return;
 	}
-		
+
 	if (m_launcherShown) {
 		Q_EMIT signalToggleLauncher();
 		return;
@@ -2095,11 +2117,11 @@ void SystemUiController::handleScreenEdgeFlickGesture(QGesture* gesture)
 	if ((m_activeCardWindow && m_maximizedCardWindow) || m_cardWindowAboutToMaximize) {
 		if (false == m_modalCardWindowActive)
 			Q_EMIT signalShowDock();
-		
+
 		Q_EMIT signalMinimizeActiveCardWindow();
 		return;
 	}
 
-	Q_EMIT signalToggleLauncher();					
+	Q_EMIT signalToggleLauncher();
 }
 

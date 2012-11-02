@@ -269,7 +269,7 @@ public:
 
 	// QGraphicsItem::paint
 	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
-	
+
 	int  bmViewGetWidth() const;
 	void bmViewUpdated();
 	void bmViewMessageCountUpdated(int count);
@@ -348,7 +348,7 @@ LockWindow::LockWindow(uint32_t maxWidth, uint32_t maxHeight)
 	m_bounds = QRectF((int)-maxWidth/2, (int)-maxHeight/2, maxWidth, maxHeight);
 	setOpacity(0.0);
 	setVisible(false);
-	
+
 	connect(SystemUiController::instance(), SIGNAL(signalAlertActivated()), this, SLOT(slotAlertActivated()));
 	connect(SystemUiController::instance(), SIGNAL(signalAlertDeactivated()), this, SLOT(slotAlertDeactivated()));
 	connect(SystemUiController::instance(), SIGNAL(signalTransientAlertActivated()), this, SLOT(slotTransientAlertActivated()));
@@ -382,11 +382,11 @@ void LockWindow::init()
 
 	connect(DisplayManager::instance(), SIGNAL(signalDisplayStateChange(int)), this, SLOT(slotDisplayStateChanged(int)));
     connect(DisplayManager::instance(), SIGNAL(signalLockStateChange(int, int)), this, SLOT(slotLockStateChanged(int, int)));
-	connect(SystemUiController::instance(), SIGNAL(signalPositiveSpaceAboutToChange(const QRect&, bool, bool)), 
+	connect(SystemUiController::instance(), SIGNAL(signalPositiveSpaceAboutToChange(const QRect&, bool, bool)),
 											SLOT(slotPositiveSpaceAboutToChange(const QRect&, bool, bool)));
-	connect(SystemUiController::instance(), SIGNAL(signalPositiveSpaceChanged(const QRect&)), 
+	connect(SystemUiController::instance(), SIGNAL(signalPositiveSpaceChanged(const QRect&)),
 											SLOT(slotPositiveSpaceChanged(const QRect&)));
-	connect(SystemUiController::instance(), SIGNAL(signalPositiveSpaceChangeFinished(const QRect&)), 
+	connect(SystemUiController::instance(), SIGNAL(signalPositiveSpaceChangeFinished(const QRect&)),
 											SLOT(slotPositiveSpaceChangeFinished(const QRect&)));
 
 	connect(SystemUiController::instance(), SIGNAL(signalUiRotationCompleted()),
@@ -405,12 +405,17 @@ void LockWindow::init()
 	kBannerWidgetHeight = BannerMessageHandler::instance()->viewHeight();
 	if (kBannerWidgetHeight < 20) // DFISH-5147: Total banner height >= 40, shadows are 10 each, so widget height >= 20
 		kBannerWidgetHeight = 20;
-	
+
 	m_statusBar = new StatusBar(StatusBar::TypeLockScreen, m_bounds.width(), settings->positiveSpaceTopPadding);
 	m_statusBar->init();
 	m_statusBar->setParentItem(this);
 	m_statusBar->setPos(0, m_bounds.y() + m_statusBar->boundingRect().height() / 2);
 	m_statusBar->setZValue(100);
+
+	m_gestureArea = new GestureArea(m_bounds.width(), Settings::LunaSettings()->virtualCoreNaviHeight);
+	m_gestureArea->init();
+	m_gestureArea->setParentItem(this);
+	m_gestureArea->setZValue(100);
 
 	// Background (Status/Wallpaper/Dashboard/Banner/Mask)
 	m_bgNode = new LockBackground();
@@ -421,7 +426,7 @@ void LockWindow::init()
 	// Clock
 	m_clockWin = new ClockWindow();
 	m_clockWin->setParentItem(this);
-	m_clockWin->setPos(0,-(SystemUiController::instance()->currentUiHeight() * 0.35));
+	m_clockWin->setPos(0,-(SystemUiController::instance()->currentUiHeight() * 0.3));
 	m_clockWin->tick();
 
 	// Dashboard Alerts
@@ -454,7 +459,7 @@ void LockWindow::init()
 	m_lockButton->setParentItem(this);
 
 	std::string filePath = Settings::LunaSettings()->lunaSystemResourcesPath + "/popup-bg.png";
-	gBackground9Tile = PixmapObjectLoader::instance()->quickLoadNineTiled (QString (filePath.c_str()), 
+	gBackground9Tile = PixmapObjectLoader::instance()->quickLoadNineTiled (QString (filePath.c_str()),
 			(quint32)(kShadowWidth + kBackgroundCornerWidth),
 			(quint32)(kShadowWidth + kBackgroundCornerWidth),
 			(quint32)(kShadowWidth + kBackgroundCornerWidth),
@@ -533,20 +538,25 @@ void LockWindow::resize(int width, int height)
 		m_statusBar->update();
 	}
 
+	if(m_gestureArea) {
+		m_gestureArea->resize(width, height);
+		m_gestureArea->update();
+	}
+
 	if(m_clockWin) {
 		m_clockWin->resize(width, height);
-		m_clockWin->setPos(0,-(height * 0.35));
+		m_clockWin->setPos(0,-(height * 0.3));
 		m_clockWin->tick();
 	}
 
 	if(m_dashboardAlerts)
-		m_dashboardAlerts->setPos(0,0); 
+		m_dashboardAlerts->setPos(0,0);
 
 	if(m_bannerAlerts)
 		m_bannerAlerts->setPos(0, 0);
 
 	if(m_popUpAlert)
-		m_popUpAlert->setPos(0,0); 
+		m_popUpAlert->setPos(0,0);
 
 	if(m_helpWin)
 		m_helpWin->setPos(0, boundingRect().bottom() - boundingRect().height() * LOCK_BUTTON_OFFSET - (m_helpWin->boundingRect().height()) / 2);
@@ -799,7 +809,7 @@ void LockWindow::activatePopUpAlert()
 	}
 	else {
 		m_lockButton->setImageType(LockButton::ImagePadlock);
-		m_helpWin->setLabel(fromStdUtf8(LOCALIZED(kUnlockLabel))); 
+		m_helpWin->setLabel(fromStdUtf8(LOCALIZED(kUnlockLabel)));
 	}
 
 	m_popUpAlert->adjustAlertBounds();
@@ -807,20 +817,20 @@ void LockWindow::activatePopUpAlert()
 	showAlert(m_popUpAlert);
 }
 
-void LockWindow::registerBannerView() 
+void LockWindow::registerBannerView()
 {
 	if(bannerViewRegistered) return;
-	
+
 	if(m_bannerAlerts)
 		BannerMessageHandler::instance()->registerView(m_bannerAlerts);
 
 	bannerViewRegistered = true;
 }
 
-void LockWindow::unregisterBannerView() 
+void LockWindow::unregisterBannerView()
 {
 	if(!bannerViewRegistered) return;
-	
+
 	if(m_bannerAlerts)
 		BannerMessageHandler::instance()->unregisterView(m_bannerAlerts);
 
@@ -1068,7 +1078,7 @@ void LockWindow::changeState(State newState)
 		hideAlert(m_popUpAlert);
 
 		if (EASPolicyManager::instance()->policyPending()
-				&& EASPolicyManager::instance()->getPolicy() 
+				&& EASPolicyManager::instance()->getPolicy()
 				&& EASPolicyManager::instance()->getPolicy()->requiresAlphaNumeric())
 		{
 			QMetaObject::invokeMethod(m_unlockDialog, "setupDialog", Q_ARG(QVariant, fromStdUtf8(LOCALIZED("Password Required"))),
@@ -1734,7 +1744,7 @@ void LockWindow::handlePenMoveStateNormal(Event* event)
 	m_lockButton->setPos(event->x, event->y);
 
 	int distanceSquared = m_lockButton->distanceToAnchorSquared(event->x, event->y);
-	if ((distanceSquared > kSaucerRadiusSquared) && (event->y < m_lockButtonY))
+	if ((distanceSquared > kSaucerRadiusSquared * Settings::LunaSettings()->layoutScale) && (event->y < m_lockButtonY))
 		hideHelp();
 	else
 		showHelp();
@@ -1764,12 +1774,12 @@ void LockWindow::handlePenUpStateNormal(Event* event)
 		m_lockButton->press(false);
 
 		int distanceSquared = m_lockButton->distanceToAnchorSquared(event->x, event->y);
-		if ((distanceSquared > kSaucerRadiusSquared) && (event->y < m_lockButtonY)){
+		if ((distanceSquared > kSaucerRadiusSquared * Settings::LunaSettings()->layoutScale) && (event->y < m_lockButtonY)){
 			tryUnlock();
 			SystemService::instance()->postLockButtonTriggered();
 		}
 	}
-	
+
 	if (!isLocked())
 		return;
 
@@ -1801,7 +1811,7 @@ void LockWindow::handlePenUpStateNormal(Event* event)
 		QPoint click = m_dashboardAlerts->mapFromParent(QPoint(event->x, event->y)).toPoint();
 		if (!m_dashboardAlerts->contains(click))
 			return;
-		
+
 		m_dashboardAlerts->sendClickAt(click.x(), click.y());
 	}
 }
@@ -2133,7 +2143,7 @@ void LockWindow::showAlert(TransparentNode* alertNode)
 {
 	if (!alertNode)
 		return;
-	
+
 	// we will start showing a completely transparent node.
 	alertNode->setVisible(true);
 	alertNode->animateOpacity(1.0);
@@ -2248,14 +2258,18 @@ LockButton::LockButton()
 	// padlock images
 	QString filePath = prefix + "/screen-lock-padlock-off.png";
 	m_buttonImages[ImagePadlock] = QPixmap(filePath);
+	m_buttonImages[ImagePadlock] = m_buttonImages[ImagePadlock].scaledToHeight(m_buttonImages[ImagePadlock].height() * Settings::LunaSettings()->uiScale, Qt::SmoothTransformation);
 	filePath = prefix + "/screen-lock-padlock-on.png";
 	m_buttonImages[ImagePadlock+1] = QPixmap(filePath);
+	m_buttonImages[ImagePadlock+1] = m_buttonImages[ImagePadlock+1].scaledToHeight(m_buttonImages[ImagePadlock+1].height() * Settings::LunaSettings()->uiScale, Qt::SmoothTransformation);
 
 	// incoming call images
 	filePath = prefix + "/screen-lock-incoming-call-off.png";
 	m_buttonImages[ImageIncomingCall] = QPixmap(filePath);
+	m_buttonImages[ImageIncomingCall] = m_buttonImages[ImageIncomingCall].scaledToHeight(m_buttonImages[ImageIncomingCall].height() * Settings::LunaSettings()->uiScale, Qt::SmoothTransformation);
 	filePath = prefix + "/screen-lock-incoming-call-on.png";
 	m_buttonImages[ImageIncomingCall+1] = QPixmap(filePath);
+	m_buttonImages[ImageIncomingCall+1] = m_buttonImages[ImageIncomingCall+1].scaledToHeight(m_buttonImages[ImageIncomingCall+1].height() * Settings::LunaSettings()->uiScale, Qt::SmoothTransformation);
 
 	setPixmap(m_buttonImages[m_imageType + (m_pressed?1:0)]);
 	setOffset(-boundingRect().width()/2,-boundingRect().height()/2);
@@ -2338,16 +2352,17 @@ HelpWindow::HelpWindow()
 
 	std::string filePath = Settings::LunaSettings()->lunaSystemResourcesPath + "/screen-lock-target-scrim.png";
 	m_surf = new QPixmap(filePath.c_str());
+	*m_surf = m_surf->scaledToHeight(m_surf->height() * Settings::LunaSettings()->uiScale, Qt::SmoothTransformation);
 
 	const char* fontName = Settings::LunaSettings()->fontLockWindow.c_str();
-	m_font = new QFont(fontName, 20); // $$$ font size
-	m_font->setPixelSize(20);
+	m_font = new QFont(fontName, 20 * Settings::LunaSettings()->textScale); // $$$ font size
+	m_font->setPixelSize(20 * Settings::LunaSettings()->textScale);
 	m_font->setBold(true);
 
 	textLayout.setFont(*m_font);
 
 	if (m_surf) {
-		m_bounds = QRect(-m_surf->width()/2, -m_surf->height()/2, m_surf->width(), m_surf->height());
+		m_bounds = QRect(-m_surf->width()/2, -m_surf->height()/1.5, m_surf->width(), m_surf->height());
 	}
 }
 
@@ -2368,7 +2383,9 @@ void HelpWindow::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
 {
 	// draw the saucer
 	if (m_surf)
+	{
 		painter->drawPixmap(m_bounds, *m_surf);
+	}
 
 	QPen oldPen = painter->pen();
 
@@ -2389,7 +2406,7 @@ void HelpWindow::setLabel(QString label)
 
 	// create the text layout for the label
 	int leading = fontMetrics.leading();
-	qreal height = 0;
+	qreal height = -fontMetrics.height()/2;
 	textLayout.beginLayout();
 	int i = 0;
 	while (i < 2) {
@@ -2431,9 +2448,11 @@ LockBackground::LockBackground()
 	// Load mask pixmaps
 	std::string maskFilePath = Settings::LunaSettings()->lunaSystemResourcesPath + "/screen-lock-wallpaper-mask-bottom.png";
 	m_bottomMask = QPixmap(qFromUtf8Stl(maskFilePath));
+	m_bottomMask = m_bottomMask.scaledToHeight(m_bottomMask.height() * Settings::LunaSettings()->uiScale);
 
 	maskFilePath = Settings::LunaSettings()->lunaSystemResourcesPath + "/screen-lock-wallpaper-mask-top.png";
 	m_topMask = QPixmap(qFromUtf8Stl(maskFilePath));
+	m_topMask = m_topMask.scaledToHeight(m_topMask.height() * Settings::LunaSettings()->uiScale);
 }
 
 LockBackground::~LockBackground()
@@ -2535,7 +2554,7 @@ DashboardAlerts::DashboardAlerts()
 	kVisibleDashboard = 5.5;
 	kBottomPadding = 3;
 	kTopPadding = 1;
-	
+
 	kDashboardWidgetHeight = kDashboardItemHeight * kVisibleDashboard + m_divider.height() * (kMaxDashboardItems - 1);
 	m_bounds = QRect(-(kMaxWidth/2), -(kDashboardWidgetHeight/2), kMaxWidth, kDashboardWidgetHeight);
 
@@ -2606,7 +2625,7 @@ void DashboardAlerts::paint(QPainter* painter, const QStyleOptionGraphicsItem* o
 		}
 		else {
 			if (numSurfaces  == kMaxDashboardItems) {
-				painter->drawPixmap (QRect (-m_bounds.width()/2, m_bounds.bottom() - m_scrollFade.height(), m_bounds.width(), m_scrollFade.height()), m_scrollFade); 
+				painter->drawPixmap (QRect (-m_bounds.width()/2, m_bounds.bottom() - m_scrollFade.height(), m_bounds.width(), m_scrollFade.height()), m_scrollFade);
 			}
 		}
 	}
@@ -2665,7 +2684,7 @@ BannerAlerts::BannerAlerts()
 	: BannerMessageView(BannerMessageView::NoScroll)
 {
 	m_bounds = QRect(-(int)kMaxWidth/2, -(int)kBannerWidgetHeight/2,
-				     kMaxWidth, kBannerWidgetHeight);	
+				     kMaxWidth, kBannerWidgetHeight);
 	kPadding = 10;
 }
 
@@ -2764,7 +2783,7 @@ void PopUpAlert::adjustAlertBounds()
 		// FIXME: yet to be resolved, Larry to send visual design
 		m_bounds.setHeight(SystemUiController::instance()->currentUiHeight() - kTopPadding - kAlertsFromBottom);
 		m_bounds.moveTop(-m_bounds.height()/2);
-		
+
 		setPos(0, parentItem()->boundingRect().y() + kTopPadding + m_bounds.height()/2);
 	}
 	else {
@@ -2832,6 +2851,5 @@ DashboardWindowManager* getDashboardWindowManager()
 	WindowManagerBase* dashMgr = static_cast<WindowServerLuna*>(WindowServer::instance())->dashboardWindowManager();
 	return (dashMgr ? static_cast<DashboardWindowManager*>(dashMgr) : 0);
 }
-
 
 #include "LockWindow.moc"

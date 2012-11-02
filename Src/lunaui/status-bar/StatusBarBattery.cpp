@@ -46,8 +46,8 @@ StatusBarBattery::StatusBarBattery(bool showText)
 	int width, height;
 
 	// defaults in case of error while loading
-	m_imgWidth  = 17;
-	m_imgHeight = 20;
+	m_imgWidth  = 17 * Settings::LunaSettings()->uiScale;
+	m_imgHeight = 20 * Settings::LunaSettings()->uiScale;
 
 	Settings* settings = Settings::LunaSettings();
 	std::string statusBarImagesPath = settings->lunaSystemResourcesPath + "/statusBar/";
@@ -55,6 +55,7 @@ StatusBarBattery::StatusBarBattery(bool showText)
 	// Load a single image to get the size -- defer all others until init
 	std::string errorPath = statusBarImagesPath + "battery-error.png";
 	m_errorPixmap = QPixmap(errorPath.c_str());
+	m_errorPixmap = m_errorPixmap.scaledToHeight(m_errorPixmap.height() * Settings::LunaSettings()->uiScale, Qt::SmoothTransformation);
 
 	if (!m_errorPixmap.isNull()) {
 		m_imgWidth = m_errorPixmap.width() + BATTERY_IMAGE_WIDTH_PADDING;
@@ -64,8 +65,8 @@ StatusBarBattery::StatusBarBattery(bool showText)
 	if(Settings::LunaSettings()->tabletUi && m_showBatteryText) {
 		// Set up text
 		const char* fontName = Settings::LunaSettings()->fontStatusBar.c_str();
-		m_font = new QFont(fontName, 14);
-		m_font->setPixelSize(14);
+		m_font = new QFont(fontName, 14 * Settings::LunaSettings()->textScale);
+		m_font->setPixelSize(14 * Settings::LunaSettings()->textScale);
 
 		if (m_font) {
 			m_font->setBold(true);
@@ -170,13 +171,16 @@ void StatusBarBattery::init()
 			m_pixmap[i] = m_pixmap[i-1];
 		} else {
 			m_pixmap[i] = QPixmap(batteryPath.c_str());
+			m_pixmap[i] = m_pixmap[i].scaledToHeight(m_pixmap[i].height() * Settings::LunaSettings()->uiScale, Qt::SmoothTransformation);
 		}
 
 		m_chargingPixmap[i] = QPixmap(chargingPath.c_str());
+		m_chargingPixmap[i] = m_chargingPixmap[i].scaledToHeight(m_chargingPixmap[i].height() * Settings::LunaSettings()->uiScale, Qt::SmoothTransformation);
 	}
 
 	std::string errorPath = statusBarImagesPath + "battery-error.png";
 	m_errorPixmap = QPixmap(errorPath.c_str());
+	m_errorPixmap = m_errorPixmap.scaledToHeight(m_errorPixmap.height() * Settings::LunaSettings()->uiScale, Qt::SmoothTransformation);
 
 	// Instantiates and initialized the services connector
 	StatusBarServicesConnector* svcConnector = StatusBarServicesConnector::instance();

@@ -22,6 +22,8 @@
 #include "pixmap3htileobject.h"
 #include "dimensionsglobal.h"
 
+#include "Settings.h"
+
 #include <QPainter>
 #include <QPointF>
 #include <QRect>
@@ -59,8 +61,7 @@ Pixmap3HTileObject::Pixmap3HTileObject(const quint32 width,const quint32 height,
 		return;	//bad bad bad
 	}
 
-	m_destinationSizeRequested = QSize((width == 0 ? pm->width() : width),
-										pm->height());
+	m_destinationSizeRequested = QSize((width == 0 ? pm->width() : width), (height == 0 ? pm->height() : height));
 	createDestinationRectangles();
 }
 
@@ -77,8 +78,8 @@ Pixmap3HTileObject::Pixmap3HTileObject( const quint32 width, const quint32 heigh
 	{
 		return;		//base class failed to load pixmap
 	}
-	m_destinationSizeRequested = QSize((width == 0 ? pm->width() : width),
-										pm->height());
+	
+	m_destinationSizeRequested = QSize((width == 0 ? pm->width() : width), (height == 0 ? pm->height() : height));
 
 	makeSlices((quint32)(pm->width()),
 				(quint32)(pm->height()),
@@ -181,7 +182,7 @@ bool Pixmap3HTileObject::resize(const quint32 w,const quint32 h)
 	{
 		return false;
 	}
-	m_destinationSizeRequested = QSize(w,height());
+	m_destinationSizeRequested = QSize(w,h);
 	makeSlices((quint32)(pm->width()),
 						(quint32)(pm->height()),
 						m_inCoords.left(),m_inCoords.right(),
@@ -271,10 +272,18 @@ bool Pixmap3HTileObject::createDestinationRectangles()
 	 m_boundingRect = QRectF();
 	 m_destRects = QVector<QRectF>(3);
 
-    m_destRects[0] = QRectF(0,0,
-             m_sourceRects[0].width(),m_sourceRects[0].height());
-    m_destRects[2] = QRectF(m_destinationSizeRequested.width()-m_sourceRects[2].width(),0.0,
-                m_sourceRects[2].width(),m_sourceRects[2].height());
+    m_destRects[0] = QRectF(
+    	     0,
+    	     0,
+             m_sourceRects[0].width(),
+             m_destinationSizeRequested.height()
+             );
+    m_destRects[2] = QRectF(
+    		m_destinationSizeRequested.width()-m_sourceRects[2].width(),
+    		0,
+                m_sourceRects[2].width(),
+                m_destinationSizeRequested.height()
+                );
 
     m_inCoords.setLeft(m_sourceRects[0].width());
     m_inCoords.setRight(m_sourceRects[2].width());
@@ -293,5 +302,6 @@ bool Pixmap3HTileObject::createDestinationRectangles()
     	m_geom |= m_destRects[i];
     }
     m_boundingRect = m_geom.adjusted(-0.5,-0.5,0.5,0.5);
+    
     return true;
 }

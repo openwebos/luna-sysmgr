@@ -53,8 +53,8 @@ StatusBarClock::StatusBarClock(unsigned int padding)
 
 	// Set up text
 	const char* fontName = Settings::LunaSettings()->fontStatusBar.c_str();
-	m_font = new QFont(fontName, 15);
-	m_font->setPixelSize(15);
+	m_font = new QFont(fontName, 15 * Settings::LunaSettings()->textScale);
+	m_font->setPixelSize(15 * Settings::LunaSettings()->textScale);
 
 	if (m_font) {
 		m_font->setBold(true);

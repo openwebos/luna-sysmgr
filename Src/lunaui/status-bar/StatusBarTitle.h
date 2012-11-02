@@ -60,6 +60,7 @@ private Q_SLOTS:
 private:
 
 	QFont* m_font;
+	int m_baselineOffset;
 	QPixmap m_titleBackground;
 	QPixmap m_currentTitle, m_newTitle;
 	QRectF m_curRect, m_newRect;

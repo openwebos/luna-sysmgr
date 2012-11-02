@@ -2,14 +2,16 @@ import Qt 4.7
 
 Rectangle {
     id: itemRect
-    width: parent.width
-    height: 42
     color: "transparent"
 
     property Item content;
     property bool selectable: true
     property bool selected: false
     property bool forceSelected: false
+    property real layoutScale: 1.0;
+    
+    width: parent.width
+    height: 42 * layoutScale;
 
     property int menuPosition:0 // 0 = middle, 1 = top, 2 = bottom
 

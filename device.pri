@@ -67,7 +67,7 @@ include(device-known.pri)
 
 contains(CONFIG_BUILD, webosdevice) {
     ## Known Device
-    LIBS += -lserviceinstall
+    LIBS += -lserviceinstaller
 } else {
     warning($$MACHINE_NAME not matched in device-known.pri)
 

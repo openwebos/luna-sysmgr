@@ -31,6 +31,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QVector>
 #include "SystemMenu.h"
+#include "GestureArea.h"
 
 class Window;
 class QGestureEvent;
@@ -68,9 +69,9 @@ protected:
 	void flickGestureEvent(QGestureEvent* event);
 
 	virtual bool sceneEvent(QEvent* event);
-																   
+
 private Q_SLOTS:
-	
+
 	void slotPositiveSpaceChanged(const QRect& r);
 	void slotSystemMenuStateChanged(bool opened);
 	void slotCloseSystemMenu();
@@ -83,7 +84,7 @@ private:
 	virtual void removeWindow(Window* win);
 	virtual void focusWindow(Window* win);
 	virtual void unfocusWindow(Window* win);
-	
+
 	void positionCornerWindows(const QRect& r);
 	void mapCoordToWindow(Window* win, int& x, int& y);
 	void showMenuWindow(Window* win);
@@ -108,6 +109,8 @@ private:
 
 	SystemMenu* m_sysMenu;
 	bool m_systemMenuOpened;
+
+	GestureArea* m_gestureArea;
 };
 
 #endif /* MENUWINDOWMANAGER_H */

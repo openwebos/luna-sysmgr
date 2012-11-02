@@ -38,6 +38,7 @@ ReticleItem::ReticleItem()
 
 	std::string filePath = Settings::LunaSettings()->lunaSystemResourcesPath + "/penindicator-ripple.png";
 	m_pixmap = QPixmap::fromImage(QImage(qFromUtf8Stl(filePath)));
+	m_pixmap = m_pixmap.scaledToHeight(m_pixmap.height() * Settings::LunaSettings()->uiScale, Qt::SmoothTransformation);
 
 	m_width = m_pixmap.width();
 	m_height = m_pixmap.height();

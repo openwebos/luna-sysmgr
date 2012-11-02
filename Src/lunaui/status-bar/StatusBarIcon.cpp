@@ -43,6 +43,7 @@ StatusBarIcon::~StatusBarIcon()
 void StatusBarIcon::setImage(QPixmap* img)
 {
 	m_imgPtr = img;
+	*m_imgPtr = m_imgPtr->scaledToHeight(m_imgPtr->height() * Settings::LunaSettings()->uiScale, Qt::SmoothTransformation);
 }
 
 QRect StatusBarIcon::boundingRect() const

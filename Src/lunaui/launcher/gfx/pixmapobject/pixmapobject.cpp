@@ -30,7 +30,7 @@ PixmapObject::PixmapObject()
 	pm = new QPixmap();
 }
 
-PixmapObject::PixmapObject( int width, int height)
+PixmapObject::PixmapObject(int width, int height)
 : m_destroyEmitted(false)
 {
 	m_uid = QUuid::createUuid();

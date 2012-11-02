@@ -79,7 +79,7 @@ CardLoading::CardLoading(Window* win)
     // Next, allow app specific settings to override if appropriate:
 	ApplicationDescription* appDesc = m_win->appDescription();
     if (appDesc) {
-        int size = Settings::LunaSettings()->splashIconSize;
+        int size = Settings::LunaSettings()->splashIconSize * Settings::LunaSettings()->layoutScale;
         m_icon.load(appDesc->splashIconName().c_str());
         if (!m_icon.isNull()) {
             // scale splash icon to fit the devices screen dimensions

@@ -45,8 +45,8 @@ namespace QuicklaunchLayout {
 
 		gIconYPos = 20;
 
-    	gIconHeight = 64;
-		gIconWidth = 64;
+    		gIconHeight = 512;
+		gIconWidth = 512;
 
 		s_maxNumColumns = (QuicklaunchWidth - MIN_ITEM_DISTANCE * 4) / (gIconWidth + MIN_ITEM_DISTANCE * 2);
 	}
