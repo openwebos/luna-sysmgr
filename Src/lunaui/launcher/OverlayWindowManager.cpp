@@ -1775,7 +1775,7 @@ void OverlayWindowManager::applyLaunchFeedback(int centerX, int centerY)
 
 QPropertyAnimation * OverlayWindowManager::dimensionsLauncherShowUpAnimation()
 {
-	QPointF shownPos = QPoint(0, Settings::LunaSettings()->positiveSpaceTopPadding / 2);
+	QPointF shownPos = QPoint(0, (!Settings::LunaSettings()->tabletUi && SystemUiController::instance()->doesDashboardHaveContent()) ? 0 : Settings::LunaSettings()->positiveSpaceTopPadding / 2);
 	QPropertyAnimation * pAnim = new QPropertyAnimation(DimensionsUI::primaryInstance(),"pos");
 	pAnim->setEndValue(shownPos);
 	return pAnim;
@@ -1788,7 +1788,7 @@ void OverlayWindowManager::dimensionsLauncherShowUpAnimation(QPropertyAnimation 
 		return;
 	}
 	p_anim->stop();
-	QPointF shownPos = QPoint(0, Settings::LunaSettings()->positiveSpaceTopPadding / 2);
+	QPointF shownPos = QPoint(0, (!Settings::LunaSettings()->tabletUi && SystemUiController::instance()->doesDashboardHaveContent()) ? 0 : Settings::LunaSettings()->positiveSpaceTopPadding / 2);
 	p_anim->setEndValue(shownPos);
 }
 
@@ -1860,7 +1860,7 @@ void OverlayWindowManager::dimensionsLauncherAdjustPositionOnResize()
 	}
 	else
 	{
-		QPointF shownPos = QPoint(0, Settings::LunaSettings()->positiveSpaceTopPadding / 2);
+		QPointF shownPos = QPoint(0, (!Settings::LunaSettings()->tabletUi && SystemUiController::instance()->doesDashboardHaveContent()) ? 0 : Settings::LunaSettings()->positiveSpaceTopPadding / 2);
 		DimensionsUI::primaryInstance()->setPos(shownPos);
 	}
 }

@@ -31,6 +31,7 @@
 class InputWindowManager : public WindowManagerBase
 {
 	Q_OBJECT
+	Q_PROPERTY( int imeY READ imeY WRITE setImeY )
 
 public:
 	InputWindowManager(int maxWidth, int maxHeight);
@@ -54,10 +55,14 @@ private Q_SLOTS:
     void slotExitBrickMode();
 
 private:
+	int imeY() { return m_imeY; }
+	void setImeY(int imeY);
+
 	IMEManager m_imeMgr;
 	IMEDataInterface* m_activeIME;
 	IMEView* m_imeView;
 	bool m_imeShown;
+	int m_imeY;
     QPropertyAnimation m_fadeAnim;
 };
 

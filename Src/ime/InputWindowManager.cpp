@@ -27,6 +27,7 @@
 #include "Utils.h"
 #include "SystemService.h"
 #include "AnimationSettings.h"
+#include "Settings.h"
 
 
 InputWindowManager::InputWindowManager(int maxWidth, int maxHeight)
@@ -34,6 +35,7 @@ InputWindowManager::InputWindowManager(int maxWidth, int maxHeight)
 	, m_activeIME(0)
 	, m_imeView(0)
 	, m_imeShown(false)
+	, m_imeY(0)
 {
 	connect(SystemUiController::instance(), SIGNAL(signalNegativeSpaceChanged(QRect)),
 											SLOT(slotNegativeSpaceChanged(QRect)));
@@ -58,8 +60,8 @@ void InputWindowManager::init()
 {
 	QRectF r = boundingRect();
 	m_imeView = new IMEView(this);
-	m_imeView->setBoundingRect(QRectF(0, 0, r.width(), r.height()));
-	m_imeView->setPos(r.topLeft());
+	m_imeView->setBoundingRect(QRectF(0, -m_imeY, r.width(), r.height()));
+	m_imeView->setPos(boundingRect().topLeft());
 
 	m_activeIME = m_imeMgr.createPreferredIME(SystemUiController::instance()->currentUiWidth(), SystemUiController::instance()->currentUiHeight());
 	Q_ASSERT(m_activeIME);
@@ -68,6 +70,8 @@ void InputWindowManager::init()
 			SLOT(slotKeyboardHeightChanged(const qint32&)));
 
 	m_imeView->attach(m_activeIME);
+	
+	m_imeY = Settings::LunaSettings()->positiveSpaceBottomPadding;
 
     m_fadeAnim.setTargetObject(m_imeView);
     m_fadeAnim.setPropertyName("opacity");
@@ -79,7 +83,7 @@ void InputWindowManager::resize(int width, int height)
 {
 	WindowManagerBase::resize(width, height);
 
-	m_imeView->setBoundingRect(QRectF(0, 0, width, height));
+	m_imeView->setBoundingRect(QRectF(0, -m_imeY, width, height));
 	m_imeView->setPos(boundingRect().topLeft());
 
 	if (m_activeIME) {
@@ -133,8 +137,14 @@ void InputWindowManager::slotHideIME()
 
 	if (m_activeIME)
 		m_activeIME->m_visible.set(false);
+		
+	QPropertyAnimation *animation = new QPropertyAnimation(this, "imeY");
+	animation->setDuration(100);
+	animation->setStartValue(0);
+	animation->setEndValue(Settings::LunaSettings()->positiveSpaceBottomPadding);
+	animation->start();
 
-	int targetTop = SystemUiController::instance()->currentUiHeight();
+	int targetTop = SystemUiController::instance()->currentUiHeight() - (SystemUiController::instance()->doesDashboardHaveContent() ? Settings::LunaSettings()->positiveSpaceBottomPadding : 0);
 	SystemUiController::instance()->changeNegativeSpace(targetTop, true);
 }
 
@@ -146,6 +156,12 @@ void InputWindowManager::slotShowIME()
 
 	if (m_activeIME)
 		m_activeIME->m_visible.set(true);
+	
+	QPropertyAnimation* animation = new QPropertyAnimation(this, "imeY");
+	animation->setDuration(100);
+	animation->setStartValue(Settings::LunaSettings()->positiveSpaceBottomPadding);
+	animation->setEndValue(0);
+	animation->start();
 
 	int targetTop = SystemUiController::instance()->currentUiHeight() - m_activeIME->m_keyboardHeight.get();
 	SystemUiController::instance()->changeNegativeSpace(targetTop, true);
@@ -185,5 +201,12 @@ void InputWindowManager::slotExitBrickMode()
     m_fadeAnim.setStartValue(m_imeView->opacity());
     m_fadeAnim.setEndValue(1.0);
     m_fadeAnim.start();
+}
+
+void InputWindowManager::setImeY(int imeY)
+{
+	m_imeY = imeY;
+	m_imeView->setBoundingRect(QRectF(0, -m_imeY, boundingRect().width(), boundingRect().height()));
+	m_imeView->setPos(boundingRect().topLeft());
 }
 
