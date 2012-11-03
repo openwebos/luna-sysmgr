@@ -75,7 +75,9 @@ private:
 	int getCurrentRssUsage() const;
 
 	int getProcessMemInfo(pid_t pid);
-	
+
+	void adjustOomScore();
+
 #if defined(HAS_MEMCHUTE)
     static void memchuteCallback(MemchuteThreshold threshold);
 	void memchuteStateChanged();
