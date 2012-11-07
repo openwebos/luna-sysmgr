@@ -1310,7 +1310,8 @@ void LockWindow::unlock()
 
 bool LockWindow::requiresPasscode() const
 {
-	if (EASPolicyManager::instance()->policyPending())
+	if (EASPolicyManager::instance()->policyPending() &&
+		EASPolicyManager::instance()->getPolicy()->passwordRequired())
 		return true;
 	if (Security::instance()->passcodeSet()) {
 		uint32_t timeDiff = (Time::curSysTimeMs() - m_lastLocked) / 1000;
