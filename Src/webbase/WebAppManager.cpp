@@ -967,7 +967,6 @@ WebAppBase* WebAppManager::launchUrlInternal(const std::string& url, Window::Typ
 		}
 	}
 
-
 	// Low Memory handling
 	if (!ignoreLowMemory && preventAppUnderLowMemory(appId.toStdString(), winType, desc)) {
 		errorCode = SystemUiController::InternalError;
@@ -1451,6 +1450,10 @@ void WebAppManager::webPageRemoved(SysMgrWebBridge* page)
 
 bool WebAppManager::preventAppUnderLowMemory(const std::string& appId, Window::Type winType, ApplicationDescription* appDesc) const
 {
+    if(Settings::LunaSettings()->allowAllAppsInLowMemory) {
+        return false;
+    }
+
 	const std::set<std::string>& appsToAllowInLowMemory = Settings::LunaSettings()->appsToAllowInLowMemory;
 	const std::set<std::string>& appsToLaunchAtBoot = Settings::LunaSettings()->appsToLaunchAtBoot;
 

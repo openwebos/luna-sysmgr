@@ -66,6 +66,7 @@ public:
 
 	int					cardLimit; // -1 to disable
 	std::set<std::string>	appsToAllowInLowMemory;
+    bool                allowAllAppsInLowMemory;
 
 	bool				showReticle;
 

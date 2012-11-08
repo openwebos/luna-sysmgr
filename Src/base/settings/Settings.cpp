@@ -240,6 +240,7 @@ Settings::Settings()
 	, logFileName("/var/log/lunasysmgr.log")
     , cardDimmPercentage(0.8f)
     , schemaValidationOption(0)
+    , allowAllAppsInLowMemory(false)
 {
 
 	load(kSettingsFile);
@@ -398,6 +399,7 @@ void Settings::load(const char* settingsFile)
 	KEY_INTEGER( "Display", "LockScreenTimeoutMs", lockScreenTimeout);
 
 	KEY_INTEGER( "Memory", "CardLimit", cardLimit );
+    KEY_BOOLEAN( "Memory", "AllowAllAppsInLowMemory", allowAllAppsInLowMemory);
 	KEY_INTEGER( "General","DisplayWidth",displayWidth);
 	KEY_INTEGER( "General","DisplayHeight",displayHeight);
 	KEY_INTEGER( "General","GestureAreaHeight",gestureAreaHeight);
@@ -603,20 +605,21 @@ void Settings::load(const char* settingsFile)
 	}
 
 	// apps to allow under low memory conditions
-	gchar** appsToAllowInLowMemoryStr = g_key_file_get_string_list(keyfile, "Memory",
-																   "AppsToAllowInLowMemory", NULL, NULL);
-	if (appsToAllowInLowMemoryStr) {
+    if(!allowAllAppsInLowMemory) {
+        gchar** appsToAllowInLowMemoryStr = g_key_file_get_string_list(keyfile, "Memory",
+                                                                       "AppsToAllowInLowMemory", NULL, NULL);
+        if (appsToAllowInLowMemoryStr) {
+            int index = 0;
+            appsToAllowInLowMemory.clear();
+            while (appsToAllowInLowMemoryStr[index]) {
+                appsToAllowInLowMemory.insert(appsToAllowInLowMemoryStr[index]);
+                g_message("App to allow in Low memory: %s", appsToAllowInLowMemoryStr[index]);
+                ++index;
+            }
 
-		int index = 0;
-		appsToAllowInLowMemory.clear();
-		while (appsToAllowInLowMemoryStr[index]) {
-			appsToAllowInLowMemory.insert(appsToAllowInLowMemoryStr[index]);
-			g_message("App to allow in Low memory: %s", appsToAllowInLowMemoryStr[index]);
-			++index;
-		}
-
-		g_strfreev(appsToAllowInLowMemoryStr);
-	}
+            g_strfreev(appsToAllowInLowMemoryStr);
+        }
+    }
 
 	// apps with accelerated compositing disabled
 	gchar** appsToDisableAccelCompositingStr = g_key_file_get_string_list(keyfile, "AccelCompositingDisabled",
