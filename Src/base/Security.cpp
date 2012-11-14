@@ -248,7 +248,9 @@ int Security::setPasscode(const std::string& mode, const std::string& passcode, 
 			}
 			else {
 				g_warning("%s: failed to open temp file '%s'", __PRETTY_FUNCTION__, strerror(errno));
-                                ////-coverity-investigation: do we need to set error code and error text
+				errorText = "Passcode save failed";
+				success = false;
+				goto Done;
 			}
 
 			if (saved && !is_error(saved))        
