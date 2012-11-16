@@ -1116,7 +1116,9 @@ bool ApplicationDescription::securityChecksVerified()
 				(m_id == "com.palm.calculator" && m_folderPath == "/media/cryptofs/apps/usr/palm/applications/com.palm.app.calculator") ||
                 (m_id == "com.palm.launcher" && m_folderPath == "/usr/lib/luna/system/luna-applauncher") ||
                 (m_id == "com.palm.systemui" && m_folderPath == "/usr/lib/luna/system/luna-systemui") ||
-				(m_id == "com.palm.mojo-systemui" && m_folderPath == "/usr/palm/applications/mojo-systemui"))
+				(m_id == "com.palm.mojo-systemui" && m_folderPath == "/usr/palm/applications/mojo-systemui") ||
+                (m_id == "com.palm.app.smartcom.acmthinclient" && m_folderPath == "/usr/palm/applications/smartcom.acmthinclient")
+           )
         {
             return true;
         }
