@@ -29,6 +29,7 @@
 #include <set>
 #include <glib.h>
 #include <QtGlobal>
+#include <QVariant>
 
 class Settings
 {
@@ -285,6 +286,8 @@ public:
 
 
 	void createNeededFolders();
+
+    QVariant getSetting(const QString &key) const;
 
 private:
 	void load(const char* settingsFile);

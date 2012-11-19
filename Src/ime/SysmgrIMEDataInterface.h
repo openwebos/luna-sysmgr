@@ -25,6 +25,11 @@
 #include "IMEDataInterface.h"
 #include "InputMethod.h"
 #include <qnamespace.h>
+#include <QString>
+#include <string>
+#include <glib.h>
+
+class VirtualKeyboardPreferences;
 
 class SysmgrIMEModel : public IMEDataInterface
 {
@@ -55,6 +60,28 @@ public:
 	virtual void keyDownAudioFeedback(Qt::Key key);
 
 	void	setInputMethod(InputMethod * inputMethod);
+
+    virtual QVariant getLunaSystemSetting(const QString &key);
+
+    virtual QString getLocalizedString(const std::string &str);
+
+    virtual std::string getLocale();
+
+    virtual void createRemoveBannerMessage(const std::string &appId,
+                                           const std::string&msgId);
+
+    virtual std::string createAddBannerMessage(const std::string &appId,
+                                               const std::string &msg,
+                                               const std::string &launchParams,
+                                               const std::string &icon,
+                                               const std::string &soundClass,
+                                               const std::string &soundFile,
+                                               int duration,
+                                               bool doNotSuppress);
+
+    virtual VirtualKeyboardPreferences &virtualKeyboardPreferences();
+
+    virtual GMainLoop *getMainLoop();
 
 private:
 	InputMethod *	m_inputMethod;

@@ -16,8 +16,7 @@
 *
 * LICENSE@@@ */
 
-
-
+// TODO (efigs): write proper doxygen docs
 
 #ifndef INPUTMETHOD_H
 #define INPUTMETHOD_H
@@ -25,14 +24,28 @@
 #include <QTouchEvent>
 #include <QPainter>
 
+/*! \class InputMethod
+ * class description
+ */
 class InputMethod : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
+
 public:
-	virtual void touchEvent(const QTouchEvent& te) = 0;
-	virtual void paint(QPainter& painter) = 0;
-	virtual void tapEvent(const QPoint& tapPt) = 0;
-	virtual void screenEdgeFlickEvent() = 0;
+    /*! desc
+     * \param te */
+    virtual void touchEvent(const QTouchEvent &te) = 0;
+
+    /*! desc
+     * \param painter */
+    virtual void paint(QPainter &painter) = 0;
+
+    /*! desc
+     * \param tapPt */
+    virtual void tapEvent(const QPoint &tapPt) = 0;
+
+    /*! desc */
+    virtual void screenEdgeFlickEvent() = 0;
 };
 
 #endif

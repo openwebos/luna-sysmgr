@@ -34,4 +34,4 @@ run-standalone
 patches/
 /get-tests.sh
 use-this-*-folder.sh
-
+*.pro.user
