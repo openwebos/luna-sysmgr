@@ -22,7 +22,11 @@
 
 #include "Logging.h"
 #include "SysmgrIMEDataInterface.h"
-#include "VirtualKeyboard.h"
+
+#include <QDebug>
+#include <QDir>
+#include <QPluginLoader>
+#include "VirtualKeyboard.h" //<VirtualKeyboard.h>
 
 // This is to generate physical device layouts on desktop. Keep this undefined unless that's what you're working on!
 //#define GENERATE_PRE_LAYOUTS
@@ -31,86 +35,162 @@
 #include "PreKeymap.h"
 #endif
 
+// TODO (efigs): remove excessive debug prints after testing plugin discovery
+// with different plugins.
+
+static QList<VirtualKeyboardFactory *> getVKBFactories()
+{
+    QList<VirtualKeyboardFactory *> list;
+    QString path("/usr/lib/luna");
+    qDebug() << "\033[1;33;45m" << Q_FUNC_INFO << "Searching for VKB plugins in" << path << "\033[0m";
+
+    QDir plugindir = QDir(path);
+    QStringList files = plugindir.entryList(QDir::Files);
+    qDebug() << "\033[1;33;45m" << Q_FUNC_INFO << "Found" << files.count() << "files" << "\033[0m";
+
+    QPluginLoader loader;
+    QStringList::const_iterator it = files.constBegin();
+
+    while (it != files.constEnd()) {
+        qDebug() << "\033[1;33;40m" << Q_FUNC_INFO << "Checking" << (*it) << "\033[0m";
+        loader.setFileName(plugindir.absoluteFilePath(*it));
+
+        VirtualKeyboardFactory *factory =
+            qobject_cast<VirtualKeyboardFactory *>(loader.instance());
+
+        if (factory) {
+            qDebug() << "\033[1;32;40m" << Q_FUNC_INFO << "Loaded plugin"
+                     << (*it) << "successfully" << "\033[0m";
+            list.append(factory);
+        } else {
+            qWarning() << "\033[1;31;40m" << Q_FUNC_INFO << "Failed to load"
+                       << (*it) << "\n" << loader.errorString() << "\033[0m";
+
+        }
+
+        ++it;
+    }
+
+    return list;
+}
+
 IMEManager::IMEManager()
 {
 #ifdef GENERATE_PRE_LAYOUTS
-	Pre_Keyboard::PreKeymap	keymap;
-	keymap.setRect(0, 0, 500, 200);
+    Pre_Keyboard::PreKeymap	keymap;
+    keymap.setRect(0, 0, 500, 200);
 
-	const Pre_Keyboard::PreKeymap::LayoutFamily * qwerty = Pre_Keyboard::PreKeymap::LayoutFamily::findLayoutFamily("qwerty", false);
-	const Pre_Keyboard::PreKeymap::LayoutFamily * qwertz = Pre_Keyboard::PreKeymap::LayoutFamily::findLayoutFamily("qwertz", false);
-	const Pre_Keyboard::PreKeymap::LayoutFamily * azerty = Pre_Keyboard::PreKeymap::LayoutFamily::findLayoutFamily("azerty", false);
-	if (VERIFY(qwerty))
-	{
-		keymap.setLayoutFamily(qwerty);
-		keymap.generateKeyboardLayout("pre_qwerty.xml");
-	}
-	if (VERIFY(qwertz))
-	{
-		keymap.setLayoutFamily(qwertz);
-		keymap.generateKeyboardLayout("pre_qwertz.xml");
-	}
-	if (VERIFY(azerty))
-	{
-		keymap.setLayoutFamily(azerty);
-		keymap.generateKeyboardLayout("pre_azerty.xml");
-	}
+    const Pre_Keyboard::PreKeymap::LayoutFamily * qwerty = Pre_Keyboard::PreKeymap::LayoutFamily::findLayoutFamily("qwerty", false);
+    const Pre_Keyboard::PreKeymap::LayoutFamily * qwertz = Pre_Keyboard::PreKeymap::LayoutFamily::findLayoutFamily("qwertz", false);
+    const Pre_Keyboard::PreKeymap::LayoutFamily * azerty = Pre_Keyboard::PreKeymap::LayoutFamily::findLayoutFamily("azerty", false);
+    if (VERIFY(qwerty))
+    {
+        keymap.setLayoutFamily(qwerty);
+        keymap.generateKeyboardLayout("pre_qwerty.xml");
+    }
+    if (VERIFY(qwertz))
+    {
+        keymap.setLayoutFamily(qwertz);
+        keymap.generateKeyboardLayout("pre_qwertz.xml");
+    }
+    if (VERIFY(azerty))
+    {
+        keymap.setLayoutFamily(azerty);
+        keymap.generateKeyboardLayout("pre_azerty.xml");
+    }
 
-	exit(0);
+    exit(0);
 #endif
 }
 
 QStringList IMEManager::availableIMEs() const
 {
-	QStringList	list;
-	VirtualKeyboardFactory * factory = VirtualKeyboardFactory::getFirstFactory();
-	while (factory)
-	{
-		list.push_back(factory->name());
-		factory = factory->getNextFactory();
-	}
-	return list;
+    QStringList	names;
+    QList<VirtualKeyboardFactory *> factories = getVKBFactories();
+    QList<VirtualKeyboardFactory *>::const_iterator it = factories.constBegin();
+
+    while (it != factories.constEnd()) {
+        names.append((*it)->name());
+        ++it;
+    }
+
+    return names;
 }
 
-IMEDataInterface* IMEManager::createIME(const QString& key)
+IMEDataInterface *IMEManager::createIME(const QString &key)
 {
-	VirtualKeyboardFactory * factory = VirtualKeyboardFactory::getFirstFactory();
-	while (factory && factory->name() != key)
-		factory = factory->getNextFactory();
+    QList<VirtualKeyboardFactory *> factories = getVKBFactories();
+    QList<VirtualKeyboardFactory *>::const_iterator it = factories.constBegin();
+    VirtualKeyboardFactory *factory = 0;
+    InputMethod *keyboard = 0;
 
-	if (factory) {
-		SysmgrIMEModel * imeDataInterface = new SysmgrIMEModel();
-		InputMethod * keyboard = factory->getVirtualKeyboard(imeDataInterface);
-		imeDataInterface->setInputMethod(keyboard);
+    while (it != factories.constEnd()) {
+        if ((*it)->name() == key) {
+            factory = *it;
+            break;
+        }
 
-		return imeDataInterface;
-	}
-	return NULL;
+        ++it;
+    }
+
+    if (factory) {
+        SysmgrIMEModel *imeDataInterface = new SysmgrIMEModel();
+        keyboard = factory->newVirtualKeyboard(imeDataInterface);
+
+        if (keyboard) {
+            qDebug() << "\033[1;32;40m" << Q_FUNC_INFO
+                     << QString("Selecting \"%1\"").arg(factory->name())
+                     << "\033[0m";
+            imeDataInterface->setInputMethod(keyboard);
+            return imeDataInterface;
+        }
+
+        delete imeDataInterface;
+    }
+
+    qCritical() << "\033[1;33;41m" << Q_FUNC_INFO << "Unable to create keyboard!"
+                << "factory:" << factory << "keyboard:" << keyboard << "\033[0m";
+    return 0;
 }
 
-IMEDataInterface * IMEManager::createPreferredIME(int maxWidth, int maxHeight)
+IMEDataInterface *IMEManager::createPreferredIME(int maxWidth, int maxHeight)
 {
-	VirtualKeyboardFactory::EVirtualKeyboardSupport	bestSupport = VirtualKeyboardFactory::eVirtualKeyboardSupport_NotSupported;
-	VirtualKeyboardFactory * bestFactory = NULL;
+    QList<VirtualKeyboardFactory *> factories = getVKBFactories();
+    QList<VirtualKeyboardFactory *>::const_iterator it = factories.constBegin();
+    VirtualKeyboardFactory::EVirtualKeyboardSupport bestSupport =
+        VirtualKeyboardFactory::eVirtualKeyboardSupport_NotSupported;
+    VirtualKeyboardFactory *bestFactory = 0;
+    InputMethod *keyboard = 0;
 
-	VirtualKeyboardFactory * factory = VirtualKeyboardFactory::getFirstFactory();
-	while (factory)
-	{
-		VirtualKeyboardFactory::EVirtualKeyboardSupport	support = factory->getSupport(maxWidth, maxHeight);
-		if (support > bestSupport)
-		{
-			bestFactory = factory;
-			bestSupport = support;
-		}
-		factory = factory->getNextFactory();
-	}
-	if (bestSupport > VirtualKeyboardFactory::eVirtualKeyboardSupport_NotSupported && bestFactory) {
-		g_message("IMEManager::createPreferredIME: selecting '%s'", bestFactory->name().toUtf8().data());
-		SysmgrIMEModel * imeDataInterface = new SysmgrIMEModel();
-		InputMethod * keyboard = bestFactory->getVirtualKeyboard(imeDataInterface);
-		imeDataInterface->setInputMethod(keyboard);
+    while (it != factories.constEnd()) {
+        VirtualKeyboardFactory::EVirtualKeyboardSupport support =
+            (*it)->getSupport(maxWidth, maxHeight);
 
-		return imeDataInterface;
-	}
-	return NULL;
+        if (support > bestSupport) {
+            bestFactory = *it;
+            bestSupport = support;
+        }
+
+        ++it;
+    }
+
+    if (bestSupport > VirtualKeyboardFactory::eVirtualKeyboardSupport_NotSupported &&
+        bestFactory) {
+        SysmgrIMEModel *imeDataInterface = new SysmgrIMEModel();
+        keyboard = bestFactory->newVirtualKeyboard(imeDataInterface);
+
+        if (keyboard) {
+            qDebug() << "\033[1;32;40m" << Q_FUNC_INFO
+                     << QString("Selecting \"%1\"").arg(bestFactory->name())
+                     << "\033[0m";
+            imeDataInterface->setInputMethod(keyboard);
+            return imeDataInterface;
+        }
+
+        delete imeDataInterface;
+    }
+
+    qCritical() << "\033[1;33;41m" << Q_FUNC_INFO << "Unable to create keyboard!"
+                << "bestFactory:" << bestFactory << "keyboard:" << keyboard << "\033[0m";
+    return 0;
 }

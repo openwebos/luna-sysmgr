@@ -263,8 +263,8 @@ SOURCES = \
 	SystemMenu.cpp \
 	BtDeviceClass.cpp \
 	IMEManager.cpp \
-	TabletKeyboard.cpp \
-	PhoneKeyboard.cpp \
+#    TabletKeyboard.cpp \ # TODO (efigs): remove
+#    PhoneKeyboard.cpp \ # TODO (efigs): remove
 	InputWindowManager.cpp \
 	IMEView.cpp \ 
 	SysmgrIMEDataInterface.cpp \
@@ -277,7 +277,6 @@ SOURCES = \
     JSONUtils.cpp \
     GhostCard.cpp \
     WSOverlayScreenShotAnimation.cpp \
-	VirtualKeyboard.cpp \
 	GlyphCache.cpp \
 	CandidateBar.cpp \
 	CandidateBarRemote.cpp \
@@ -441,15 +440,15 @@ HEADERS = \
 	SystemMenu.h \
 	BtDeviceClass.h \
 	IMEManager.h \
-	InputMethod.h \
-	TabletKeyboard.h \
-	PhoneKeyboard.h \
+	InputMethod.h \ # TODO (efigs): move to luna-webkit-api
+#    TabletKeyboard.h \ # TODO (efigs): remove
+#    PhoneKeyboard.h \ # TODO (efigs): remove
 	InputWindowManager.h \
 	IMEView.h \
-	IMEData.h_generator.h \
-	IMEData.h \
+	IMEData.h_generator.h \ # TODO (efigs): move to luna-webkit-api
+	IMEData.h \ # TODO (efigs): move to luna-webkit-api
 	SysmgrIMEDataInterface.h \
-	IMEDataInterface.h \
+	IMEDataInterface.h \ # TODO (efigs): move to luna-webkit-api
 	IMEController.h \
 	IMEPixmap.h \
 	TabletKeymap.h \
@@ -459,7 +458,7 @@ HEADERS = \
     JSONUtils.h \
     GhostCard.h \
     WSOverlayScreenShotAnimation.h \
-	VirtualKeyboard.h \
+	VirtualKeyboard.h \ # TODO (efigs): move to luna-webkit-api
 	GlyphCache.h \
 	CandidateBar.h \
 	CandidateBarRemote.h \
