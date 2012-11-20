@@ -43,6 +43,7 @@ ApplicationDescription::ApplicationDescription()
     , m_splashBackgroundName()
     , m_launchInNewGroup(false)
 	, m_tapToShareSupported(false)
+    , m_handlesRelaunch(false)
 {
 	m_isHeadLess = false;
 	m_hasTransparentWindows = false;
@@ -456,6 +457,12 @@ ApplicationDescription* ApplicationDescription::fromFile(const std::string& file
 		appDesc->m_tapToShareSupported = json_object_get_boolean(label);
 	}
 
+    // Should handle relaunch event itself instead of just focusing first window
+    label = json_object_object_get(root, "handlesRelaunch");
+    if (label && !is_error(label)) {
+        appDesc->m_handlesRelaunch = json_object_get_boolean(label);
+    }
+
 	// Requested Window Orientation: optional
 	label = json_object_object_get(root, "requestedWindowOrientation");
 	if( label && !is_error(label) && json_object_is_type(label, json_type_string))
@@ -585,6 +592,8 @@ ApplicationDescription* ApplicationDescription::fromJsonString(const char* jsonS
 	success &= extractFromJson(root, "launchinnewgroup", appDesc->m_launchInNewGroup);
 	success &= extractFromJson(root, "requestedWindowOrientation", appDesc->m_requestedWindowOrientation);
 	success &= extractFromJson(root, "tapToShareSupported", appDesc->m_tapToShareSupported);
+
+        success &= extractFromJson(root, "handlesRelaunch", appDesc->m_handlesRelaunch);
 
 	
 	int temp;
@@ -768,6 +777,7 @@ json_object* ApplicationDescription::toJSON() const
 		json_object_object_add(json, (char*) "accounts", json_object_new_string(m_accountsJsonStr.c_str()));
 
 	json_object_object_add(json, (char*) "tapToShareSupported",json_object_new_boolean(this->tapToShareSupported()));	//use isRemovable() instead of m_isRemovable in case "removability" logic changes
+        json_object_object_add(json, (char*) "handlesRelaunch",json_object_new_boolean(this->handlesRelaunch()));
 
 	if (m_dockMode) {
 		json_object_object_add(json, (char*) "dockMode", json_object_new_boolean(true));
@@ -1010,6 +1020,7 @@ void ApplicationDescription::getAppDescriptionString(std::string &descString) co
 	json_object_object_add(json, (char*) "launchinnewgroup", json_object_new_boolean(m_launchInNewGroup));
 	json_object_object_add(json, (char*) "requestedWindowOrientation", json_object_new_string((char*) m_requestedWindowOrientation.c_str()));
 	json_object_object_add(json, (char*) "tapToShareSupported",   json_object_new_boolean(m_tapToShareSupported));
+        json_object_object_add(json, (char*) "handlesRelaunch", json_object_new_boolean(m_handlesRelaunch));
 
 	if (m_dockMode) {
 		json_object_object_add(json, (char*) "dockMode", json_object_new_boolean(true));

@@ -396,9 +396,15 @@ void IpcClientHost::closeWindow(Window* w)
 	}
 }
 
-void IpcClientHost::relaunch()
+bool IpcClientHost::hasWindows() const
 {
-	// Find the first window and maximize it
+    return !m_winMap.empty();
+}
+
+void IpcClientHost::relaunch(char * const argv[])
+{
+        // For applications with "handlesRelaunch" attribute, it sends the IPC
+        // relaunch message. Otherwise, find the first window and maximize it
 
 	WindowMap::const_iterator it = m_winMap.begin();
 	if (it == m_winMap.end())
@@ -408,7 +414,13 @@ void IpcClientHost::relaunch()
 	if (!w)
 		return;
 
-	WindowServer::instance()->focusWindow(w);
+        if (w->appDescription()->handlesRelaunch() && (argv && argv[0] && argv[1])) {
+                std::string param(argv[1]);
+                g_message("%s:%d routing id:%d window: %x param: %s - %s", __PRETTY_FUNCTION__, __LINE__, static_cast<HostWindow*>(w)->routingId(), w, argv[1], param.c_str());
+                m_channel->sendAsyncMessage(new View_Relaunch(static_cast<HostWindow*>(w)->routingId(), param));
+        } else {
+                WindowServer::instance()->focusWindow(w);
+        }
 }
 
 void IpcClientHost::replaceWindowKey(Window* win, int oldKey, int newKey)

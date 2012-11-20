@@ -49,13 +49,14 @@ public:
 
 	void windowDeleted(Window* w);
 	
-	virtual void relaunch();
+	virtual void relaunch(char * const argv[]);
 	virtual void closeWindow(Window* w);
 
     virtual void replaceWindowKey(Window* win, int oldKey, int newKey);
     
     int pid() const { return m_pid; }
 	std::string name() const { return m_name; }	
+    bool hasWindows() const;
 
 protected:
 
