@@ -153,7 +153,10 @@ IMEDataInterface *IMEManager::createIME(const QString &key)
     return 0;
 }
 
-IMEDataInterface *IMEManager::createPreferredIME(int maxWidth, int maxHeight)
+IMEDataInterface *IMEManager::createPreferredIME(int maxWidth,
+                                                 int maxHeight,
+                                                 int dpi,
+                                                 const char *locale)
 {
     QList<VirtualKeyboardFactory *> factories = getVKBFactories();
     QList<VirtualKeyboardFactory *>::const_iterator it = factories.constBegin();
@@ -164,7 +167,7 @@ IMEDataInterface *IMEManager::createPreferredIME(int maxWidth, int maxHeight)
 
     while (it != factories.constEnd()) {
         VirtualKeyboardFactory::EVirtualKeyboardSupport support =
-            (*it)->getSupport(maxWidth, maxHeight);
+            (*it)->getSupport(maxWidth, maxHeight, dpi, locale);
 
         if (support > bestSupport) {
             bestFactory = *it;
