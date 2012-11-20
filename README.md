@@ -17,6 +17,7 @@ This repository contains the webOS System Manager, which is a key webOS componen
 
 WebAppMgr is provided by System Manager and is responsible for running Enyo applications.
 
+
 LunaSysmgr
 ==========
 
@@ -127,6 +128,21 @@ This component supports the following methods, which are described in detail in 
 * com.palm.vibrate/vibrateNamedEffect
 
 
+About the 'unstable' branch
+===========================
+
+Minor, low-risk changes are submitted directly to the 'master' branch.
+Periodically we carefully review a set of changes and create a tag,
+which corresponds to a stable point.
+
+The 'unstable' branch is used for significant changes while those changes
+are under active development, and allows for the ongoing review of these changes.  
+
+Presently, the 'unstable' branch of luna-sysmgr is being used for the development
+of the Pluggable Keyboard capability, and should be viewed in conjunction with the
+'unstable' branch of luna-webkit-api and the 'master' branch of keyboard-efigs.  
+
+
 How to Build on Linux
 =====================
 
@@ -144,7 +160,7 @@ To build your local clone of luna-sysmgr instead of the "stable" version install
 * Locate the function build_luna-sysmgr
 * Change the line "cd $BASE/luna-sysmgr" to use the folder containing your clone, for example "cd ~/github/luna-sysmgr"
 * Close the text editor
-* Remove the file ~/luna-desktop-binaries/luna-sysmgr/luna-desktop-build.stamp
+* Remove the file ~/luna-desktop-binaries/luna-sysmgr/luna-desktop-build*.stamp
 * Start the build
 
 Cautions:
