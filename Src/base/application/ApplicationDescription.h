@@ -112,6 +112,7 @@ public:
 	bool               isHeadLess() const { return m_isHeadLess; }
 	bool               hasTransparentWindows() const { return m_hasTransparentWindows; }
 	bool			   isRemovable() const { return m_isRemovable; }
+    bool               handlesRelaunch() const { return m_handlesRelaunch; }
 	bool			   isUserHideable() const { return m_isUserHideable; }
 	bool			   isVisible() const { return m_isVisible; }
 	const std::string& folderPath() const { return m_folderPath; }
@@ -267,6 +268,7 @@ private:
 	bool				   		m_hasAccounts;
 	bool						m_launchInNewGroup;
 	bool						m_tapToShareSupported;
+    bool                        m_handlesRelaunch;
 
 	// Dock Mode parameters
 	bool						m_dockMode;

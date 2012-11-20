@@ -224,7 +224,7 @@ int IpcServer::launchNativeProcess(const std::string& appId, const char* path, c
 
 		IpcClientHost* host = clientHostForAppId(appId);
 		if (host)
-			host->relaunch();
+			host->relaunch(argv);
 		
 		return it->second;
 	}
@@ -500,7 +500,7 @@ IpcClientHost* IpcServer::clientHostForAppId(const std::string& appId) const
 
 		g_debug("Checking clientHost: '%s' against '%s'", (*it)->name().c_str(),
 				appId.c_str());
-		if ((*it)->name() == appId)
+        if ((*it)->name() == appId && (*it)->hasWindows())
 			return *it;
 	}
 
