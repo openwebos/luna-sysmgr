@@ -29,11 +29,14 @@
 class IMEManager
 {
 public:
-	IMEManager();
+    IMEManager();
 
-	QStringList availableIMEs() const;
-	IMEDataInterface * createIME(const QString& key);
-	IMEDataInterface * createPreferredIME(int maxWidth, int maxHeight);
+    QStringList availableIMEs() const;
+    IMEDataInterface *createIME(const QString &key);
+    IMEDataInterface *createPreferredIME(int maxWidth,
+                                         int maxHeight,
+                                         int dpi,
+                                         const char *locale);
 };
 
 #endif

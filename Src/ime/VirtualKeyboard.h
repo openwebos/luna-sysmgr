@@ -145,9 +145,13 @@ public:
 
     /*! desc
      * \param maxWidth
-     * \param maxHeight */
+     * \param maxHeight
+     * \param dpi
+     * \param locale */
     virtual EVirtualKeyboardSupport getSupport(int maxWidth,
-                                               int maxHeight) = 0;
+                                               int maxHeight,
+                                               int dpi,
+                                               const char *locale) = 0;
 };
 
 Q_DECLARE_INTERFACE(VirtualKeyboardFactory,
