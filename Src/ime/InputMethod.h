@@ -25,26 +25,32 @@
 #include <QPainter>
 
 /*! \class InputMethod
- * class description
+ * \brief Interface for delivering events to input methods.
+ *
+ * Input methods such as virtual keyboards need to implement this interface to
+ * be notified of and handle screen events and need to paint themselves.
  */
 class InputMethod : public QObject
 {
     Q_OBJECT
 
 public:
-    /*! desc
-     * \param te */
+    /*! \brief Pass a touch event to the input method.
+     * \param te Touch event that occurred.
+     */
     virtual void touchEvent(const QTouchEvent &te) = 0;
 
-    /*! desc
-     * \param painter */
+    /*! \brief Make the input method draw itself.
+     * \param painter QPainter object to paint with.
+     */
     virtual void paint(QPainter &painter) = 0;
 
-    /*! desc
-     * \param tapPt */
+    /*! \brief Notify input method that the screen was tapped.
+     * \param tapPt The point of screen that was tapped.
+     */
     virtual void tapEvent(const QPoint &tapPt) = 0;
 
-    /*! desc */
+    //! \brief Notify input method of a screen edge flick event.
     virtual void screenEdgeFlickEvent() = 0;
 };
 
