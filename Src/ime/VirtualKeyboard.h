@@ -24,130 +24,131 @@
 #include "IMEDataInterface.h"
 #include "InputMethod.h"
 
-// TODO (efigs): write proper doxygen docs. also revise the instructions below
-
 /*! \class VirtualKeyboard
- * Interface for virtual keyboards implemented inside system manager, so that
- * we can have different kinds of keyboards (tablet, phone, pinyin?...)
- * co-exist in the code base without risky overlap.
+ * \brief Interface for virtual keyboards.
  *
  * To create a new virtual keyboard:
  *
- * 1. Create a virtual keyboard derived from VirtualKeyboard, which
- *    implements the interfaces of VirtualKeyboard & InputMethod (it derives
- *    from both).
+ * 1. Derive your virtual keyboard class from VirtualKeyboard. VirtualKeyboard
+ *    inherits from InputMethod, so you'll need to implement the interfaces of
+ *    both classes.
  *
  * 2. Create a factory for it: Derive from VirtualKeyboardFactory and
- *    implement the "create()" method.
+ *    implement the pure virtual methods.
  *
- *    Example:
- *
- *    \code
- *    class TabletKeyboardFactory : public VirtualKeyboardFactory
- *    {
- *    public:
- *        TabletKeyboardFactory() : VirtualKeyboardFactory("Tablet Keyboard")
- *        {
- *        }
- *
- *        InputMethod *create(IMEDataInterface *dataInterface)
- *        {
- *            return new TabletKeyboard(dataInterface);
- *        }
- *    };
- *    \endcode
  */
 class VirtualKeyboard : public InputMethod
 {
 public:
+    //! \brief Class constructor.
     explicit VirtualKeyboard(IMEDataInterface *dataInterface) :
         m_IMEDataInterface(dataInterface) {}
 
+    //! \brief Class destructor.
     virtual ~VirtualKeyboard() { m_IMEDataInterface = 0; }
 
-    //! Hides the keyboard.
+    //! \brief Hide the keyboard.
     void hide() { m_IMEDataInterface->requestHide(); }
 
-    /*! Change the size of the keyboard. Not persisted.
-     * \param size -2 is XS, -1 is S, 0 is M, and 1 is L. */
+    /*! \brief Change the size of the keyboard. Not persistent.
+     *  \param size -2 is XS, -1 is S, 0 is M, and 1 is L.
+     */
     virtual void requestSize(int size) = 0;
 
-    /*! Change the height of the keyboard. Temporary, not persisted.
-     * \param height Height in pixels. */
+    /*! \brief Change the height of the keyboard. Temporary, not persistent.
+     *  \param height Height in pixels.
+     */
     virtual void requestHeight(int height) = 0;
 
     /*! \brief Change the height associated with a size.
-     * Not persisted, but will stick through resizes until the setting
-     * is changed or sysmgr restarted. */
+     *  Not persistent, but will stick through resizes until the setting is
+     *  changed or sysmgr restarted.
+     *  \param size -2 is XS, -1 is S, 0 is M, and 1 is L.
+     *  \param height Height in pixels.
+     */
     virtual void changePresetHeightForSize(int size, int height) = 0;
 
     /*! For debug purposes, some generic requests can be sent via luna-send
-     * commands and processed here */
+     * commands and processed here
+     */
     virtual bool setBoolOption(const std::string &optionName, bool value) = 0;
+
+    /*! For debug purposes, some generic requests can be sent via luna-send
+     * commands and processed here
+     */
     virtual bool setIntOption(const std::string &optionName, int value) = 0;
 
-    /*! Also for debug purposes, a named value can be read from the current
-     * keyboard */
+    /*! For debug purposes, a named value can be read from the current keyboard.
+     */
     virtual bool getValue(const std::string &name, std::string &outValue) = 0;
 
-    //! Set keyboard & language pair.
+    /*! \brief Set keyboard layout and language.
+     *  \param layoutName Name of the keyboard layout to display
+     *  \param languageName Name of language to associate with the layout
+     *  \param showLanguageKey Set to true to display the language key in the
+     *         layout
+     */
     virtual void setKeyboardCombo(const std::string &layoutName,
                                   const std::string &languageName,
                                   bool showLanguageKey) = 0;
 
-    //! Notification that language settings were changed (by the user?)
+    //! \brief Notification that language settings were changed (by the user?)
     virtual void keyboardCombosChanged() = 0;
 
-    /*! Provide a list of keyboard layout that will be shown in the
-     * preference app. */
+    //! \brief Get a list of keyboard layouts to be shown in the preference app.
     virtual QList<const char *> getLayoutNameList() = 0;
 
     /*! \brief Get default language for keyboard layout.
-     * Each layout has a default language. Which is it for this layout (which
-     * should be in the list above).
-     * \return Language string or NULL if the layout is unknown. */
+     *  Each layout has a default language.
+     *  \param layoutName Name of the layout, should be present in the layout
+               name list returned by \e getLayoutNameList().
+     *  \return Language string or NULL if the layout is unknown.
+     */
     virtual const char *getLayoutDefaultLanguage(const char *layoutName) = 0;
 
 protected:
-    //! desc
+    //! Pointer to an IMEDataInterface instance.
     IMEDataInterface *m_IMEDataInterface;
 };
 
 /*! \class VirtualKeyboardFactory
- * class description
+ * \brief Factory interface for constructing a virtual keyboard.
  */
 class VirtualKeyboardFactory
 {
 public:
-    //! description
+    //! Describes how well a virtual keyboard fits to a device.
     typedef enum {
-        //! don't even try
+        //! Don't even try.
         eVirtualKeyboardSupport_NotSupported,
-        //! can work, but really not designed for this device
+        //! Can work, but really not designed for this device.
         eVirtualKeyboardSupport_Poor,
-        //! supports devices of this size
+        //! Supports devices of this size.
         eVirtualKeyboardSupport_Preferred_Size,
-        /*! supports devices of this size and supports current locale
-         * particularly well */
+        /*! Supports devices of this size and supports current locale
+         * particularly well. */
         eVirtualKeyboardSupport_Preferred_SizeAndLocale
     } EVirtualKeyboardSupport;
 
     virtual ~VirtualKeyboardFactory() {}
 
-    /*! desc
-     * \param dataInterface
-     * \return  */
+    /*! \brief Get a virtual keyboard.
+     * \param dataInterface Pointer to an IMEDataInterface instance.
+     * \return A pointer to the virtual keyboard.
+     */
     virtual InputMethod *newVirtualKeyboard(IMEDataInterface *dataInterface) = 0;
 
-    /*! desc
-     * \return */
+    /*! \brief Get the name of the keyboard.
+     * \return The name of the keyboard.
+     */
     virtual QString name() const = 0;
 
-    /*! desc
-     * \param maxWidth
-     * \param maxHeight
-     * \param dpi
-     * \param locale */
+    /*! \brief Get information on how well a virtual keyboard fits to a screen.
+     * \param maxWidth Maximum width available for the virtual keyboard in pixels.
+     * \param maxHeight Maximum height available for the virtual keyboard in pixels.
+     * \param dpi Screen DPI.
+     * \param locale Device locale
+     */
     virtual EVirtualKeyboardSupport getSupport(int maxWidth,
                                                int maxHeight,
                                                int dpi,
