@@ -17,6 +17,7 @@
 # LICENSE@@@
 
 MACHINE_NAME = $$(MACHINE)
+STAGING_INCLUDE_DIR = $$(STAGING_INCDIR)
 
 contains(MACHINE_NAME, "qemux86-64") {
     CONFIG_BUILD += nyx webosemulator

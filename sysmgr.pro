@@ -263,27 +263,17 @@ SOURCES = \
 	SystemMenu.cpp \
 	BtDeviceClass.cpp \
 	IMEManager.cpp \
-#    TabletKeyboard.cpp \ # TODO (efigs): remove
-#    PhoneKeyboard.cpp \ # TODO (efigs): remove
 	InputWindowManager.cpp \
 	IMEView.cpp \ 
 	SysmgrIMEDataInterface.cpp \
 	IMEController.cpp \
-	IMEPixmap.cpp \
-	TabletKeymap.cpp \
-	PhoneKeymap.cpp \
 	KeyLocationRecorder.cpp \
     VirtualKeyboardPreferences.cpp \
     JSONUtils.cpp \
     GhostCard.cpp \
     WSOverlayScreenShotAnimation.cpp \
-	GlyphCache.cpp \
-	CandidateBar.cpp \
-	CandidateBarRemote.cpp \
-	PalmIMEHelpers.cpp \
     InputClient.cpp \
 	QmlAlertWindow.cpp \
-    ShortcutsHandler.cpp \
     QtHostWindow.cpp \
     UiNavigationController.cpp \
     SysMgrWebBridge.cpp \
@@ -440,35 +430,20 @@ HEADERS = \
 	SystemMenu.h \
 	BtDeviceClass.h \
 	IMEManager.h \
-	InputMethod.h \ # TODO (efigs): move to luna-webkit-api
-#    TabletKeyboard.h \ # TODO (efigs): remove
-#    PhoneKeyboard.h \ # TODO (efigs): remove
 	InputWindowManager.h \
 	IMEView.h \
-	IMEData.h_generator.h \ # TODO (efigs): move to luna-webkit-api
-	IMEData.h \ # TODO (efigs): move to luna-webkit-api
 	SysmgrIMEDataInterface.h \
-	IMEDataInterface.h \ # TODO (efigs): move to luna-webkit-api
 	IMEController.h \
-	IMEPixmap.h \
-	TabletKeymap.h \
-	PhoneKeymap.h \
 	KeyLocationRecorder.h \
     VirtualKeyboardPreferences.h \
     JSONUtils.h \
     GhostCard.h \
     WSOverlayScreenShotAnimation.h \
-	VirtualKeyboard.h \ # TODO (efigs): move to luna-webkit-api
-	GlyphCache.h \
-	CandidateBar.h \
-	CandidateBarRemote.h \
-	PalmIMEHelpers.h \
     InputClient.h \
     QmlInputItem.h \
     CardSmoothEdgeShaderStage.h \
     CardRoundedCornerShaderStage.h \
 	QmlAlertWindow.h \
-    ShortcutsHandler.h \
     QtHostWindow.h \
     UiNavigationController.h \
     SysMgrWebBridge.h \
@@ -674,6 +649,8 @@ linux-g++ {
     }
 }
 
+HEADERS += $${STAGING_INCLUDE_DIR}/include/ime/IMEData.h \
+    $${STAGING_INCLUDE_DIR}/include/ime/IMEDataInterface.h
 
 contains(CONFIG_BUILD, opengl) {
 	QT += opengl
