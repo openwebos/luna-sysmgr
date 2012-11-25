@@ -838,20 +838,16 @@ void DisplayOn::startUserInactivityTimer()
         return;
     }
 
-#if (defined(TARGET_DESKTOP) || defined(TARGET_EMULATOR))
-    g_debug("%s: not starting timer on emulator or desktop", __PRETTY_FUNCTION__);
-    return;
-
-#else
-    g_debug ("%s: %d ms", __PRETTY_FUNCTION__, dimTimeout());
+#if defined(HAS_DISPLAY_TIMEOUT) && !(defined(TARGET_DESKTOP) || defined(TARGET_EMULATOR))
+    g_debug("%s: %d ms", __PRETTY_FUNCTION__, dimTimeout());
     if (isDemo()) {
-        g_warning ("in demo mode, inactivity timer started for %d", dimTimeout() + offTimeout());
+        g_warning("%s: in demo mode, inactivity timer started for %d", __PRETTY_FUNCTION__, dimTimeout() + offTimeout());
         m_timerUser->start (dimTimeout() + offTimeout());
-    }
-    else {
+    } else {
         m_timerUser->start (dimTimeout());
     }
-
+#else
+    g_debug("%s: not starting display timeout timer, display timeouts disabled", __PRETTY_FUNCTION__);
 #endif
 }
 
@@ -939,15 +935,16 @@ bool DisplayOn::timeoutInternal()
     }
     else
     {
-#if (defined(TARGET_DESKTOP) || defined(TARGET_EMULATOR))
-    g_warning("%s: not turning off display on emulator or desktop", __PRETTY_FUNCTION__);
-    changeDisplayState (DisplayStateOnLocked, DisplayEventTimeout, NULL);
+#if defined(HAS_DISPLAY_TIMEOUT) && !(defined(TARGET_DESKTOP) || defined(TARGET_EMULATOR))
+        g_message("%s: change to dim in on", __PRETTY_FUNCTION__);
+        if(isOnCall()) {
+            changeDisplayState (DisplayStateOffOnCall, DisplayEventTimeout, NULL);
+        } else {
+            changeDisplayState (DisplayStateOff, DisplayEventTimeout, NULL);
+        }
 #else
-	g_message ("%s: change to dim in on", __PRETTY_FUNCTION__);
-	if (isOnCall())
-	    changeDisplayState (DisplayStateOffOnCall, DisplayEventTimeout, NULL);
-	else 
-	    changeDisplayState (DisplayStateOff, DisplayEventTimeout, NULL);
+        g_warning("%s: not turning off display, display timeouts disabled", __PRETTY_FUNCTION__);
+        changeDisplayState (DisplayStateOnLocked, DisplayEventTimeout, NULL);
 #endif
     }
     return false;
@@ -1149,14 +1146,15 @@ bool DisplayOnLocked::timeout()
     }
     else
     {
-#if (defined(TARGET_DESKTOP) || defined(TARGET_EMULATOR))
-    g_warning ("%s: not turning off display on emulator or desktop", __PRETTY_FUNCTION__);
+#if defined(HAS_DISPLAY_TIMEOUT) && !(defined(TARGET_DESKTOP) || defined(TARGET_EMULATOR))
+        g_message("%s: going to off from onlocked state", __PRETTY_FUNCTION__);
+        if (isOnCall()) {
+            changeDisplayState(DisplayStateOffOnCall, DisplayEventTimeout, NULL);
+        } else {
+            changeDisplayState(DisplayStateOff, DisplayEventTimeout, NULL);
+        }
 #else
-	g_message ("%s: going to off from onlocked state", __FUNCTION__);
-	if (isOnCall())
-	    changeDisplayState (DisplayStateOffOnCall, DisplayEventTimeout, NULL);
-	else
-	    changeDisplayState (DisplayStateOff, DisplayEventTimeout, NULL);
+        g_warning("%s: not turning off display, display timeouts disabled", __PRETTY_FUNCTION__);
 #endif
     }
     return false;
