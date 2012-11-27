@@ -649,8 +649,8 @@ linux-g++ {
     }
 }
 
-HEADERS += $${STAGING_INCLUDE_DIR}/include/ime/IMEData.h \
-    $${STAGING_INCLUDE_DIR}/include/ime/IMEDataInterface.h
+HEADERS += $${STAGING_INCLUDE_DIR}/ime/IMEData.h \
+    $${STAGING_INCLUDE_DIR}/ime/IMEDataInterface.h
 
 contains(CONFIG_BUILD, opengl) {
 	QT += opengl
