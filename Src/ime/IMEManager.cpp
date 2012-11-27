@@ -156,7 +156,7 @@ IMEDataInterface *IMEManager::createIME(const QString &key)
 IMEDataInterface *IMEManager::createPreferredIME(int maxWidth,
                                                  int maxHeight,
                                                  int dpi,
-                                                 const char *locale)
+                                                 const std::string locale)
 {
     QList<VirtualKeyboardFactory *> factories = getVKBFactories();
     QList<VirtualKeyboardFactory *>::const_iterator it = factories.constBegin();

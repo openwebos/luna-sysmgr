@@ -36,7 +36,7 @@ public:
     IMEDataInterface *createPreferredIME(int maxWidth,
                                          int maxHeight,
                                          int dpi,
-                                         const char *locale);
+                                         const std::string locale);
 };
 
 #endif

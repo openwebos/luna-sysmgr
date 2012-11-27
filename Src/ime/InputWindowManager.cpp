@@ -27,7 +27,9 @@
 #include "Utils.h"
 #include "SystemService.h"
 #include "AnimationSettings.h"
-
+#include "Preferences.h"
+#include <QApplication>
+#include <QDesktopWidget>
 
 InputWindowManager::InputWindowManager(int maxWidth, int maxHeight)
 	: WindowManagerBase(maxWidth, maxHeight)
@@ -60,8 +62,15 @@ void InputWindowManager::init()
 	m_imeView = new IMEView(this);
 	m_imeView->setBoundingRect(QRectF(0, 0, r.width(), r.height()));
 	m_imeView->setPos(r.topLeft());
-	// TODO (efigs): get dpi and locale values
-	m_activeIME = m_imeMgr.createPreferredIME(SystemUiController::instance()->currentUiWidth(), SystemUiController::instance()->currentUiHeight(), 0, 0);
+
+    int dpi = (QApplication::desktop()->physicalDpiX() +
+               QApplication::desktop()->physicalDpiY()) / 2;
+
+    m_activeIME = m_imeMgr.createPreferredIME(
+                SystemUiController::instance()->currentUiWidth(),
+                SystemUiController::instance()->currentUiHeight(),
+                dpi, Preferences::instance()->locale());
+
 	Q_ASSERT(m_activeIME);
 
 	connect(&(m_activeIME->m_keyboardHeight), SIGNAL(valueChanged(const qint32&)), 
