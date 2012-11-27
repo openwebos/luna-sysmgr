@@ -84,11 +84,26 @@ void SysMgrWebBridge::commonSetup()
 
 }
 
+void SysMgrWebBridge::resetParentForChildrenBridge() {
+    QObjectList childrenlist = children();
+    for (int i = 0; i < childrenlist.size(); i++) {
+        SysMgrWebBridge* bridge = qobject_cast<SysMgrWebBridge *>(childrenlist.at(i));
+        if(bridge)
+             bridge->setParent(parent());
+    }
+
+}
+
 SysMgrWebBridge::~SysMgrWebBridge() 
 {
     m_isShuttingDown = true;
-    delete m_page;
-    m_page = 0;
+    if(m_page) {
+        delete m_page;
+        m_page = 0;
+    }
+    //When the SysMgrWebBridge deleted, it should reset the children SysMgrWebBridge's parent to its parent,
+    //Otherwise, it will deleted all the children SysMgrWebBridge which are still open
+    resetParentForChildrenBridge();
 }
 
 const QRect SysMgrWebBridge::requestedGeometry() const

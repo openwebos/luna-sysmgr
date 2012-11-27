@@ -163,6 +163,12 @@ class SysMgrWebBridge : public QObject,
         void setupStageArgs(const QUrl);
         void setupStageArgs(const char* url);
         void addPalmSystemObject();
+        /*!
+            \fn void resetParentForChildrenBridge()
+            \brief Reset all children SysMgrWebPage's parent to current parent. 
+            It is used in destructor to avoid double free when remove card window from card group
+        */
+        void resetParentForChildrenBridge();
 
         friend class WebAppBase;
 };
