@@ -19,13 +19,13 @@
 MACHINE_NAME = $$(MACHINE)
 
 contains(MACHINE_NAME, "broadway") {
-	DEFINES += MACHINE_BROADWAY USE_KEYMAPS PALM_DEVICE HAS_DISPLAY_TIMEOUT
+	DEFINES += MACHINE_BROADWAY HAS_KEYMAPS PALM_DEVICE HAS_DISPLAY_TIMEOUT
 	CONFIG_BUILD += opengl texturesharing directrendering
 	CONFIG_BUILD += haptics napp nyx hidlib webosdevice
     LIBS += -lqpalm
 }
 contains(MACHINE_NAME, "mantaray") {
-	DEFINES += MACHINE_MANTARAY USE_KEYMAPS PALM_DEVICE HAS_DISPLAY_TIMEOUT
+	DEFINES += MACHINE_MANTARAY HAS_KEYMAPS PALM_DEVICE HAS_DISPLAY_TIMEOUT
 	CONFIG_BUILD += opengl openglcomposited directrendering
 	CONFIG_BUILD += haptics napp nyx hidlib webosdevice
     LIBS += -lqpalm
