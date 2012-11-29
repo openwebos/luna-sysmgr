@@ -177,3 +177,74 @@ void SysmgrIMEModel::keyDownAudioFeedback(Qt::Key key)
 		SoundPlayerPool::instance()->playFeedback("key");
 }
 
+void SysmgrIMEModel::applyInitSettings(VirtualKeyboard *ime)
+{
+    VirtualKeyboardPreferences::instance().applyInitSettings(ime);
+}
+
+void SysmgrIMEModel::activateCombo()
+{
+    VirtualKeyboardPreferences::instance().activateCombo();
+}
+
+void SysmgrIMEModel::selectKeyboardCombo(int index)
+{
+    VirtualKeyboardPreferences::instance().selectKeyboardCombo(index);
+}
+
+void SysmgrIMEModel::selectLayoutCombo(const char *layoutName)
+{
+    VirtualKeyboardPreferences::instance().selectLayoutCombo(layoutName);
+}
+
+void SysmgrIMEModel::selectNextKeyboardCombo()
+{
+    VirtualKeyboardPreferences::instance().selectNextKeyboardCombo();
+}
+
+void SysmgrIMEModel::createDefaultKeyboards()
+{
+    VirtualKeyboardPreferences::instance().createDefaultKeyboards();
+}
+
+void SysmgrIMEModel::clearDefaultDeyboards()
+{
+    VirtualKeyboardPreferences::instance().clearDefaultDeyboards();
+}
+
+void SysmgrIMEModel::toggleTapSounds()
+{
+    VirtualKeyboardPreferences::instance().setTapSounds(!VirtualKeyboardPreferences::instance().getTapSounds());
+}
+
+bool SysmgrIMEModel::getTapSounds() const
+{
+    return VirtualKeyboardPreferences::instance().getTapSounds();
+}
+
+int SysmgrIMEModel::getKeyboardComboCount() const
+{
+    return VirtualKeyboardPreferences::instance().getKeyboardComboCount();
+}
+
+bool SysmgrIMEModel::getSpaces2period() const
+{
+    return VirtualKeyboardPreferences::instance().getSpaces2period();
+}
+
+void SysmgrIMEModel::selectKeyboardSize(int size)
+{
+    VirtualKeyboardPreferences::instance().selectKeyboardSize(size);
+}
+
+const char *SysmgrIMEModel::getLanguageFromKeyboardCombo(int index)
+{
+    VirtualKeyboardPreferences &prefs = VirtualKeyboardPreferences::instance();
+    return prefs.getkeyboardCombo(index).language.c_str();
+}
+
+const char *SysmgrIMEModel::getLayoutFromKeyboardCombo(int index)
+{
+    VirtualKeyboardPreferences &prefs = VirtualKeyboardPreferences::instance();
+    return prefs.getkeyboardCombo(index).layout.c_str();
+}

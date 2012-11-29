@@ -59,6 +59,21 @@ public:
 
 	virtual void keyDownAudioFeedback(Qt::Key key);
 
+    virtual void applyInitSettings(VirtualKeyboard *ime);
+    virtual void activateCombo();
+    virtual void selectKeyboardCombo(int index);
+    virtual void selectLayoutCombo(const char * layoutName);
+    virtual void selectNextKeyboardCombo();
+    virtual void createDefaultKeyboards();
+    virtual void clearDefaultDeyboards();
+    virtual void toggleTapSounds();
+    virtual bool getTapSounds() const;
+    virtual int  getKeyboardComboCount() const;
+    virtual bool getSpaces2period() const;
+    virtual void selectKeyboardSize(int size);
+    virtual const char *getLanguageFromKeyboardCombo(int index);
+    virtual const char* getLayoutFromKeyboardCombo(int index);
+
 	void	setInputMethod(InputMethod * inputMethod);
 
     virtual QVariant getLunaSystemSetting(const QString &key);
