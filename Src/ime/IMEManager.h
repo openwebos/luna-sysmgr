@@ -24,7 +24,7 @@
 
 #include <QStringList>
 
-#include "IMEDataInterface.h"
+#include <IMEDataInterface.h>
 
 class IMEManager
 {

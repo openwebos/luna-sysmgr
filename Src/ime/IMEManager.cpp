@@ -26,7 +26,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QPluginLoader>
-#include "VirtualKeyboard.h" //<VirtualKeyboard.h>
+#include <VirtualKeyboard.h>
 
 // This is to generate physical device layouts on desktop. Keep this undefined unless that's what you're working on!
 //#define GENERATE_PRE_LAYOUTS
@@ -34,9 +34,6 @@
 #ifdef GENERATE_PRE_LAYOUTS
 #include "PreKeymap.h"
 #endif
-
-// TODO (efigs): remove excessive debug prints after testing plugin discovery
-// with different plugins.
 
 static QList<VirtualKeyboardFactory *> getVKBFactories()
 {
