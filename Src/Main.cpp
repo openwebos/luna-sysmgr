@@ -31,7 +31,6 @@
 #include "IpcServer.h"
 #include "Localization.h"
 #include "WindowServer.h"
-#include "WebAppManager.h"
 #include "WebAppMgrProxy.h"
 #include "MemoryMonitor.h"
 #include "Settings.h"
@@ -495,45 +494,6 @@ static void generateGoodBacktraceTerminateHandler()
 	exit(-1);
 }
 
-static int RunWebAppManagerTask(void* data)
-{
-    // Install the handler for signals that we want to trap:
-    // Note: We install the handlers after we initialize the setting because
-    // we may do something different depending on the settings values.
-    installOuterCrashHandler(SIGILL);
-    installOuterCrashHandler(SIGSEGV);
-    installOuterCrashHandler(SIGTERM);
-
-	::prctl(PR_SET_NAME, (unsigned long) "WebAppMgr", 0, 0, 0);
-	::prctl(PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0);
-
-
-	char msg = 0x00;
-	int len = 0;
-
-	// block here until the IpcServer in the main process is ready
-	while (len != 1 || msg != msgOkToContinue)
-		len = ::read(IpcServerPipeFd, &msg, 1);
-
-	::close(IpcServerPipeFd);
-	IpcServerPipeFd = -1;
-
-	const HostInfo* info = &(HostBase::instance()->getInfo());
-	WebAppManager::instance()->setHostInfo(info);
-
-	initMallocStatsCb(WebAppManager::instance()->mainLoop(), s_mallocStatsInterval);
-
-	logInit();
-
-	// Start the Browser App Launcher
-#ifdef NO_WEBKIT_INIT
-	WindowServer::instance()->bootupFinished();
-#else
-	WebAppManager::instance()->run(); // Sync execution of the task
-#endif
-
-	return 0;
-}
 
 
 int appArgc = 0;
@@ -562,30 +522,6 @@ static int RunBootupAnimationTask(void* data)
 	return 0;
 }
 
-pid_t spawnWebKitProcess()
-{
-	int fd[2];
-	::pipe(fd);
-
-	pid_t pid = ::fork();
-	if (pid < 0)
-		return pid;
-
-
-	if (pid == 0) {
-		// child closed the WRITE end of the pipe
-		::close(fd[1]);
-		IpcServerPipeFd = fd[0];
-		RunWebAppManagerTask((void*) 0);
-		exit(-1);
-	} else {
-		// parent closes the READ end of the pipe
-		::close(fd[0]);
-		WebAppMgrPipeFd = fd[1];
-	}
-
-	return pid;
-}
 
 pid_t spawnBootupAnimationProcess()
 {
@@ -703,28 +639,14 @@ int main( int argc, char** argv)
 #endif
 
 
-	pid_t webKitPid= spawnWebKitProcess();
-	if(webKitPid < 0) { // failed to start the WebKit process
-		return -1;
-	}
-
 	// Tie LunaSysMgr to Processor 0
 	setCpuAffinity(getpid(), 1);
-
-	// Tie WebAppMgr to Processor 1
-	setCpuAffinity(webKitPid, 0);
 
 	// Safe to create logging threads now
 	logInit();
 
 	// Initialize Ipc Server
 	(void) IpcServer::instance();
-
-	// Ipc Server is ready, so signal the WebAppMgr process (via pipe) to go ahead and connect
-	::write(WebAppMgrPipeFd, &msgOkToContinue, 1);
-	::close(WebAppMgrPipeFd);
-	WebAppMgrPipeFd = -1;
-
 
 #if !defined(TARGET_DESKTOP)
 	// Set "nice" property
