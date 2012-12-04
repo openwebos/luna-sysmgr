@@ -59,7 +59,6 @@
 
 #include "BootupAnimation.h"
 #include "Logging.h"
-#include "Debug.h"
 #include "HapticsController.h"
 #include "HostBase.h"
 #include "MutexLocker.h"

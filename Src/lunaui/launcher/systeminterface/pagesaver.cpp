@@ -46,8 +46,6 @@
 
 #include <glib.h>
 
-#include "BackupManager.h"
-
 namespace DimensionsSystemInterface
 {
 
