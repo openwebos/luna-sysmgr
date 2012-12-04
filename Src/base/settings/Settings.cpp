@@ -38,7 +38,7 @@
 
 static const char* kSettingsFile = "/etc/palm/luna.conf";
 static const char* kSettingsFilePlatform = "/etc/palm/luna-platform.conf";
-static QHash<QString, QVariant> allSettings;
+static QHash<QString, QVariant> *allSettings = 0;
 
 #if 0
 
@@ -244,7 +244,7 @@ Settings::Settings()
     , schemaValidationOption(0)
     , allowAllAppsInLowMemory(false)
 {
-
+    allSettings = new QHash<QString, QVariant>();
 	load(kSettingsFile);
 	load(kSettingsFilePlatform);
 
@@ -254,6 +254,7 @@ Settings::Settings()
 
 Settings::~Settings()
 {
+    delete allSettings;
 }
 
 #define KEY_STRING(cat,name,var) \
@@ -261,7 +262,7 @@ Settings::~Settings()
 	gchar* _vs;\
 	GError* _error = 0;\
 	_vs=g_key_file_get_string(keyfile,cat,name,&_error);\
-	if( !_error && _vs ) { var=(const char*)_vs; g_free(_vs); allSettings.insert(name, QString::fromStdString(var)); }\
+	if( !_error && _vs ) { var=(const char*)_vs; g_free(_vs); allSettings->insert(name, QString::fromStdString(var)); }\
 	else g_error_free(_error); \
 }
 
@@ -270,7 +271,7 @@ Settings::~Settings()
 	gchar* _vs;\
 	GError* _error = 0;\
 	_vs=g_key_file_get_string(keyfile,cat,name,&_error);\
-	if( !_error && _vs ) { var=::MemStringToBytes((const char*)_vs); g_free(_vs); allSettings.insert(name, QString::fromStdString(var)); }\
+	if( !_error && _vs ) { var=::MemStringToBytes((const char*)_vs); g_free(_vs); allSettings->insert(name, QString::fromStdString(var)); }\
 	else g_error_free(_error); \
 }
 
@@ -279,7 +280,7 @@ Settings::~Settings()
 	gboolean _vb;\
 	GError* _error = 0;\
 	_vb=g_key_file_get_boolean(keyfile,cat,name,&_error);\
-	if( !_error ) { var=_vb; allSettings.insert(name, var); }\
+	if( !_error ) { var=_vb; allSettings->insert(name, var); }\
 	else g_error_free(_error); \
 }
 
@@ -288,7 +289,7 @@ Settings::~Settings()
 	int _v;\
 	GError* _error = 0;\
 	_v=g_key_file_get_integer(keyfile,cat,name,&_error);\
-	if( !_error ) { var=_v; allSettings.insert(name, var); }\
+	if( !_error ) { var=_v; allSettings->insert(name, var); }\
 	else g_error_free(_error); \
 }
 
@@ -297,7 +298,7 @@ Settings::~Settings()
 	double _v;\
 	GError* _error = 0;\
 	_v=g_key_file_get_double(keyfile,cat,name,&_error);\
-	if( !_error ) { var=_v; allSettings.insert(name, var); }\
+	if( !_error ) { var=_v; allSettings->insert(name, var); }\
 	else g_error_free(_error); \
 }
 
@@ -741,5 +742,5 @@ void Settings::createNeededFolders()
 
 QVariant Settings::getSetting(const QString &key) const
 {
-    return allSettings.value(key);
+    return allSettings->value(key);
 }
