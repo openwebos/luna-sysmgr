@@ -683,11 +683,11 @@ contains(CONFIG_BUILD, opengl) {
 
 	contains(CONFIG_BUILD, texturesharing) {
 		DEFINES += HAVE_TEXTURESHARING OPENGLCOMPOSITED
-		SOURCES += HostWindowDataOpenGLTextureShared.cpp 
+		SOURCES += HostWindowDataOpenGLTextureShared.cpp \
 					RemoteWindowDataSoftwareTextureShared.cpp \
 					RemoteWindowDataSoftwareQt.cpp \
-					RemoteWindowDataSoftwareOpenGLComposited.cpp 
-		HEADERS += HostWindowDataOpenGLTextureShared.h 
+					RemoteWindowDataSoftwareOpenGLComposited.cpp
+		HEADERS += HostWindowDataOpenGLTextureShared.h \
 					RemoteWindowDataSoftwareTextureShared.h \
 					RemoteWindowDataSoftwareQt.h \
 					RemoteWindowDataSoftwareOpenGLComposited.h \
