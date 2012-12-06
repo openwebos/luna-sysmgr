@@ -58,6 +58,7 @@ HEADERS += HostQtDesktop.h FlickGestureRecognizer.h FlickGesture.h
 LIBS += \
 	-Wl,-rpath $$(LUNA_STAGING)/lib \
 	-L$$(LUNA_STAGING)/lib \
+	-Wl,-rpath $$(LUNA_STAGING)/usr/lib \
 	-L$$(LUNA_STAGING)/usr/lib \
 
 INCLUDEPATH += \
@@ -71,6 +72,7 @@ INCLUDEPATH += \
 	$$(LUNA_STAGING)/include/QtDeclarative \
 	$$(LUNA_STAGING)/include/sysmgr-ipc \
 	$$(LUNA_STAGING)/include/ime \
+	$$(LUNA_STAGING)/usr/include \
 
 
 #install
