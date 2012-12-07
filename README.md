@@ -138,9 +138,9 @@ which corresponds to a stable point.
 The 'unstable' branch is used for significant changes while those changes
 are under active development, and allows for the ongoing review of these changes.  
 
-Presently, the 'unstable' branch of luna-sysmgr is being used for the development
-of the Pluggable Keyboard capability, and should be viewed in conjunction with the
-'unstable' branch of luna-webkit-api and the 'master' branch of keyboard-efigs.  
+Presently, the 'unstable' branch of luna-sysmgr is being used for the project to
+separate out WebAppMgr, and should be viewed in conjunction with the
+the 'master' branches of webappmanager and luna-sysmgr-common.  
 
 
 How to Build on Linux
