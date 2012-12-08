@@ -49,6 +49,8 @@
 #include <QApplication>
 #include <qsocketnotifier.h>
 
+#include <cjson/json.h>
+
 #include "CustomEvents.h"
 #include "Time.h"
 #include "HostBase.h"
