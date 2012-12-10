@@ -257,7 +257,8 @@ SOURCES = \
 	QmlAlertWindow.cpp \
     QtHostWindow.cpp \
     UiNavigationController.cpp \
-    NyxSensorConnector.cpp
+    NyxSensorConnector.cpp \
+    BackupManager.cpp 
 #    WebKitSensorConnector.cpp
 
 HEADERS = \
@@ -405,7 +406,8 @@ HEADERS = \
     QtHostWindow.h \
     UiNavigationController.h \
     NyxSensorCommonTypes.h \
-    NyxSensorConnector.h
+    NyxSensorConnector.h \
+    BackupManager.h
 #    WebKitSensorConnector.h
 
 ####### LAUNCHER ADDITIONS ########

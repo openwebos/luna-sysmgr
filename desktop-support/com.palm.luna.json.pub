@@ -2,7 +2,7 @@
     "role": {
         "exeName":"/usr/lib/luna/LunaSysMgr",
         "type": "privileged",
-        "allowedNames": ["", "com.palm.applicationManager", "com.palm.display", "com.palm.keys", "com.palm.lunastats", "com.palm.appDataBackup", "com.palm.luna-*"]
+        "allowedNames": ["", "com.palm.applicationManager", "com.palm.display", "com.palm.keys", "com.palm.lunastats", "com.palm.sysMgrDataBackup", "com.palm.luna-*"]
     },
     "permissions": [
         {
@@ -26,7 +26,7 @@
             "outbound":["*"]
         },
         {
-            "service":"com.palm.appDataBackup",
+            "service":"com.palm.sysMgrDataBackup",
             "inbound":["*"],
             "outbound":["*"]
         }

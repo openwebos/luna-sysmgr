@@ -1,5 +1,5 @@
 {
-	"id" : "com.palm.appDataBackup",
+	"id" : "com.palm.sysMgrDataBackup",
 	"preBackup" : "preBackup",
 	"postRestore" : "postRestore"
 }
