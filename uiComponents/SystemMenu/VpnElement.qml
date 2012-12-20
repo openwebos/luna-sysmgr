@@ -93,6 +93,7 @@ Drawer {
                         elide: Text.ElideRight;
                         color: "#AAA";
                         font.pixelSize: 13
+                        font.family: "Prelude"
                         font.capitalization: Font.AllUppercase
                     }
                 }
