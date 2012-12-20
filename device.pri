@@ -68,7 +68,7 @@ include(device-known.pri)
 
 contains(CONFIG_BUILD, webosdevice) {
     ## Known Device
-    LIBS += -lserviceinstall
+    LIBS += -lserviceinstaller
 } else {
     warning($$MACHINE_NAME not matched in device-known.pri)
 
@@ -82,7 +82,7 @@ contains(CONFIG_BUILD, webosdevice) {
     LIBS += -lqpalm
 
     ##  Activate ServiceInstaller, if available for your build target
-    # LIBS += -lserviceinstall
+    # LIBS += -lserviceinstaller
 
     ##  Set this if you have libnapp and nrwindow available for your build target
     # CONFIG_BUILD += napp
