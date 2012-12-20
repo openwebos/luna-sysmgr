@@ -1104,13 +1104,21 @@ bool ApplicationDescription::initSysmgrBuiltIn(QObject * pReceiver,const std::st
 	bool v = false;
 	for(int i = metaObject->methodOffset(); i < metaObject->methodCount(); ++i)
 	{
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		if (QString(metaObject->method(i).signature()).contains(QString::fromStdString(entrypt)))
+#else
+        if (QString(metaObject->method(i).methodSignature()).contains(QString::fromStdString(entrypt)))
+#endif
 		{
 			//try and connect
 			m_pBuiltin_launcher = new SysmgrBuiltinLaunchHelper(args);
 			QString normSig = QMetaObject::normalizedSignature("signalEntry(const std::string&)");
-			int idxSignal = m_pBuiltin_launcher->metaObject()->indexOfSignal(normSig.toAscii().data());
+            int idxSignal = m_pBuiltin_launcher->metaObject()->indexOfSignal(normSig.toLatin1().data());
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 			int idxSlot = metaObject->indexOfSlot(metaObject->method(i).signature());
+#else
+            int idxSlot = metaObject->indexOfSlot(metaObject->method(i).methodSignature());
+#endif
 			v = QMetaObject::connect(m_pBuiltin_launcher,idxSignal,
 							pReceiver,idxSlot);
 			break;

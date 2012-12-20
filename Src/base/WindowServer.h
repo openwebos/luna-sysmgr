@@ -51,13 +51,21 @@
 #include <QMultiMap>
 #include <QPointer>
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QGesture>
+#endif
+
 class Window;
 struct WindowProperties;
 class WindowManagerBase;
 class MetaKeyManager;
 class CoreNaviManager;
 class ReticleItem;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 class QDeclarativeEngine;
+#else
+class QQmlEngine;
+#endif
 class SharedGlobalProperties;
 
 class QGraphicsPixmapObject : public QGraphicsObject {
@@ -217,7 +225,11 @@ public:
 
 	bool deviceIsPortraitType() const { return m_deviceIsPortraitType; }
 
-	virtual QDeclarativeEngine* declarativeEngine() { return NULL; }
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    virtual QDeclarativeEngine* declarativeEngine() { return NULL; }
+#else
+    virtual QQmlEngine* qmlEngine() { return NULL; }
+#endif
 
     // maps a rect given in item's coordinate space into 
     virtual QRectF mapRectToRoot(const QGraphicsItem* item, const QRectF& rect) const;

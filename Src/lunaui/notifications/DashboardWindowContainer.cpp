@@ -240,7 +240,11 @@ void DashboardWindowContainer::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 			Q_EMIT signalItemDragState(true);
 		} else if(m_dashboardManualDrag) {
 			QGraphicsSceneMouseEvent ev;
-			ev.setCanceled(true);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+            ev.setCanceled(true);
+#else
+            ev.ignore();
+#endif
 			mouseReleaseEvent(&ev);
 			m_dashboardManualDrag = false;
 		}
@@ -310,7 +314,11 @@ void DashboardWindowContainer::mouseWasGrabbedByParent()
 {
 	// fake a mouse cancel
 	QGraphicsSceneMouseEvent ev;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	ev.setCanceled(true);
+#else
+    ev.ignore();
+#endif
 	mouseReleaseEvent(&ev);
 }
 
@@ -329,7 +337,11 @@ void DashboardWindowContainer::mouseReleaseEvent(QGraphicsSceneMouseEvent* event
 	if (DashboardWindow* w = m_draggedWindow.data()) {
 
 		if(!m_dashboardManualDrag) {
-			if (event->canceled() || w->persistent())
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+            if (event->canceled() || w->persistent())
+#else
+            if (!event->isAccepted() || w->persistent())
+#endif
 				goto Done;
 
 			// A window was being dragged around. Did it move too far?
@@ -353,7 +365,12 @@ void DashboardWindowContainer::mouseReleaseEvent(QGraphicsSceneMouseEvent* event
 			int winY = event->pos().y() - w->pos().y() + w->boundingRect().height()/2;
 
 			Event ev;
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 			if (event->canceled())
+#else
+            if (!event->isAccepted())
+#endif
 				ev.type = Event::PenCancel;
 			else
 				ev.type = Event::PenUp;

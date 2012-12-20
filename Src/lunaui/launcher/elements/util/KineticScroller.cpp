@@ -30,7 +30,11 @@
 #include "Settings.h"
 #include "DisplayManager.h"
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 static const int kQbstractAnimationTimeout = QAbstractAnimation::animationTimerInterval();
+#else
+// QT5_TODO
+#endif
 static const int kOverScrollCorrectionTimeOut = 350;
 static const int kOverscrollTimeout = 200; // ms
 static const int kFlickFilterTimeout = 100; // ms
@@ -487,7 +491,11 @@ void KineticScroller::zizz(qreal inV)
 	// Start a periodic timer that will fire every 10 msec
 	m_flickAnimationTimerActive = true;
 	m_flickAnimationTimer.setSingleShot(false);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	m_flickAnimationTimer.setInterval(QAbstractAnimation::animationTimerInterval());
+#else
+// QT5_TODO
+#endif
 
 	// Call the function directly to determine the next scrolling position. This will start the timer for subsequent ticks.
 	flickAnimationTick();

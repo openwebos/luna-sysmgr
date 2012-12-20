@@ -3938,7 +3938,7 @@ static void util_cleanup_installDir(const std::string& installDirPath) {
 bool ApplicationInstaller::isValidInstallURI(const std::string& url)
 {
 	QUrl qurl(url.c_str());
-	if (qurl.isValid() && ApplicationManager::isAppPackage(qurl.path().toAscii()))
+    if (qurl.isValid() && ApplicationManager::isAppPackage(qurl.path().toLatin1()))
 		return true;
 	
 	return false;

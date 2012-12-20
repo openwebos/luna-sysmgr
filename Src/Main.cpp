@@ -403,6 +403,7 @@ static void outerCrashHandler(int sig, siginfo_t *info, void *data)
     crashLogFD = -1;
 }
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 void qtMsgHandler(QtMsgType type, const char *str) {
     switch(type)
     {
@@ -423,6 +424,28 @@ void qtMsgHandler(QtMsgType type, const char *str) {
 	    break;
     }
 }
+#else
+void qtMsgHandler(QtMsgType type, const QMessageLogContext&, const QString& str) {
+    switch(type)
+    {
+    case QtDebugMsg:
+        g_debug("QDebug: %s", qPrintable(str));
+        break;
+    case QtWarningMsg:
+        g_warning("QWarning: %s", qPrintable(str));
+        break;
+    case QtCriticalMsg:
+        g_critical("QCritical: %s", qPrintable(str));
+        break;
+    case QtFatalMsg:
+        g_error("QFatal: %s", qPrintable(str));
+        break;
+    default:
+        g_message("QMessage: %s", qPrintable(str));
+        break;
+    }
+}
+#endif
 
 static void parseCommandlineOptions(int argc, char** argv)
 {
@@ -654,7 +677,12 @@ int main( int argc, char** argv)
 	setpriority(PRIO_PROCESS,getpid(),-1);
 #endif
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	qInstallMsgHandler(qtMsgHandler);
+#else
+    qInstallMessageHandler(qtMsgHandler);
+#endif
+
 	QApplication app(argc, argv);
 	QApplication::setStartDragDistance(settings->tapRadius);
 	QApplication::setDoubleClickInterval (Settings::LunaSettings()->tapDoubleClickDuration);

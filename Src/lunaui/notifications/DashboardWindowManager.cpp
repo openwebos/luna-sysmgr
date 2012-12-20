@@ -25,9 +25,16 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QStateMachine>
 #include <QState>
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include <QDeclarativeEngine>
 #include <QDeclarativeComponent>
 #include <QDeclarativeContext>
+#else
+#include <QQmlEngine>
+#include <QQmlComponent>
+#include <QQmlContext>
+#endif
 
 #include "DashboardWindowManager.h"
 #include "AlertWindow.h"
@@ -133,10 +140,17 @@ void DashboardWindowManager::init()
 	int height = boundingRect().toRect().height();
 
 	if(m_isOverlay) {
-		QDeclarativeEngine* qmlEngine = WindowServer::instance()->declarativeEngine();
-
-		 if(qmlEngine) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+        QDeclarativeEngine* qmlEngine = WindowServer::instance()->declarativeEngine();
+#else
+        QQmlEngine* qmlEngine = WindowServer::instance()->qmlEngine();
+#endif
+        if(qmlEngine) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 			 QDeclarativeContext* context =	qmlEngine->rootContext();
+#else
+             QQmlContext* context =	qmlEngine->rootContext();
+#endif
 			 m_dashboardWinContainer = new DashboardWindowContainer(this, kTabletNotificationContentWidth, 0);
 			 if(context) {
 				 context->setContextProperty("DashboardContainer", m_dashboardWinContainer);
@@ -145,8 +159,12 @@ void DashboardWindowManager::init()
 			 Settings* settings = Settings::LunaSettings();
 			 std::string systemMenuQmlPath = settings->lunaQmlUiComponentsPath + "DashboardMenu/DashboardMenu.qml";
 			 QUrl url = QUrl::fromLocalFile(systemMenuQmlPath.c_str());
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 			 m_qmlNotifMenu = new QDeclarativeComponent(qmlEngine, url, this);
-			 if(m_qmlNotifMenu) {
+#else
+             m_qmlNotifMenu = new QQmlComponent(qmlEngine, url, this);
+#endif
+             if(m_qmlNotifMenu) {
 				 m_menuObject = qobject_cast<QGraphicsObject *>(m_qmlNotifMenu->create());
 				 if(m_menuObject) {
 					 m_menuObject->setParentItem(this);

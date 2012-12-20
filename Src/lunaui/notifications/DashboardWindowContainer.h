@@ -28,7 +28,11 @@
 #include <QObject>
 #include <QParallelAnimationGroup>
 #include <QSet>
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include <QWeakPointer>
+#endif
+
 #include <QPointer>
 #include <QPixmap>
 
@@ -163,7 +167,11 @@ private:
 	QSet<DashboardWindow*> m_pendingDeleteItems;
 	QSet<DashboardWindow*> m_deletedItems;
 	QPointer<QPropertyAnimation> m_updateViewPortAnimation;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	QWeakPointer<DashboardWindow> m_draggedWindow;
+#else
+    QPointer<DashboardWindow> m_draggedWindow;
+#endif
 
 	bool m_isMenu;
 

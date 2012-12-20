@@ -83,7 +83,9 @@ QDebug operator<<(QDebug dbg, const QTouchEvent::TouchPoint &s)
 {
 	dbg.nospace() << "\"TouchPoint\":"
 			<< "{ \"id\":" << s.id()
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 			<< ", \"primary\":\"" << (s.isPrimary() ? "true" : "false") << "\""
+#endif
 			<< ", \"state\":" << touchStateToString(s.state())
 			<< ", \"pos\":\"" << s.pos() << "\""
 			<< ", \"pressure\":\"" << s.pressure() << "\""

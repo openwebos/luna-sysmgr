@@ -33,7 +33,11 @@
 #include <QPointer>
 #include <QGraphicsObject>
 #include <QPropertyAnimation>
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include <QDeclarativeComponent>
+#else
+#include <QQmlComponent>
+#endif
 
 
 class Window;
@@ -237,9 +241,13 @@ private:
 	bool bannerViewRegistered;
 
 //	CardWindow* m_phoneAppWin;
-
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	QDeclarativeComponent* m_qmlUnlockPanel;
 	QDeclarativeComponent* m_qmlUnlockDialog;
+#else
+    QQmlComponent* m_qmlUnlockPanel;
+    QQmlComponent* m_qmlUnlockDialog;
+#endif
 	InputItem* m_unlockPanel;
 	QGraphicsObject* m_unlockDialog;
 

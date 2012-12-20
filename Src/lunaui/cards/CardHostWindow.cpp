@@ -700,7 +700,11 @@ void CardHostWindow::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 
 	bool initial = m_penInPlayButton;
 	
-	m_penInPlayButton = (rect.contains(pos) && !event->canceled());
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    m_penInPlayButton = (rect.contains(pos) && !event->canceled());
+#else
+    m_penInPlayButton = (rect.contains(pos) && event->isAccepted());
+#endif
 	if (m_penInPlayButton)
 		resumeCard();
 

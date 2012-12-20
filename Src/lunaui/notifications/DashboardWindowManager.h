@@ -52,7 +52,11 @@ class DashboardWindow;
 class DashboardWindowContainer;
 class GraphicsItemContainer;
 class NotificationPolicy;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 class QDeclarativeComponent;
+#else
+class QQmlComponent;
+#endif
 
 class DashboardWindowManager : public WindowManagerBase
 {
@@ -226,7 +230,11 @@ private:
 	int m_dashboardRightOffset;
 	friend class BannerWindow;
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	QDeclarativeComponent* m_qmlNotifMenu;
+#else
+    QQmlComponent* m_qmlNotifMenu;
+#endif
 	// Top Level Menu Object
 	QGraphicsObject* m_menuObject;
 	int m_notifMenuRightEdgeOffset;

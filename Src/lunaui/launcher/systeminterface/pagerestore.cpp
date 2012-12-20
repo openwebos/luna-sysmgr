@@ -699,8 +699,9 @@ bool PageRestore::isQuicklaunchFileCompatibleWithCurrentSaveSysVersion(const QVa
 //static
 bool PageRestore::convertLegacyJsonQuicklaunchConfig(const QString& sourceFilepath,const QString& destinationFilepath)
 {
-	json_object * root = json_object_from_file(sourceFilepath.toAscii().data());
-	if (!root || is_error(root))
+    json_object * root = json_object_from_file(sourceFilepath.toLatin1().data());
+
+    if (!root || is_error(root))
 	{
 		return false;
 	}
@@ -796,8 +797,9 @@ QList<QPair<QString,QList<QString> > > PageRestore::loadStaticLegacyLauncherConf
 
 	QList<QPair<QString,QList<QString> > > pagelist;
 
-	json_object * root = json_object_from_file(sourceFilepath.toAscii().data());
-	if (!root || is_error(root))
+    json_object * root = json_object_from_file(sourceFilepath.toLatin1().data());
+
+    if (!root || is_error(root))
 	{
 		return pagelist;
 	}

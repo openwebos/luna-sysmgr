@@ -23,9 +23,16 @@
 
 #include <QGesture>
 #include <QCoreApplication>
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include <QDeclarativeComponent>
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
+#else
+#include <QQmlComponent>
+#include <QQmlContext>
+#include <QQmlEngine>
+#endif
 
 #include <SysMgrDefs.h>
 
@@ -90,9 +97,15 @@ DockModeMenuManager::~DockModeMenuManager()
 
 void DockModeMenuManager::init()
 {
-	QDeclarativeEngine* qmlEngine = WindowServer::instance()->declarativeEngine();
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    QDeclarativeEngine* qmlEngine = WindowServer::instance()->declarativeEngine();
 	if(qmlEngine) {
 		QDeclarativeContext* context =	qmlEngine->rootContext();
+#else
+    QQmlEngine* qmlEngine = WindowServer::instance()->qmlEngine();
+    if(qmlEngine) {
+        QQmlContext* context =	qmlEngine->rootContext();
+#endif
 		m_appMenuContainer = new DockModeAppMenuContainer(this, kAppMenuWidth, 0);
 		if(context) {
 			context->setContextProperty("DockModeAppMenuContainer", m_appMenuContainer);
@@ -101,7 +114,11 @@ void DockModeMenuManager::init()
 		Settings* settings = Settings::LunaSettings();
 		std::string systemMenuQmlPath = settings->lunaQmlUiComponentsPath + "DockModeAppMenu/DockModeAppMenu.qml";
 		QUrl url = QUrl::fromLocalFile(systemMenuQmlPath.c_str());
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		m_qmlNotifMenu = new QDeclarativeComponent(qmlEngine, url, this);
+#else
+        m_qmlNotifMenu = new QQmlComponent(qmlEngine, url, this);
+#endif
 		if(m_qmlNotifMenu) {
 			m_menuObject = qobject_cast<QGraphicsObject *>(m_qmlNotifMenu->create());
 			if(m_menuObject) {

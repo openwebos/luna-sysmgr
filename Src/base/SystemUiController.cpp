@@ -54,6 +54,13 @@
 #define MESSAGES_INTERNAL_FILE "SysMgrMessagesInternal.h"
 #include <PIpcMessageMacros.h>
 
+#include <SysMgrDeviceKeydefs.h>
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    #define KEYS Qt
+#else
+    #define KEYS
+#endif
+
 static SystemUiController* s_instance = 0;
 
 static const char* kLauncherAppId = "com.palm.launcher";
@@ -294,29 +301,31 @@ bool SystemUiController::handleCustomEvent(QEvent* event)
 
 bool SystemUiController::handleKeyEvent(QKeyEvent *event)
 {
-#if !defined(TARGET_EMULATOR)
+#if !defined(TARGET_EMULATOR) && (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	if (!Preferences::instance()->sysUiEnableNextPrevGestures()) {
-		if (event->key() == Qt::Key_CoreNavi_Previous) {
-			event->setKey(Qt::Key_CoreNavi_Back);
-		} else if (event->key() == Qt::Key_CoreNavi_Next) {
-			event->setKey(Qt::Key_CoreNavi_Menu);
+        if (event->key() == KEYS::Key_CoreNavi_Previous) {
+            event->setKey(KEYS::Key_CoreNavi_Back);
+        } else if (event->key() == KEYS::Key_CoreNavi_Next) {
+            event->setKey(KEYS::Key_CoreNavi_Menu);
 		}
 	}
+#else
+    // QT5_TODO: QKeyEvent::setKey() has been removed, what could we use?
 #endif
 
 	if (event->type() == QEvent::KeyPress) {
 		switch (event->key()) {
-		case Qt::Key_CoreNavi_Home:
-		case Qt::Key_CoreNavi_Launcher:
-		case Qt::Key_CoreNavi_QuickLaunch:
-		case Qt::Key_CoreNavi_Previous:
-		case Qt::Key_CoreNavi_Next:
-		case Qt::Key_CoreNavi_SwipeDown:
+        case KEYS::Key_CoreNavi_Home:
+        case KEYS::Key_CoreNavi_Launcher:
+        case KEYS::Key_CoreNavi_QuickLaunch:
+        case KEYS::Key_CoreNavi_Previous:
+        case KEYS::Key_CoreNavi_Next:
+        case KEYS::Key_CoreNavi_SwipeDown:
 			// Eat all up corenavi gesture key downs
 			return true;
 
-		case Qt::Key_CoreNavi_Back:
-		case Qt::Key_CoreNavi_Menu:
+        case KEYS::Key_CoreNavi_Back:
+        case KEYS::Key_CoreNavi_Menu:
 			if (m_dashboardOpened || m_menuVisible || m_launcherShown)
 				return true;
 			else
@@ -325,7 +334,7 @@ bool SystemUiController::handleKeyEvent(QKeyEvent *event)
         case Qt::Key_Escape: // maps to the open/close notifications key on BT keyboards
         case Qt::Key_Search: // maps to universal search toggle
         case Qt::Key_Super_L: // maps to the card view key (launcher gesture)
-        case Qt::Key_Keyboard:
+        case KEYS::Key_Keyboard:
             return true;
 
 		case Qt::Key_Shift:
@@ -333,7 +342,7 @@ bool SystemUiController::handleKeyEvent(QKeyEvent *event)
 		case Qt::Key_Alt:
 		case Qt::Key_Option:
 			// Modifiers should not close dashboard
-		case Qt::Key_CoreNavi_Meta:
+        case KEYS::Key_CoreNavi_Meta:
 			// Don't use meta to close dashboard
 			break;
 
@@ -361,7 +370,7 @@ bool SystemUiController::handleKeyEvent(QKeyEvent *event)
 
 		switch (event->key()) {
 
-		case Qt::Key_CoreNavi_QuickLaunch:
+        case KEYS::Key_CoreNavi_QuickLaunch:
 
 			// Eat away quick launch gesture when suppressGesture is set to true
 			if (m_suppressGestures) {
@@ -378,8 +387,8 @@ bool SystemUiController::handleKeyEvent(QKeyEvent *event)
 			}
 			break;
 
-		case Qt::Key_CoreNavi_Previous:
-		case Qt::Key_CoreNavi_Next:
+        case KEYS::Key_CoreNavi_Previous:
+        case KEYS::Key_CoreNavi_Next:
 
 			if (m_dashboardOpened) {
 				g_warning ("%s: %d", __PRETTY_FUNCTION__, __LINE__);
@@ -389,12 +398,12 @@ bool SystemUiController::handleKeyEvent(QKeyEvent *event)
 				Q_EMIT signalHideMenu();
 			}
 			if (!m_launcherShown) {
-				Q_EMIT signalChangeCardWindow(event->key() == Qt::Key_CoreNavi_Next);
+                Q_EMIT signalChangeCardWindow(event->key() == KEYS::Key_CoreNavi_Next);
 				return true;
 			}
 			break;
 
-		case Qt::Key_CoreNavi_Menu:
+        case KEYS::Key_CoreNavi_Menu:
 
 			if(m_deviceLocked && !m_inDockMode)
 				return false;
@@ -408,7 +417,7 @@ bool SystemUiController::handleKeyEvent(QKeyEvent *event)
 			}
 			break;
 
-		case Qt::Key_CoreNavi_Back:
+        case KEYS::Key_CoreNavi_Back:
 
 			if(m_deviceLocked && !m_inDockMode)
 				return false;
@@ -429,7 +438,7 @@ bool SystemUiController::handleKeyEvent(QKeyEvent *event)
 
 			break;
 
-		case (Qt::Key_CoreNavi_Launcher):
+        case (KEYS::Key_CoreNavi_Launcher):
         case (Qt::Key_Super_L): {
 
 			if (Settings::LunaSettings()->uiType == Settings::UI_MINIMAL) {
@@ -483,7 +492,7 @@ bool SystemUiController::handleKeyEvent(QKeyEvent *event)
 			break;
 		}
 
-		case (Qt::Key_CoreNavi_SwipeDown): {
+        case (KEYS::Key_CoreNavi_SwipeDown): {
 
 			if (Settings::LunaSettings()->uiType == Settings::UI_MINIMAL ||
 				m_emergencyMode) {
@@ -512,7 +521,7 @@ bool SystemUiController::handleKeyEvent(QKeyEvent *event)
 			return true;
 		}
 
-		case Qt::Key_CoreNavi_Home: {
+        case KEYS::Key_CoreNavi_Home: {
 
 			if (m_inDockMode) {
 				enterOrExitDockModeUi(false);
@@ -604,7 +613,7 @@ bool SystemUiController::handleKeyEvent(QKeyEvent *event)
             }
             return true;
         }
-        case Qt::Key_Keyboard: {
+        case KEYS::Key_Keyboard: {
             // toggle the state of the IME
             IMEController::instance()->setIMEActive(!IMEController::instance()->isIMEActive());
             return true;
@@ -927,7 +936,7 @@ void SystemUiController::setAlertVisible(bool val)
 
 void SystemUiController::slotKeyEventRejected(const SysMgrKeyEvent& event)
 {
-	if((event.key == Qt::Key_CoreNavi_Back) && (event.type == QEvent::KeyRelease)){
+    if((event.key == KEYS::Key_CoreNavi_Back) && (event.type == QEvent::KeyRelease)){
 		if(m_inDockMode) {
 			enterOrExitDockModeUi (false);
 		} else if (m_launcherShown){
@@ -2029,7 +2038,7 @@ std::string SystemUiController::getMenuTitleForMaximizedWindow(Window* win)
 void SystemUiController::handleScreenEdgeFlickGesture(QGesture* gesture)
 {
 	ScreenEdgeFlickGesture* g = static_cast<ScreenEdgeFlickGesture*>(gesture);
-	if (g->state() != Qt::GestureFinished)
+    if (g->state() != Qt::GestureFinished)
 		return;
 
     OrientationEvent::Orientation orientation = WindowServer::instance()->getUiOrientation();

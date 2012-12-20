@@ -275,7 +275,12 @@ void AlertWindow::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 void AlertWindow::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
     Event::Type type;
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     if (!event->canceled())
+#else
+    if (event->isAccepted())
+#endif
         type = Event::PenUp;
     else
         type = Event::PenCancel;

@@ -83,7 +83,7 @@ private:
 	QEvent::Type getKeyState(Qt::Key key);
 	bool setKeyState(Qt::Key key, QEvent::Type state);
 	bool keyToString(Qt::Key key, const char** string);
-	Qt::Key stringToKey(const char* string);
+    qint32 stringToKey(const char* string);
 	
 	LSPalmService* m_palmService;
 	LSHandle* m_service;           // private bus
@@ -141,6 +141,5 @@ private:
 
 	std::map<std::string, CategoryMapEntry*> m_categoryMap;
 };
-
 
 #endif /* INPUTMANAGER_H */

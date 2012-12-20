@@ -36,7 +36,11 @@ class SingleClickGesture : public QGesture
 
 public:
 	SingleClickGesture(QObject* parent = 0)
-	    : QGesture(parent, (Qt::GestureType) SysMgrGestureSingleClick)
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+        : QGesture(parent, (Qt::GestureType) SysMgrGestureSingleClick)
+#else
+        : QGesture(parent)
+#endif
 	    , m_timerId(0), m_triggerSingleClickOnRelease (false), m_mouseDown (false)
 	    , m_modifiers (0)
             {

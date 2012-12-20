@@ -52,7 +52,11 @@ void CardDropShadowEffect::draw(QPainter *painter)
 {
 	Q_ASSERT(s_shadowPixmap != 0);
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	qDrawPixmaps(painter, m_drawingData.constData(), m_drawingData.size(), *s_shadowPixmap);
+#else
+    // QT5_TODO
+#endif
 	
 	// paint the item, of course
     drawSource(painter);
@@ -76,6 +80,10 @@ void CardDropShadowEffect::cacheDrawingData()
 	QMargins margins(s_shadowPixmap->width()/2, s_shadowPixmap->height()/2,
 					 s_shadowPixmap->width()/2, s_shadowPixmap->height()/2);
 
-	m_drawingData = qCalculateFrameBorderData(bounds, margins, s_shadowPixmap->rect(), margins);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    m_drawingData = qCalculateFrameBorderData(bounds, margins, s_shadowPixmap->rect(), margins);
+#else
+    // QT5_TODO
+#endif
 }
 

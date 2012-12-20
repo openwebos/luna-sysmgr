@@ -57,8 +57,9 @@ static bool fileCopy(const QString& source,const QString& copied)
 static int makeTempFile(const QString& base,QString& r_filename)
 {
 	gchar * tempname = 0;
-	int fh = g_file_open_tmp((base+QString("_tmpXXXXXX")).toAscii().constData(),&tempname,0);
-	if (fh != -1)
+    int fh = g_file_open_tmp((base+QString("_tmpXXXXXX")).toLatin1().constData(),&tempname,0);
+
+    if (fh != -1)
 	{
 		r_filename = QString((const char *)tempname);
 	}
@@ -93,8 +94,9 @@ SafeFileOperator::SafeFileOperator(OpType op,const QString& fileName,QSettings::
 		//Qt will "volatile-ize" the qsettings file and could potentially overwrite it
 		m_tempName = makeUniqueTempFilename(baseFilename);
 		//make sure this file is truly gone, or else the copy below will fail
-		 unlink(m_tempName.toAscii().constData());
-		if (!(fileCopy(fileName,m_tempName)))
+        unlink(m_tempName.toLatin1().constData());
+
+        if (!(fileCopy(fileName,m_tempName)))
 		{
 			//failed to copy! Fall back to unsafe mode, and use the original file
 			g_warning("%s: copy operation for %s mode access to [%s] (target for copy was [%s]) --> FAILED. Falling back into unsafe mode",
@@ -108,8 +110,9 @@ SafeFileOperator::SafeFileOperator(OpType op,const QString& fileName,QSettings::
 		else
 		{
 			//open the temp file, so i can have a little control over it
-			m_tmpFh =  open(m_tempName.toAscii().constData(), O_RDONLY | O_RSYNC,S_IRWXU);
-			m_unsafe = false;
+            m_tmpFh =  open(m_tempName.toLatin1().constData(), O_RDONLY | O_RSYNC,S_IRWXU);
+
+            m_unsafe = false;
 			if (m_tmpFh == -1)
 			{
 				//still can't create a temp file!
@@ -137,8 +140,10 @@ SafeFileOperator::SafeFileOperator(OpType op,const QString& fileName,QSettings::
 			g_debug("%s: Failed to auto-create temp file with makeTempFile()...falling back to manually created temp file [%s]",
 					__FUNCTION__,
 					qPrintable(m_tempName));
-			m_tmpFh =  open(m_tempName.toAscii().constData(), O_WRONLY | O_DSYNC | O_SYNC | O_CREAT | O_TRUNC,S_IRWXU);
-			if (m_tmpFh == -1)
+
+            m_tmpFh =  open(m_tempName.toLatin1().constData(), O_WRONLY | O_DSYNC | O_SYNC | O_CREAT | O_TRUNC,S_IRWXU);
+
+            if (m_tmpFh == -1)
 			{
 				//still can't create a temp file!
 				//fallback to unsafe mode
@@ -201,16 +206,18 @@ SafeFileOperator::~SafeFileOperator()
 			// (these files are small so it should be no big perf issue)
 			QString targetCopy = m_originalPath + m_tempBasename;
 			//first make sure an old stale temp of this name doesn't exist - delete it.
-			 unlink(targetCopy.toAscii().constData());
-			bool rc = fileCopy(m_tempName,targetCopy);
+            unlink(targetCopy.toLatin1().constData());
+
+            bool rc = fileCopy(m_tempName,targetCopy);
 			if (!rc)
 			{
 			g_warning("%s: copy-to-rename [%s] -> [%s]... %s",__FUNCTION__,qPrintable(m_tempName),qPrintable(targetCopy),
 					( (rc) ? "SUCCESS" : "FAIL")
 			);
 			}
-			int v = localRename(targetCopy.toAscii().constData(),m_actualName.toAscii().constData());
-			if (v != 0)
+            int v = localRename(targetCopy.toLatin1().constData(),m_actualName.toLatin1().constData());
+
+            if (v != 0)
 			{
 			g_warning("%s: trying to rename [%s] -> [%s]... %s (%d , errno = %d)",__FUNCTION__,qPrintable(targetCopy),qPrintable(m_actualName),
 								( (v == 0) ? "SUCCESS" : "FAIL"),v,
@@ -221,8 +228,9 @@ SafeFileOperator::~SafeFileOperator()
 			if (v)
 			{
 				//make sure the temp-copy goes away in the case of an error
-				int rc =  unlink(targetCopy.toAscii().constData());
-				if (rc != 0)
+                int rc =  unlink(targetCopy.toLatin1().constData());
+
+                if (rc != 0)
 				{
 				g_warning("%s: trying to delete temp-copy file [%s]... %s",__FUNCTION__,qPrintable(targetCopy),
 									( ( rc == 0) ? "SUCCESS" : "FAIL")
@@ -231,11 +239,11 @@ SafeFileOperator::~SafeFileOperator()
 			}
 		}
 
-		//nuke the temp...(it will still exist in some cases; in others, it will have been renamed)
-		if (QFile::exists(m_tempName.toAscii().constData()))
-		{
-			int rc = unlink(m_tempName.toAscii().constData());
-			if (rc != 0)
+        //nuke the temp...(it will still exist in some cases; in others, it will have been renamed)
+        if (QFile::exists(m_tempName.toLatin1().constData()))
+        {
+            int rc = unlink(m_tempName.toLatin1().constData());
+            if (rc != 0)
 			{
 			g_warning("%s: trying to delete temp file [%s]... %s",__FUNCTION__,qPrintable(m_tempName),
 					( (rc == 0) ? "SUCCESS" : "FAIL")

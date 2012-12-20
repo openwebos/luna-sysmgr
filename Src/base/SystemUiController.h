@@ -50,6 +50,10 @@ QT_END_NAMESPACE
 
 class QGesture;
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+class QGestureEvent;
+#endif
+
 class SystemUiController : public QObject
 {
 	Q_OBJECT

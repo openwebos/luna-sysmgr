@@ -191,7 +191,7 @@ GraphicsSettings::~GraphicsSettings()
 
 void  GraphicsSettings::reload()
 {
-	load(m_settingsFile.toAscii().constData());
+    load(m_settingsFile.toLatin1().constData());
 }
 
 void GraphicsSettings::load(const char* settingsFile)

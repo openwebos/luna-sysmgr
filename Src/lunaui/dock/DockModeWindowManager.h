@@ -33,7 +33,13 @@
 #include <QPropertyAnimation>
 #include <QParallelAnimationGroup>
 #include <QGraphicsSceneMouseEvent>
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include <QDeclarativeComponent>
+#else
+#include <QQmlComponent>
+#endif
+
 #include <QGestureEvent>
 #include <QTextLayout>
 #include <QPointer>

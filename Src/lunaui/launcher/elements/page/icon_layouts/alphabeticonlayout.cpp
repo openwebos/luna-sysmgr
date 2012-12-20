@@ -511,7 +511,11 @@ void AlphabetIconLayout::paint(QPainter * painter, const QRectF& sourceRect)
 			dit != m_rowDividers.end();++dit)
 	{
 		++r;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		QRectF sourceGeomIntersectArea = (*dit)->untranslateFromPosition((*dit)->positionRelativeGeometry().intersect(sourceRect));
+#else
+        QRectF sourceGeomIntersectArea = (*dit)->untranslateFromPosition((*dit)->positionRelativeGeometry().intersected(sourceRect));
+#endif
 //		//qDebug() << "hdiv " << r
 //						<< " sourceRect: " << sourceRect
 //						<< " hdiv geom: " << (*dit)->geometry()
@@ -556,7 +560,11 @@ void AlphabetIconLayout::paint(QPainter * painter, const QRectF& sourceRect,qint
 		for (RowDividerMapIter dit = m_rowDividers.begin();
 				dit != m_rowDividers.end();++dit)
 		{
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 			QRectF sourceGeomIntersectArea = (*dit)->untranslateFromPosition((*dit)->positionRelativeGeometry().intersect(sourceRect));
+#else
+            QRectF sourceGeomIntersectArea = (*dit)->untranslateFromPosition((*dit)->positionRelativeGeometry().intersected(sourceRect));
+#endif
 			if (sourceGeomIntersectArea.isEmpty())
 			{
 				continue;

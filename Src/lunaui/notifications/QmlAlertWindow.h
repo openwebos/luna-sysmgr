@@ -26,7 +26,11 @@
 
 #include "AlertWindow.h"
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 class QDeclarativeComponent;
+#else
+class QQmlComponent;
+#endif
 class QGraphicsObject;
 
 class QmlAlertWindow : public AlertWindow
@@ -50,7 +54,11 @@ private:
 
 	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	QDeclarativeComponent* m_qmlComp;
+#else
+    QQmlComponent* m_qmlComp;
+#endif
 	QGraphicsObject* m_gfxObj;
 };
 

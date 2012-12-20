@@ -24,15 +24,16 @@
 
 #include <qglobal.h>
 #include "InputClient.h"
-#include <QDeclarativeItem>
+#include <QQuickItem>
 
-class InputItem : public QDeclarativeItem
+class InputItem : public QQuickItem
                 , public InputClient
 {
     Q_OBJECT
 
 public:
-    InputItem(QDeclarativeItem* parent = 0) : QDeclarativeItem(parent) {}
+    InputItem(QQuickItem* parent = 0) : QQuickItem(parent) {}
+
 };
 
 QML_DECLARE_TYPE(InputItem)

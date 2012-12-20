@@ -22,9 +22,20 @@
 #include "SystemMenu.h"
 
 #include <QPainter>
+#include <SysMgrDeviceKeydefs.h>
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include <QDeclarativeEngine>
 #include <QDeclarativeComponent>
 #include <QDeclarativeContext>
+#define KEYS Qt
+#else
+#include <QQmlEngine>
+#include <QQmlComponent>
+#include <QQmlContext>
+#define KEYS
+#endif
+
 #include <QTimer>
 #include <QKeyEvent>
 #include <QApplication>
@@ -127,7 +138,11 @@ void SystemMenu::setOpened(bool opened)
 
 void SystemMenu::init()
 {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	QDeclarativeEngine* qmlEngine = WindowServer::instance()->declarativeEngine();
+#else
+    QQmlEngine* qmlEngine = WindowServer::instance()->qmlEngine();
+#endif
 
 	// Instantiates and initialized the services connector
 	StatusBarServicesConnector* svcConnector = StatusBarServicesConnector::instance();
@@ -150,7 +165,11 @@ void SystemMenu::init()
 	}
 
 	 if(qmlEngine) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		 QDeclarativeContext* context =	qmlEngine->rootContext();
+#else
+         QQmlContext* context =	qmlEngine->rootContext();
+#endif
 		 if(context) {
 			 context->setContextProperty("NativeSystemMenuHandler", m_menuHandler);
 		 }
@@ -158,7 +177,11 @@ void SystemMenu::init()
 		 Settings* settings = Settings::LunaSettings();
 		 std::string systemMenuQmlPath = settings->lunaQmlUiComponentsPath + "SystemMenu/SystemMenu.qml";
 		 QUrl url = QUrl::fromLocalFile(systemMenuQmlPath.c_str());
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		 m_qmlMenu = new QDeclarativeComponent(qmlEngine, url, this);
+#else
+         m_qmlMenu = new QQmlComponent(qmlEngine, url, this);
+#endif
 		 if(m_qmlMenu) {
 			 m_menuObject = qobject_cast<QGraphicsObject *>(m_qmlMenu->create());
 			 if(m_menuObject) {
@@ -360,8 +383,8 @@ void SystemMenu::slotWifiNetworkSelected(int index, QString name, int profileId,
 			                            (connStatus == "ipFailed") || (connStatus == "associationFailed"))  ) {
 		//Launch WiFi Panel with Target Parameter.
 		char params[255];
-		sprintf(params,"{\"target\": {\"ssid\": \"%s\", \"securityType\": \"%s\", \"profileId\": %d, \"connectState\": \"%s\"},}",
-				       name.toAscii().data(), securityType.toAscii().data(), profileId, connStatus.toAscii().data());
+        sprintf(params,"{\"target\": {\"ssid\": \"%s\", \"securityType\": \"%s\", \"profileId\": %d, \"connectState\": \"%s\"},}",
+                       name.toLatin1().data(), securityType.toLatin1().data(), profileId, connStatus.toLatin1().data());
 		launchApp(WIFI_PREFS_APP_ID, params);
 	} else {
 		if(profileId) {
@@ -372,8 +395,8 @@ void SystemMenu::slotWifiNetworkSelected(int index, QString name, int profileId,
 			if(!securityType.isEmpty()) {
 				//Launch WiFi Panel with Target Parameter.
 				char params[255];
-				sprintf(params,"{\"target\": {\"ssid\": \"%s\", \"securityType\": \"%s\"},}",
-						       name.toAscii().data(), securityType.toAscii().data());
+                sprintf(params,"{\"target\": {\"ssid\": \"%s\", \"securityType\": \"%s\"},}",
+                               name.toLatin1().data(), securityType.toLatin1().data());
 				launchApp(WIFI_PREFS_APP_ID, params);
 			} else {
 				StatusBarServicesConnector::instance()->connectToWifiNetwork(name.toStdString(), profileId, securityType.toStdString());
@@ -904,7 +927,7 @@ void SystemMenu::slotMuteSoundChanged(bool muteOn)
 	}
 
 	QWidget* window = QApplication::focusWidget();
-	QApplication::postEvent(window, new QKeyEvent(muteOn ? QEvent::KeyPress : QEvent::KeyRelease, Qt::Key_Ringer, Qt::NoModifier));
+    QApplication::postEvent(window, new QKeyEvent(muteOn ? QEvent::KeyPress : QEvent::KeyRelease, KEYS::Key_Ringer, Qt::NoModifier));
 }
 
 void SystemMenu::slotPowerdConnectionStateChanged(bool connected)
