@@ -623,11 +623,11 @@ int main( int argc, char** argv)
 	}
 #endif
 
-#if defined(TARGET_DEVICE) && defined(HAVE_OPENGL)
+#if defined(TARGET_DEVICE) && defined(HAVE_OPENGL) && defined(HAVE_PALM_QPA)
 	if (settings->forceSoftwareRendering)
-		::setenv("QT_QPA_PLATFORM", "palm-soft", 1);
+		::setenv("QT_QPA_PLATFORM", "palm-soft", 0);
 	else
-		::setenv("QT_QPA_PLATFORM", "palm", 1);
+		::setenv("QT_QPA_PLATFORM", "palm", 0);
 #else
     // Do not override the value if the variable exists
     ::setenv("QT_QPA_PLATFORM", "palm", 0);

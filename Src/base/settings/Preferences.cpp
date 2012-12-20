@@ -45,7 +45,7 @@ static const char* s_prefsDbPath = "/var/luna/preferences/systemprefs.db";
 
 static const char* s_logChannel = "Preferences";
 
-#if defined(TARGET_DEVICE)
+#if defined(HAS_PALM_QPA)
 extern "C" void setAdvancedGestures(int);
 #endif
 
@@ -835,7 +835,7 @@ bool Preferences::getPreferencesCallback(LSHandle *sh, LSMessage *message, void 
 
 		if (prefObjPtr) {
 			prefObjPtr->m_sysUiEnableNextPrevGestures = json_object_get_boolean(label);
-#if defined(TARGET_DEVICE)
+#if defined(HAS_PALM_QPA)
 			setAdvancedGestures(prefObjPtr->m_sysUiEnableNextPrevGestures ? 1 : 0);
 #endif
 		}
