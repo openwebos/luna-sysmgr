@@ -64,8 +64,8 @@ void PropertySettingSignalTransition::onTransition(QEvent * e)
 		QStateMachine::SignalEvent *se = static_cast<QStateMachine::SignalEvent*>(e);
 		if (!se->arguments().isEmpty())
 		{
-			m_qp_targetObject->setProperty(m_propertyName.toAscii().constData(),se->arguments().at(0));
-		}
+            m_qp_targetObject->setProperty(m_propertyName.toLatin1().constData(),se->arguments().at(0));
+        }
 	}
 	QSignalTransition::onTransition(e);
 }

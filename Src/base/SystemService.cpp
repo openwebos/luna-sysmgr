@@ -3800,7 +3800,11 @@ bool cbSetBenchmarkFlags(LSHandle *lsHandle, LSMessage *message, void *user_data
 
 		g_debug("Changing animation interval to %d", animInterval);
 
-		QAbstractAnimation::setAnimationTimerInterval(animInterval);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+        QAbstractAnimation::setAnimationTimerInterval(animInterval);
+#else
+        // QT5_TODO: Is something needed here?
+#endif
 
 		hasRequest = true;
 	}

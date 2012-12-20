@@ -33,6 +33,13 @@
 #include <map>
 #include <string>
 
+#include <SysMgrDeviceKeydefs.h>
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    #define KEYS Qt
+#else
+    #define KEYS
+#endif
+
 #define LUNA_KEYS		"com.palm.keys"
 #define CATEGORY_AUDIO		"/audio"
 #define CATEGORY_MEDIA		"/media"
@@ -762,25 +769,25 @@ QEvent::Type InputManager::getKeyState(Qt::Key key)
 	// TODO: should probably replace with hash/map
 	switch (key)
 	{
-	case Qt::Key_Ringer:
+    case KEYS::Key_Ringer:
 #if defined(TARGET_EMULATOR)
 		return QEvent::KeyRelease; // report audio as un-muted
 #else
 		return m_ringerState;
 #endif
-	case Qt::Key_Slider:
+    case KEYS::Key_Slider:
 #if defined(TARGET_EMULATOR)
 		return QEvent::KeyPress; // report slider in "closed" position
 #else
 		return m_sliderState;
 #endif
-	case Qt::Key_Headset:
+    case KEYS::Key_Headset:
 		if (m_headsetState == QEvent::KeyPress && m_headsetType == Headset)
 			return QEvent::KeyPress;
 		else
 			return QEvent::KeyRelease;
 		break;
-	case Qt::Key_HeadsetMic:
+    case KEYS::Key_HeadsetMic:
 		if (m_headsetState == QEvent::KeyPress && m_headsetType == HeadsetMic)
 			return QEvent::KeyPress;
 		else
@@ -795,19 +802,19 @@ bool InputManager::setKeyState(Qt::Key key, QEvent::Type state)
 {
 	switch (key)
 	{
-	case Qt::Key_Ringer:
+    case KEYS::Key_Ringer:
 		m_ringerState = state;
 		break;
-	case Qt::Key_Slider:
+    case KEYS::Key_Slider:
 		m_sliderState = state;
 		break;
-	case Qt::Key_Headset:
-	case Qt::Key_HeadsetMic:
+    case KEYS::Key_Headset:
+    case KEYS::Key_HeadsetMic:
 		m_headsetState = state;
 		
-		if (key == Qt::Key_Headset) {
+        if (key == KEYS::Key_Headset) {
 			m_headsetType = Headset;
-		} else if (key == Qt::Key_HeadsetMic) {
+        } else if (key == KEYS::Key_HeadsetMic) {
 			m_headsetType = HeadsetMic;
 		} else {
 			m_headsetType = HeadsetInvalid;
@@ -825,13 +832,18 @@ bool InputManager::keyToString(Qt::Key key, const char** string)
 	// TODO: we may want to use a hash table/map if we need more keys
 	switch (key)
 	{
-	case Qt::Key_Ringer:
+    case KEYS::Key_Ringer:
 		*string = STR_RINGER;
 		break;
-	case Qt::Key_Slider:
+    case KEYS::Key_Slider:
 		*string = STR_SLIDER;
 		break;
-	case Qt::Key_Power:
+// QT5_TODO: Are these two equivalent?
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    case KEYS::Key_Power:
+#else
+    case KEYS::Key_HardPower:
+#endif
 		*string = STR_POWER;
 		break;
 	case Qt::Key_VolumeUp:
@@ -858,28 +870,28 @@ bool InputManager::keyToString(Qt::Key key, const char** string)
 	case Qt::Key_MediaPrevious:
 		*string = STR_MEDIA_PREV;
 		break;
-	case Qt::Key_HeadsetButton:
+    case KEYS::Key_HeadsetButton:
 		*string = STR_HEADSET_BTN;
 		break;
-	case Qt::Key_Headset:
+    case KEYS::Key_Headset:
 		*string = STR_HEADSET;
 		break;
-	case Qt::Key_HeadsetMic:
+    case KEYS::Key_HeadsetMic:
 		*string = STR_HEADSET_MIC;
 		break;
-	case Qt::Key_MediaRepeatAll:
+    case KEYS::Key_MediaRepeatAll:
 		*string = STR_REPEAT_ALL;
 		break;
-	case Qt::Key_MediaRepeatTrack:
+    case KEYS::Key_MediaRepeatTrack:
 		*string = STR_REPEAT_TRACK;
 		break;
-	case Qt::Key_MediaRepeatNone:
+    case KEYS::Key_MediaRepeatNone:
 		*string = STR_REPEAT_NONE;
 		break;
-	case Qt::Key_MediaShuffleOn:
+    case KEYS::Key_MediaShuffleOn:
 		*string = STR_SHUFFLE_ON;
 		break;
-	case Qt::Key_MediaShuffleOff:
+    case KEYS::Key_MediaShuffleOff:
 		*string = STR_SHUFFLE_OFF;
 		break;
 	default:
@@ -890,15 +902,20 @@ bool InputManager::keyToString(Qt::Key key, const char** string)
 	return true;
 }
 
-Qt::Key InputManager::stringToKey(const char* string)
+qint32 InputManager::stringToKey(const char* string)
 {
 	// TODO: we may want to use a hash table/map if we need more keys
 	if (0 == strcmp(STR_RINGER, string)) {
-		return Qt::Key_Ringer;
+        return KEYS::Key_Ringer;
 	} else if (0 == strcmp(STR_SLIDER, string)) {
-		return Qt::Key_Slider;		
+        return KEYS::Key_Slider;
 	} else if (0 == strcmp(STR_POWER, string)) {
-		return Qt::Key_Power;		
+// QT5_TODO: Are these two equivalent?
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+        return KEYS::Key_Power;
+#else
+        return KEYS::Key_HardPower;
+#endif
 	} else if (0 == strcmp(STR_VOLUME_UP, string)) {
 		return Qt::Key_VolumeUp;
 	} else if (0 == strcmp(STR_VOLUME_DOWN, string)) {
@@ -916,21 +933,21 @@ Qt::Key InputManager::stringToKey(const char* string)
 	} else if (0 == strcmp(STR_MEDIA_PREV, string)) {
 		return Qt::Key_MediaPrevious;
 	} else if (0 == strcmp(STR_HEADSET_BTN, string)) {
-		return Qt::Key_HeadsetButton;
+        return KEYS::Key_HeadsetButton;
 	} else if (0 == strcmp(STR_HEADSET, string)) {
-		return Qt::Key_Headset;
+        return KEYS::Key_Headset;
 	} else if (0 == strcmp(STR_HEADSET_MIC, string)) {
-		return Qt::Key_HeadsetMic;
+        return KEYS::Key_HeadsetMic;
 	} else if (0 == strcmp(STR_REPEAT_ALL, string)) {
-		return Qt::Key_MediaRepeatAll;
+        return KEYS::Key_MediaRepeatAll;
 	} else if (0 == strcmp(STR_REPEAT_TRACK, string)) {
-		return Qt::Key_MediaRepeatTrack;
+        return KEYS::Key_MediaRepeatTrack;
 	} else if (0 == strcmp(STR_REPEAT_NONE, string)) {
-		return Qt::Key_MediaRepeatNone;
+        return KEYS::Key_MediaRepeatNone;
 	} else if (0 == strcmp(STR_SHUFFLE_ON, string)) {
-		return Qt::Key_MediaShuffleOn;
+        return KEYS::Key_MediaShuffleOn;
 	} else if (0 == strcmp(STR_SHUFFLE_OFF, string)) {
-		return Qt::Key_MediaShuffleOff;
+        return KEYS::Key_MediaShuffleOff;
 	} else {
 		return Qt::Key_unknown;
 	}
@@ -958,11 +975,11 @@ bool InputManager::isMediaKey(Qt::Key key)
 	case Qt::Key_MediaStop:
 	case Qt::Key_MediaNext:
 	case Qt::Key_MediaPrevious:
-	case Qt::Key_MediaRepeatAll:
-	case Qt::Key_MediaRepeatTrack:
-	case Qt::Key_MediaRepeatNone:
-	case Qt::Key_MediaShuffleOn:
-	case Qt::Key_MediaShuffleOff:
+    case KEYS::Key_MediaRepeatAll:
+    case KEYS::Key_MediaRepeatTrack:
+    case KEYS::Key_MediaRepeatNone:
+    case KEYS::Key_MediaShuffleOn:
+    case KEYS::Key_MediaShuffleOff:
 		return true;
 	default:
 		return false;
@@ -973,9 +990,14 @@ bool InputManager::isSwitch(Qt::Key key)
 {
 	switch (key)
 	{
-	case Qt::Key_Ringer:
-	case Qt::Key_Slider:
-	case Qt::Key_Power:
+    case KEYS::Key_Ringer:
+    case KEYS::Key_Slider:
+// QT5_TODO: Are these two equivalent?
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    case KEYS::Key_Power:
+#else
+    case KEYS::Key_HardPower:
+#endif
 		return true;
 	default:
 		return false;
@@ -997,9 +1019,9 @@ bool InputManager::isHeadsetKey(Qt::Key key)
 {
 	switch (key)
 	{
-	case Qt::Key_HeadsetButton:
-	case Qt::Key_Headset:
-	case Qt::Key_HeadsetMic:
+    case KEYS::Key_HeadsetButton:
+    case KEYS::Key_Headset:
+    case KEYS::Key_HeadsetMic:
 		return true;
 	default:
 		return false;
@@ -1118,7 +1140,7 @@ bool InputManager::handleEvent(QEvent* event)
 	} else if (isSwitch(key)) {
 		keyCategory = CATEGORY_SWITCHES;
 	} else if (isHeadsetKey(key)) {
-		if (!(key == Qt::Key_Headset || key == Qt::Key_HeadsetMic)) {
+        if (!(key == KEYS::Key_Headset || key == KEYS::Key_HeadsetMic)) {
 			// state machine time -- headset button
 			headsetStateMachine(keyEvent);	
 		}

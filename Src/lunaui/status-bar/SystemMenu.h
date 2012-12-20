@@ -28,8 +28,13 @@
 #include <QTimer>
 #include "StatusBarServicesConnector.h"
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 class QDeclarativeEngine;
 class QDeclarativeComponent;
+#else
+class QQmlEngine;
+class QQmlComponent;
+#endif
 class MenuHandler;
 
 class SystemMenu : public QGraphicsObject
@@ -113,7 +118,11 @@ private:
 	bool m_restricted;
 	bool m_opened;
 	int m_rightEdgeOffset;
-	QDeclarativeComponent* m_qmlMenu;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    QDeclarativeComponent* m_qmlMenu;
+#else
+    QQmlComponent* m_qmlMenu;
+#endif
 	// Top Level Menu Object
 	QGraphicsObject* m_menuObject;
 

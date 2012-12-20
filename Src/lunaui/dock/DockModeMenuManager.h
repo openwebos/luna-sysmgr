@@ -100,8 +100,12 @@ private:
 	bool m_systemMenuOpened;
 
 	DockModeAppMenuContainer* m_appMenuContainer;
-	QDeclarativeComponent* m_qmlNotifMenu;
-	QGraphicsObject* m_menuObject;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    QDeclarativeComponent* m_qmlNotifMenu;
+#else
+    QQmlComponent* m_qmlNotifMenu;
+#endif
+    QGraphicsObject* m_menuObject;
 
 	std::string m_currentApp;
 };

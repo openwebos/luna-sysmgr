@@ -58,6 +58,7 @@ HEADERS += HostQtDesktop.h FlickGestureRecognizer.h FlickGesture.h
 LIBS += \
 	-Wl,-rpath $$(LUNA_STAGING)/lib \
 	-L$$(LUNA_STAGING)/lib \
+	-L$$(LUNA_STAGING)/usr/lib \
 
 INCLUDEPATH += \
 	$$(LUNA_STAGING)/include \

@@ -218,7 +218,8 @@ void AppEffector::remove(ExternalApp * pApp)
 	LSErrorInit(&lserror);
 
 	///TODO: do I want to track remove status???
-	json_object_object_add(payload, "id", json_object_new_string(pWebOSapp->appId().toAscii().constData()));
+	json_object_object_add(payload, "id", json_object_new_string(pWebOSapp->appId().toLatin1().constData()));
+
 	if (!LSCall(ApplicationManager::instance()->m_serviceHandlePrivate,
 			"palm://com.palm.appInstallService/remove",json_object_to_json_string(payload),
 			NULL, NULL, NULL, &lserror)) {
@@ -279,7 +280,8 @@ void AppEffector::remove(const QString& webosAppId,const QUuid& iconUid)
 	LSErrorInit(&lserror);
 
 	///TODO: do I want to track remove status???
-	json_object_object_add(payload, "id", json_object_new_string(pWebOSapp->appId().toAscii().constData()));
+	json_object_object_add(payload, "id", json_object_new_string(pWebOSapp->appId().toLatin1().constData()));
+
 	if (!LSCall(ApplicationManager::instance()->m_serviceHandlePrivate,
 			"palm://com.palm.appInstallService/remove",json_object_to_json_string(payload),
 			NULL, NULL, NULL, &lserror)) {

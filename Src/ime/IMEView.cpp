@@ -182,9 +182,13 @@ void IMEView::touchBegin(QTouchEvent* te)
 	const QList<QTouchEvent::TouchPoint>& points = te->touchPoints();
 	Q_FOREACH(QTouchEvent::TouchPoint tp, points) {
 
-		if (!tp.isPrimary())
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+        if (!tp.isPrimary())
 			continue;
-		if (acceptPoint(tp.pos())) {
+#else
+    // QT5_TODO
+#endif
+        if (acceptPoint(tp.pos())) {
 			m_acceptingInput = true;
 			m_lastTouchBegin = SingletonTimer::currentTime();
 			break;

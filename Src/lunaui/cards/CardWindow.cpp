@@ -481,7 +481,11 @@ void CardWindow::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	QRectF br = boundingRect();
 
 	Event ev;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	if (event->canceled())
+#else
+    if (!event->isAccepted())
+#endif
 		ev.type = Event::PenCancel;
 	else 
 		ev.type = Event::PenUp;

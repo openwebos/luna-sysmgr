@@ -49,8 +49,13 @@ private:
 
 	Q_DISABLE_COPY(CardDropShadowEffect)
 
-	QVector<QDrawPixmaps::Data> m_drawingData;
-	QGraphicsItem* m_item;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    QVector<QDrawPixmaps::Data> m_drawingData;
+#else
+    // QT5_TODO
+#endif
+
+    QGraphicsItem* m_item;
 	QSize m_itemDims;
 };
 

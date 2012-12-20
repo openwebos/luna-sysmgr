@@ -1802,10 +1802,18 @@ void CardWindowManager::handleMouseReleaseMinimized(QGraphicsSceneMouseEvent* ev
 		// Did we go too close to the top?
 		if (m_draggedWin) {
             QRectF pr = m_draggedWin->mapRectToParent(m_draggedWin->boundingRect());
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
             if ((!event->canceled()) && (pr.center().y() > boundingRect().bottom())) {
+#else
+            if ((event->isAccepted()) && (pr.center().y() > boundingRect().bottom())) {
+#endif
                 closeWindow(m_draggedWin, true);
             }
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
             else if ((!event->canceled()) && (pr.center().y() < boundingRect().top())) {
+#else
+            else if ((event->isAccepted()) && (pr.center().y() < boundingRect().top())) {
+#endif
 				closeWindow(m_draggedWin);
 			}
 			else {
@@ -1816,7 +1824,11 @@ void CardWindowManager::handleMouseReleaseMinimized(QGraphicsSceneMouseEvent* ev
 	}
 	else if (m_movement == MovementHLocked) {
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		if(!event->canceled())
+#else
+        if(event->isAccepted())
+#endif
 			setActiveGroup(groupClosestToCenterHorizontally());
 		slideAllGroups();
 	}

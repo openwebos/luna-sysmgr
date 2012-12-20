@@ -21,9 +21,17 @@
 
 #include "Common.h"
 
+#include <qglobal.h>
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include <QDeclarativeComponent>
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
+#else
+#include <QQmlComponent>
+#include <QQmlContext>
+#include <QQmlEngine>
+#endif
 #include <QUrl>
 
 #include "QmlAlertWindow.h"
@@ -33,13 +41,25 @@
 QmlAlertWindow::QmlAlertWindow(const QString& path, int width, int height)
 	: AlertWindow(Window::Type_PopupAlert, width, height, true)
 {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	QDeclarativeEngine* qmlEngine = WindowServer::instance()->declarativeEngine();
+#else
+    QQmlEngine* qmlEngine = WindowServer::instance()->qmlEngine();
+#endif
 	if (qmlEngine) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		QDeclarativeContext* context =	qmlEngine->rootContext();
+#else
+        QQmlContext* context =	qmlEngine->rootContext();
+#endif
 		Settings* settings = Settings::LunaSettings();
 		QUrl url = QUrl::fromLocalFile(path);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		m_qmlComp = new QDeclarativeComponent(qmlEngine, url, this);
-		if (m_qmlComp) {
+#else
+        m_qmlComp = new QQmlComponent(qmlEngine, url, this);
+#endif
+        if (m_qmlComp) {
 			m_gfxObj = qobject_cast<QGraphicsObject*>(m_qmlComp->create());
 			if (m_gfxObj) {
 				m_gfxObj->setPos(-width/2, -height/2);

@@ -37,6 +37,10 @@
 #include <QPointer>
 #include <QPropertyAnimation>
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QGesture>
+#endif
+
 #include "CardRoundedCornerShaderStage.h"
 
 class CardLoading;

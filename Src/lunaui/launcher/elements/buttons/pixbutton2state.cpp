@@ -81,7 +81,12 @@ void PixButton2State::commonCtor()
 			g2 = DimensionsGlobal::realRectAroundRealPoint(m_qp_pixActive->size());
 		}
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		ThingPaintable::resize(g1.unite(g2).size().toSize());
+#else
+        ThingPaintable::resize(g1.united(g2).size().toSize());
+#endif
+
 	}
 	m_qp_currentlyRenderingPmo = m_qp_pixNormal;
 

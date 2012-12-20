@@ -33,7 +33,11 @@ QUuid	PixmapJUPOCObject::addPart(QPixmap& srcPixmap,const QRect& srcRect)
 		return QUuid();
 	}
 	//proper clipped rect, please
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	QRect csrcRect = (srcRect.isEmpty() ? srcPixmap.rect() : srcRect.intersect(srcPixmap.rect()));
+#else
+    QRect csrcRect = (srcRect.isEmpty() ? srcPixmap.rect() : srcRect.intersected(srcPixmap.rect()));
+#endif
 	QRect targetRect = findSpace(csrcRect.size());
 	if (targetRect.isEmpty())
 	{
@@ -123,7 +127,11 @@ PixmapJUPOCRefObject * PixmapJUPOCObject::addAndGetPart(QPixmap& srcPixmap,const
 		return 0;
 	}
 	//proper clipped rect, please
-	QRect csrcRect = (srcRect.isEmpty() ? srcPixmap.rect() : srcRect.intersect(srcPixmap.rect()));
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    QRect csrcRect = (srcRect.isEmpty() ? srcPixmap.rect() : srcRect.intersect(srcPixmap.rect()));
+#else
+    QRect csrcRect = (srcRect.isEmpty() ? srcPixmap.rect() : srcPixmap.rect() & srcRect);
+#endif
 	QRect targetRect = findSpace(csrcRect.size());
 	if (targetRect.isEmpty())
 	{

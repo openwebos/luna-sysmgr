@@ -31,9 +31,16 @@
 
 #include <QGesture>
 #include <QCoreApplication>
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include <QDeclarativeComponent>
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
+#else
+#include <QQmlComponent>
+#include <QQmlContext>
+#include <QQmlEngine>
+#endif
 
 
 //---------------------------------------- DockModeClockWindow ----------------------------------------------
@@ -51,7 +58,13 @@ public:
 	virtual void focusEvent (bool enable);
 private:
 	QGraphicsObject* m_clockObject;
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	QDeclarativeComponent* m_qmlNotifMenu;
+#else
+    QQmlComponent *m_qmlNotifMenu;
+#endif
+
 };
 
 DockModeClockWindow::DockModeClockWindow(const QPixmap& pixmap, DockModeWindowManager* dm, int zValue)
@@ -63,13 +76,23 @@ DockModeClockWindow::DockModeClockWindow(const QPixmap& pixmap, DockModeWindowMa
 	setName (LOCALIZED("Time"));
 	setAppId ("com.palm.dockmodetime");
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	QDeclarativeEngine* qmlEngine = WindowServer::instance()->declarativeEngine();
 	if(qmlEngine) {
 		QDeclarativeContext* context =	qmlEngine->rootContext();
+#else
+    QQmlEngine* qmlEngine = WindowServer::instance()->qmlEngine();
+    if(qmlEngine) {
+        QQmlContext* context =	qmlEngine->rootContext();
+#endif
 		Settings* settings = Settings::LunaSettings();
 		std::string systemMenuQmlPath = settings->lunaQmlUiComponentsPath + "DockModeTime/Clocks.qml";
 		QUrl url = QUrl::fromLocalFile(systemMenuQmlPath.c_str());
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		m_qmlNotifMenu = new QDeclarativeComponent(qmlEngine, url, this);
+#else
+        m_qmlNotifMenu = new QQmlComponent(qmlEngine, url, this);
+#endif
 		if(m_qmlNotifMenu) {
 			m_clockObject = qobject_cast<QGraphicsObject *>(m_qmlNotifMenu->create());
 			if(m_clockObject) {

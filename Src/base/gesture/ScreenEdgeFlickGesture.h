@@ -42,7 +42,11 @@ public:
 	};
 
 	ScreenEdgeFlickGesture(QObject* parent = 0)
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		: QGesture(parent, (Qt::GestureType) SysMgrGestureScreenEdgeFlick)
+#else
+                : QGesture(parent)
+#endif
 		, m_edge(EdgeUnknown)
 		, m_yDistance(0){
 	}
