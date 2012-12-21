@@ -830,7 +830,7 @@ void OverlayWindowManager::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     if(!event->canceled()){
 #else
-    if(!event->isAccepted()){
+    if(event->isAccepted()){
 #endif
 		ev.type = Event::PenUp;
 		handlePenUpEvent(&ev);
