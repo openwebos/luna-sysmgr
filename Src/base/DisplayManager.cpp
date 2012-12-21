@@ -39,6 +39,13 @@
 
 #include <QApplication>
 
+#include <SysMgrDeviceKeydefs.h>
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    #define KEYS Qt
+#else
+    #define KEYS
+#endif
+
 #if defined(TARGET_DEVICE) && defined(HAVE_OPENGL)
 #include <QGLContext>
 #endif
@@ -3127,8 +3134,13 @@ bool DisplayManager::handleEvent(QEvent *event)
 
     // pass the ringer and banner messages, no effect on display state at all
     // also the "media" keys from headset and avrcp
+// QT5_TODO: Qt::ExternalKeyboardModifier not present in Qt5
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     if (keyEvent && !(keyEvent->modifiers() & Qt::ExternalKeyboardModifier) &&
-			(Qt::Key_Ringer == keyEvent->key() ||
+#else
+    if (keyEvent &&
+#endif
+            (KEYS::Key_Ringer == keyEvent->key() ||
 			Qt::Key_VolumeDown == keyEvent->key() ||
 			Qt::Key_VolumeUp == keyEvent->key() ||
 			Qt::Key_VolumeMute == keyEvent->key() ||
@@ -3138,19 +3150,23 @@ bool DisplayManager::handleEvent(QEvent *event)
 			Qt::Key_MediaStop == keyEvent->key() ||
 			Qt::Key_MediaNext == keyEvent->key() ||
 			Qt::Key_MediaPrevious == keyEvent->key() ||
-			Qt::Key_MediaRepeatAll == keyEvent->key() ||
-			Qt::Key_MediaRepeatTrack == keyEvent->key() ||
-			Qt::Key_MediaRepeatNone == keyEvent->key() ||
-			Qt::Key_MediaShuffleOn == keyEvent->key() ||
-			Qt::Key_MediaShuffleOff == keyEvent->key() || 
-			Qt::Key_HeadsetButton == keyEvent->key() ||
-			Qt::Key_Headset == keyEvent->key() ||
-			Qt::Key_HeadsetMic == keyEvent->key())) {
+            KEYS::Key_MediaRepeatAll == keyEvent->key() ||
+            KEYS::Key_MediaRepeatTrack == keyEvent->key() ||
+            KEYS::Key_MediaRepeatNone == keyEvent->key() ||
+            KEYS::Key_MediaShuffleOn == keyEvent->key() ||
+            KEYS::Key_MediaShuffleOff == keyEvent->key() ||
+            KEYS::Key_HeadsetButton == keyEvent->key() ||
+            KEYS::Key_Headset == keyEvent->key() ||
+            KEYS::Key_HeadsetMic == keyEvent->key())) {
         return false;
     }
 
     // Always allow a mouse cancel event to go through
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     if (mouseEvent && mouseEvent->type() == QEvent::MouseButtonRelease && mouseEvent->canceled()) {
+#else
+    if (mouseEvent && mouseEvent->type() == QEvent::MouseButtonRelease && !mouseEvent->isAccepted()) {
+#endif
         g_debug("%s: Allowing canceled event at %d, %d through", __PRETTY_FUNCTION__, mouseEvent->x(), mouseEvent->y());
         return false;
     }
@@ -3168,7 +3184,7 @@ bool DisplayManager::handleEvent(QEvent *event)
 		return true;
 	}
 
-	if (keyEvent && Qt::Key_Optical == keyEvent->key()) {
+    if (keyEvent && KEYS::Key_Optical == keyEvent->key()) {
 		if (keyEvent->type() == QEvent::KeyRelease) {
             g_debug("%s: optical up", __PRETTY_FUNCTION__);
 			m_slidingNow = SLIDING_NOW;
@@ -3198,7 +3214,7 @@ bool DisplayManager::handleEvent(QEvent *event)
 	}
 
     // check for the slider key
-    if (keyEvent && Qt::Key_Slider == keyEvent->key()) {
+    if (keyEvent && KEYS::Key_Slider == keyEvent->key()) {
 		if (keyEvent->type() == QEvent::KeyRelease) {
 			updateState(DISPLAY_EVENT_SLIDER_UNLOCKED);
 		} else if (keyEvent->type() == QEvent::KeyPress) {
@@ -3245,7 +3261,7 @@ bool DisplayManager::handleEvent(QEvent *event)
         return true;
     }
 
-    if (event->type() == QEvent::MouseButtonPress || (keyEvent && keyEvent->type() == QEvent::KeyRelease && keyEvent->key() == Qt::Key_CoreNavi_QuickLaunch)) {
+    if (event->type() == QEvent::MouseButtonPress || (keyEvent && keyEvent->type() == QEvent::KeyRelease && keyEvent->key() == KEYS::Key_CoreNavi_QuickLaunch)) {
         m_penDown = true;
 //        if(m_blockId && event->id > m_blockId) {
 //            m_blockId = 0;
@@ -3257,12 +3273,16 @@ bool DisplayManager::handleEvent(QEvent *event)
     // if the display is off drop the following events
     if (currentState() == DisplayStateOff || currentState() == DisplayStateOffOnCall) {
 	    // drop the gestures
-	    if (keyEvent && (keyEvent->isGestureKey() && Qt::Key_CoreNavi_Home != keyEvent->key()) ) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+        if (keyEvent && (keyEvent->isGestureKey() && KEYS::Key_CoreNavi_Home != keyEvent->key()) ) {
+#else
+        if (keyEvent && (keyEvent->type() == QEvent::Gesture && KEYS::Key_CoreNavi_Home != keyEvent->key()) ) {
+#endif
 		    return true;
 	    }
     }
 
-    if (keyEvent && keyEvent->key() == Qt::Key_CoreNavi_Home) {
+    if (keyEvent && keyEvent->key() == KEYS::Key_CoreNavi_Home) {
 	    // if power key is down and power alert timer is running, the home down key should stop the timer 
 	    m_homeKeyDown = (keyEvent->type() == QEvent::KeyPress);
 	    if (m_homeKeyDown && m_power->running()) {
@@ -3287,7 +3307,12 @@ bool DisplayManager::handleEvent(QEvent *event)
 	    return false;
     }
 
-    if (keyEvent && keyEvent->key() == Qt::Key_Power) {
+// QT5_TODO: Are these equivalent?
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    if (keyEvent && keyEvent->key() == KEYS::Key_Power) {
+#else
+    if (keyEvent && keyEvent->key() == KEYS::Key_HardPower) {
+#endif
 
 		if (keyEvent->modifiers() & Qt::GroupSwitchModifier) {
 			if (keyEvent->type() == QEvent::KeyPress) {
@@ -3323,12 +3348,18 @@ bool DisplayManager::handleEvent(QEvent *event)
 			&& currentState() != DisplayStateOn
 			&& currentState() != DisplayStateOnPuck
 			&& currentState() != DisplayStateDockMode) {
+
+// QT5_TODO: Qt::ExternalKeyboardModifier not present in Qt5
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		if (keyEvent->modifiers() & Qt::ExternalKeyboardModifier)
 		{
 			g_message("%s: sending user activity external input event on key down", __PRETTY_FUNCTION__);
 			m_currentState->handleEvent(DisplayEventUserActivityExternalInput);
 		}
-		else if (m_hasSlider || currentState() != DisplayStateOff || keyEvent->key() == Qt::Key_Power)
+        else if (m_hasSlider || currentState() != DisplayStateOff || keyEvent->key() == KEYS::Key_Power)
+#else
+        if (m_hasSlider || currentState() != DisplayStateOff || keyEvent->key() == KEYS::Key_HardPower)
+#endif
 		{
 			g_message("%s: sending user activity event on key down", __PRETTY_FUNCTION__);
 			m_currentState->handleEvent(DisplayEventUserActivity);

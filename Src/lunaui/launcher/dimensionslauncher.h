@@ -55,7 +55,11 @@ class QTapAndHoldGesture;
 class QTapGesture;
 class QAnimationGroup;
 class QEvent;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 class QDeclarativeComponent;
+#else
+class QQmlComponent;
+#endif
 
 class PixmapButton;
 class PixButton2State;
@@ -585,7 +589,12 @@ protected:
 
 	QPointer<OverlayLayer> m_qp_overlay;
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	QDeclarativeComponent* m_qmlAppInfoDialog;
+#else
+    QQmlComponent* m_qmlAppInfoDialog;
+#endif
+
 	QGraphicsObject* m_appInfoDialog;
 
 	IconBase* m_iconShowingFeedback;

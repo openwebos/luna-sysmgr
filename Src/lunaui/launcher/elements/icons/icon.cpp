@@ -1081,7 +1081,11 @@ void IconBase::paint(QPainter *painter, const QRectF& sourceItemRect)
 
 	if (m_showFeedback)
 	{
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		QRect sourceFragmentRect = m_iconFeedbackPixmapGeom.translated(m_iconFeedbackPosICS).intersect(sourceRect);	//this brought it into the space of m_iconFramePixmapGeom
+#else
+        QRect sourceFragmentRect = m_iconFeedbackPixmapGeom.translated(m_iconFeedbackPosICS).intersected(sourceRect);  //this brought it into the space of m_iconFramePixmapGeom
+#endif
 		if (!sourceFragmentRect.isEmpty())
 		{
 			painter->drawPixmap(sourceFragmentRect.topLeft(),
@@ -1092,7 +1096,11 @@ void IconBase::paint(QPainter *painter, const QRectF& sourceItemRect)
 
 	if (m_showFrame)
 	{
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		QRect sourceFragmentRect = m_iconFramePixmapGeom.translated(m_iconFramePosICS).intersect(sourceRect);	//this brought it into the space of m_iconFramePixmapGeom
+#else
+        QRect sourceFragmentRect = m_iconFramePixmapGeom.translated(m_iconFramePosICS).intersected(sourceRect);        //this brought it into the space of m_iconFramePixmapGeom
+#endif
 		if (!sourceFragmentRect.isEmpty())
 		{
 			painter->drawPixmap(sourceFragmentRect.topLeft(),
@@ -1102,7 +1110,11 @@ void IconBase::paint(QPainter *painter, const QRectF& sourceItemRect)
 	}
 	if (m_showIcon)
 	{
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		QRect sourceFragmentRect = m_iconPixmapGeom.translated(m_iconPosICS).intersect(sourceRect); //this brought it into the space of m_iconPixmapGeom
+#else
+        QRect sourceFragmentRect = m_iconPixmapGeom.translated(m_iconPosICS).intersected(sourceRect); //this brought it into the space of m_iconPixmapGeom
+#endif
 		if (!sourceFragmentRect.isEmpty())
 		{
 			painter->drawPixmap(sourceFragmentRect.topLeft(),
@@ -1113,7 +1125,11 @@ void IconBase::paint(QPainter *painter, const QRectF& sourceItemRect)
 
 	if (m_qp_drDecoratorCurrentlyRenderingPixmap)
 		{
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 			QRect sourceFragmentRect = m_drDecoratorCurrentPixmapGeom.translated(m_drDecoratorCurrentPosICS).intersect(sourceRect);
+#else
+            QRect sourceFragmentRect = m_drDecoratorCurrentPixmapGeom.translated(m_drDecoratorCurrentPosICS).intersected(sourceRect);
+#endif
 			if (!sourceFragmentRect.isEmpty())
 			{
 				painter->drawPixmap(sourceFragmentRect.topLeft(),
@@ -1123,7 +1139,11 @@ void IconBase::paint(QPainter *painter, const QRectF& sourceItemRect)
 		}
 
 	if (m_showLabel) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		QRect sourceFragmentRect = m_labelGeom.translated(m_labelPosICS).intersect(sourceRect);
+#else
+        QRect sourceFragmentRect = m_labelGeom.translated(m_labelPosICS).intersected(sourceRect);
+#endif
 		if(m_qp_prerenderedLabelPixmap) {
 			// use Pre-rendered label image
 			if (!sourceFragmentRect.isEmpty()) {
@@ -1146,7 +1166,11 @@ void IconBase::paint(QPainter *painter, const QRectF& sourceItemRect)
 	{
 		//restore
 		painter->setOpacity(savedOpacity);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		QRect sourceFragmentRect = m_installStatusDecoratorPixmapGeom.translated(m_installStatusDecoratorPosICS).intersect(sourceRect);
+#else
+        QRect sourceFragmentRect = m_installStatusDecoratorPixmapGeom.translated(m_installStatusDecoratorPosICS).intersected(sourceRect);
+#endif
 		if (!sourceFragmentRect.isEmpty())
 		{
 //			painter->drawPixmap(sourceFragmentRect.topLeft(),
@@ -1187,7 +1211,11 @@ void IconBase::paint(QPainter *painter, const QRectF& sourceItemRect,qint32 rend
 	{
 		if (m_showFeedback)
 		{
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 			QRect sourceFragmentRect = m_iconFeedbackPixmapGeom.translated(m_iconFeedbackPosICS).intersect(sourceRect);	//this brought it into the space of m_iconFramePixmapGeom
+#else
+            QRect sourceFragmentRect = m_iconFeedbackPixmapGeom.translated(m_iconFeedbackPosICS).intersected(sourceRect);	//this brought it into the space of m_iconFramePixmapGeom
+#endif
 			if (!sourceFragmentRect.isEmpty())
 			{
 				painter->drawPixmap(sourceFragmentRect.topLeft(),
@@ -1198,7 +1226,11 @@ void IconBase::paint(QPainter *painter, const QRectF& sourceItemRect,qint32 rend
 
 		if (m_showFrame)
 		{
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 			QRect sourceFragmentRect = m_iconFramePixmapGeom.translated(m_iconFramePosICS).intersect(sourceRect);	//this brought it into the space of m_iconFramePixmapGeom
+#else
+            QRect sourceFragmentRect = m_iconFramePixmapGeom.translated(m_iconFramePosICS).intersected(sourceRect);	//this brought it into the space of m_iconFramePixmapGeom
+#endif
 			if (!sourceFragmentRect.isEmpty())
 			{
 				painter->drawPixmap(sourceFragmentRect.topLeft(),
@@ -1212,7 +1244,11 @@ void IconBase::paint(QPainter *painter, const QRectF& sourceItemRect,qint32 rend
 	{
 		if (m_showIcon)
 		{
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 			QRect sourceFragmentRect = m_iconPixmapGeom.translated(m_iconPosICS).intersect(sourceRect); //this brought it into the space of m_iconPixmapGeom
+#else
+            QRect sourceFragmentRect = m_iconPixmapGeom.translated(m_iconPosICS).intersected(sourceRect); //this brought it into the space of m_iconPixmapGeom
+#endif
 			if (!sourceFragmentRect.isEmpty())
 			{
 				painter->drawPixmap(sourceFragmentRect.topLeft(),
@@ -1226,7 +1262,11 @@ void IconBase::paint(QPainter *painter, const QRectF& sourceItemRect,qint32 rend
 	{
 		if (m_qp_drDecoratorCurrentlyRenderingPixmap)
 		{
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 			QRect sourceFragmentRect = m_drDecoratorCurrentPixmapGeom.translated(m_drDecoratorCurrentPosICS).intersect(sourceRect);
+#else
+            QRect sourceFragmentRect = m_drDecoratorCurrentPixmapGeom.translated(m_drDecoratorCurrentPosICS).intersected(sourceRect);
+#endif
 			if (!sourceFragmentRect.isEmpty())
 			{
 				painter->drawPixmap(sourceFragmentRect.topLeft(),
@@ -1239,7 +1279,11 @@ void IconBase::paint(QPainter *painter, const QRectF& sourceItemRect,qint32 rend
 	if (renderStage & IconRenderStage::Label)
 	{
 		if (m_showLabel) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 			QRect sourceFragmentRect = m_labelGeom.translated(m_labelPosICS).intersect(sourceRect);
+#else
+            QRect sourceFragmentRect = m_labelGeom.translated(m_labelPosICS).intersected(sourceRect);
+#endif
 			if(m_qp_prerenderedLabelPixmap) {
 				// use Pre-rendered label image
 				if (!sourceFragmentRect.isEmpty()) {

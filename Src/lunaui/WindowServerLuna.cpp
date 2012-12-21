@@ -55,8 +55,14 @@
 
 #include <QEvent>
 #include <QGraphicsPixmapItem>
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include <QDeclarativeEngine>
 #include <QDeclarativeContext>
+#else
+#include <QQmlEngine>
+#include <QQmlContext>
+#endif
 
 #if defined(HAVE_OPENGL) && defined(TARGET_DEVICE)
 #include <QGLContext>
@@ -64,6 +70,13 @@
 #endif
 
 #include <QCoreApplication>
+
+#include <SysMgrDeviceKeydefs.h>
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    #define KEYS Qt
+#else
+    #define KEYS
+#endif
 
 static const char* kWindowSrvChnl = "WindowServer";
 static const int kAlertWindowWidth = 320;
@@ -93,7 +106,12 @@ WindowServerLuna::WindowServerLuna()
 	// Cache the wallpaper in a QPixmapCache to improve speed
         setCacheMode(QGraphicsView::CacheBackground);
 
-	m_qmlEngine = new QDeclarativeEngine;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    m_qmlEngine = new QDeclarativeEngine;
+#else
+    m_qmlEngine = new QQmlEngine;
+#endif
+
 	m_qmlEngine->rootContext()->setContextProperty("runtime", Runtime::instance());
 
 	//the map is in the base class (WindowServerBase)
@@ -1153,7 +1171,7 @@ bool WindowServerLuna::sysmgrEventFilters(QEvent* event)
 		return true;
 	}
 
-	if(((type == QEvent::KeyPress) || (type == QEvent::KeyRelease)) && (((QKeyEvent*)event)->key() == Qt::Key_CoreNavi_QuickLaunch))
+    if(((type == QEvent::KeyPress) || (type == QEvent::KeyRelease)) && (((QKeyEvent*)event)->key() == KEYS::Key_CoreNavi_QuickLaunch))
 	{
 		// Quick Launch Key should go to Overlay WM
 		if(!SystemUiController::instance()->isInDockMode() && !SystemUiController::instance()->isScreenLocked() && !SystemUiController::instance()->isInEmergencyMode()) {
@@ -1189,7 +1207,12 @@ bool WindowServerLuna::processSystemShortcut(QEvent* event)
 			symDown = keyEvent->type() == QEvent::KeyPress;
 			break;
 
-		case Qt::Key_Power: {
+// QT5_TODO: Are these equivalent?
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+        case KEYS::Key_Power: {
+#else
+        case KEYS::Key_HardPower: {
+#endif
 			m_powerVolumeKeyComboState.powerKeyPress = (keyEvent->type() == QEvent::KeyPress);
 			if (!m_powerVolumeKeyComboState.powerKeyPress) {
 				cancelFullEraseCountdown();
@@ -1219,7 +1242,7 @@ bool WindowServerLuna::processSystemShortcut(QEvent* event)
 				return true;
 			break;
 		}
-		case Qt::Key_CoreNavi_Home: {
+        case KEYS::Key_CoreNavi_Home: {
 			bool ret = triggerFullEraseCountdown();
 			if (ret) {
 				// Eat up the home key event

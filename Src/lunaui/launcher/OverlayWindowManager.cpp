@@ -72,6 +72,14 @@
 
 #include <glib.h>
 
+#include <SysMgrDeviceKeydefs.h>
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+#define KEYS Qt
+#else
+#define KEYS
+#endif
+
 static const int kSlopFactorForClicks = 4;
 
 static const double kDragAnimFactorNumer = 1.0;
@@ -813,9 +821,17 @@ void OverlayWindowManager::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	ev.time = Time::curSysTimeMs();
 
 	QPointF diff = event->pos() - event->buttonDownPos(Qt::LeftButton);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	ev.setClicked((diff.manhattanLength() <= kSlopFactorForClicks) && !event->canceled());
+#else
+    ev.setClicked((diff.manhattanLength() <= kSlopFactorForClicks) && event->isAccepted());
+#endif
 
-	if(!event->canceled()){
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    if(!event->canceled()){
+#else
+    if(!event->isAccepted()){
+#endif
 		ev.type = Event::PenUp;
 		handlePenUpEvent(&ev);
 	} else {
@@ -846,7 +862,7 @@ bool OverlayWindowManager::mouseFlickEvent(FlickGesture* flick)
 
 void OverlayWindowManager::keyPressEvent(QKeyEvent* event)
 {
-	if (event->key() == Qt::Key_CoreNavi_QuickLaunch)
+    if (event->key() == KEYS::Key_CoreNavi_QuickLaunch)
 		return;
 	
 	if (m_universalSearchShown) {
@@ -877,7 +893,8 @@ void OverlayWindowManager::keyReleaseEvent(QKeyEvent* event)
 	m_ignoreKeyDueToSpeedDialEvent = false;
 
 	switch (event->key()) {
-	case (Qt::Key_CoreNavi_QuickLaunch): {
+
+    case (KEYS::Key_CoreNavi_QuickLaunch): {
 		m_dockHasMetFinger = false;
 		m_dockWasShownBeforeDrag = m_dockShown;
 		

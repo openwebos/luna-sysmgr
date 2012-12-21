@@ -50,7 +50,13 @@ CONFIG += no_keywords
 CONFIG += link_pkgconfig
 PKGCONFIG = glib-2.0 gthread-2.0
 
-QT = core gui declarative webkit network
+QT = core gui webkit network
+
+contains(QT_VERSION, "^5.*") {
+    QT += quick
+} else {
+    QT += declarative
+}
 
 VPATH = \
 		./Src \
@@ -101,7 +107,7 @@ VPATH += ./Src/lunaui/launcher/test
 
 ####### LAUNCHER ADDITIONS ########
 
-INCLUDEPATH = $$VPATH
+INCLUDEPATH = $$VPATH $$(LUNA_STAGING)/usr/include $$(LUNA_STAGING)/include $$(LUNA_STAGING)/include/luna-sysmgr-common
 
 DEFINES += QT_WEBOS
 
@@ -128,7 +134,7 @@ SOURCES = \
 	Mutex.cpp \
 	TaskBase.cpp \
 	CpuAffinity.cpp \
-	HostBase.cpp \
+    HostBase.cpp \
 	KeywordMap.cpp \
 	Window.cpp \
 	ActiveCallBanner.cpp \
@@ -280,7 +286,7 @@ HEADERS = \
 	EventThrottler.h \
 	EventThrottlerIme.h \
 	HapticsController.h \
-	HostBase.h \
+    HostBase.h \
 	HostWindow.h \
 	HostWindowData.h \
 	HostWindowDataSoftware.h \
@@ -399,7 +405,6 @@ HEADERS = \
     GhostCard.h \
     WSOverlayScreenShotAnimation.h \
     InputClient.h \
-    QmlInputItem.h \
     CardSmoothEdgeShaderStage.h \
     CardRoundedCornerShaderStage.h \
 	QmlAlertWindow.h \
@@ -409,6 +414,12 @@ HEADERS = \
     NyxSensorConnector.h \
     BackupManager.h
 #    WebKitSensorConnector.h
+
+contains(QT_VERSION, "^5.*") {
+    HEADERS += QmlInputItemQt5.h
+} else {
+    HEADERS += QmlInputItem.h
+}
 
 ####### LAUNCHER ADDITIONS ########
 
@@ -587,7 +598,8 @@ QMAKE_CXXFLAGS += -DFIX_FOR_QT
 # Override the default (-Wall -W) from g++.conf mkspec (see linux-g++.conf)
 QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-parameter -Wno-unused-variable -Wno-reorder -Wno-missing-field-initializers -Wno-extra
 
-LIBS += -lcjson -lLunaSysMgrIpc -lluna-service2 -lpbnjson_cpp -lssl -lsqlite3 -lssl -lcrypto -lnyx
+LIBS += -lcjson -lLunaSysMgrIpc -lluna-service2 -lpbnjson_c -lpbnjson_cpp -lssl -lsqlite3 -lssl -lcrypto -lnyx
+
 
 linux-g++ {
     include(desktop.pri)

@@ -210,8 +210,7 @@ OperationalSettings::OperationalSettings()
 	readSettings(kSettingsFilePlatform);
 
 	verify();
-
-	g_mkdir_with_parents(savedPagesDirectory.toAscii().constData(),0755);
+    g_mkdir_with_parents(savedPagesDirectory.toLatin1().constData(),0755);
 }
 
 OperationalSettings::~OperationalSettings()
@@ -274,5 +273,5 @@ void OperationalSettings::verify()
 	{
 		savedPagesDirectory = QString("/var/luna/preferences/launcher3/");
 	}
-	(void)g_mkdir_with_parents(savedPagesDirectory.toAscii().constData(),0755);
+    (void)g_mkdir_with_parents(savedPagesDirectory.toLatin1().constData(),0755);
 }

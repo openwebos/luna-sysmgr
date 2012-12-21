@@ -318,7 +318,11 @@ void IconCell::paint(QPainter * painter, const QRectF& sourceRect)
 	// (its own ICS...from -w/2,-h/2 blahblah... where w = width of the icon object itself; all totally contained
 	//	inside the icon class (like IconBase)
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	QRectF sourceGeomIntersectArea = untranslateGeometry(relativeGeometry().intersect(sourceRect));
+#else
+    QRectF sourceGeomIntersectArea = untranslateGeometry(relativeGeometry().intersected(sourceRect));
+#endif
 
 	if (sourceGeomIntersectArea.isEmpty())
 	{
@@ -364,7 +368,11 @@ void IconCell::paint(QPainter * painter, const QRectF& sourceRect,qint32 renderO
 	// (its own ICS...from -w/2,-h/2 blahblah... where w = width of the icon object itself; all totally contained
 	//	inside the icon class (like IconBase)
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	QRectF sourceGeomIntersectArea = untranslateGeometry(relativeGeometry().intersect(sourceRect));
+#else
+    QRectF sourceGeomIntersectArea = untranslateGeometry(relativeGeometry().intersected(sourceRect));
+#endif
 
 	if (sourceGeomIntersectArea.isEmpty())
 	{
@@ -505,7 +513,11 @@ void IconRow::recomputeGeometry(bool adjustPosition)
 	{
 		for (int i=0;i<m_iconList.size();++i)
 		{
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 			m_geom = m_geom.unite(m_iconList[i]->geometry().translated(m_iconList[i]->position()));
+#else
+            m_geom = m_geom.united(m_iconList[i]->geometry().translated(m_iconList[i]->position()));
+#endif
 		}
 		if (adjustPosition)
 		{

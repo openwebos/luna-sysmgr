@@ -25,6 +25,13 @@
 #include "Preferences.h"
 #include "Settings.h"
 
+#include <SysMgrDeviceKeydefs.h>
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    #define KEYS Qt
+#else
+    #define KEYS
+#endif
+
 #if defined(MACHINE_BROADWAY)
 #define MINIMUM_BRIGHTNESS 5
 #define MAXIMUM_BRIGHTNESS 100
@@ -203,35 +210,35 @@ void CoreNaviManager::renderGesture(int key) {
 	int brightness = m_brightness;
 
 	switch (key) {
-	case Qt::Key_CoreNavi_Launcher:
-	case Qt::Key_CoreNavi_QuickLaunch:
+    case KEYS::Key_CoreNavi_Launcher:
+    case KEYS::Key_CoreNavi_QuickLaunch:
 		g_debug("%s: rendering launcher / quick launch", __PRETTY_FUNCTION__);
 		m_leds->ledWaterdrop(brightness, 300, 500, 400, 500, false);
 		m_centerGlow = false;
 		break;
-	case Qt::Key_CoreNavi_Back:
+    case KEYS::Key_CoreNavi_Back:
 		g_debug("%s: rendering back", __PRETTY_FUNCTION__);
 		m_leds->ledFade(m_leds->Left(), brightness, 200, 300, 200, 600);
 		m_centerGlow = false;
 		break;
-	case Qt::Key_CoreNavi_Menu:
+    case KEYS::Key_CoreNavi_Menu:
 		g_debug("%s: rendering menu", __PRETTY_FUNCTION__);
 		m_leds->ledFade(m_leds->Right(), brightness, 200, 300, 200, 600);
 		m_centerGlow = false;
 		break;
-	case Qt::Key_CoreNavi_SwipeDown:
+    case KEYS::Key_CoreNavi_SwipeDown:
 		//reverse waterdrop.
 		g_debug("%s: rendering down", __PRETTY_FUNCTION__);
 		m_leds->ledWaterdrop(brightness, 300, 500, 400, 500, true);
 		m_centerGlow = false;
 		break;
-	case Qt::Key_CoreNavi_Previous:
+    case KEYS::Key_CoreNavi_Previous:
 		//Light all three in order
 		g_debug("%s: rendering previous", __PRETTY_FUNCTION__);
 		m_leds->ledFullFade(brightness, 100, 500, 100, 400, 300, false);
 		m_centerGlow = false;
 		break;
-	case Qt::Key_CoreNavi_Next:
+    case KEYS::Key_CoreNavi_Next:
 		//Reverse
 		g_debug("%s: rendering next", __PRETTY_FUNCTION__);
 		m_leds->ledFullFade(brightness, 100, 500, 100, 400, 300, true);
@@ -250,27 +257,27 @@ void CoreNaviManager::renderGestureOnLightbar(int key) {
 	m_lightbarRestoreTimer.stop();
 
 	switch (key) {
-	case Qt::Key_CoreNavi_Launcher:
-	case Qt::Key_CoreNavi_QuickLaunch:
+    case KEYS::Key_CoreNavi_Launcher:
+    case KEYS::Key_CoreNavi_QuickLaunch:
 		g_debug("Rendering Launcher/QuickLaunch - ledWaterdrop");
 		lightbarOff();
 		m_leds->ledWaterdrop(brightness, 200, 400, 300, 400, false);
 		m_lightbarRestoreTimer.start(200 + 400 + 300 + 400, true);
 		break;
-	case Qt::Key_CoreNavi_SwipeDown:
-		//reverse waterdrop.
+    case KEYS::Key_CoreNavi_SwipeDown:
+        //reverse waterdrop.
 		g_debug("%s: rendering down", __PRETTY_FUNCTION__);
 		lightbarOff();
 		m_leds->ledWaterdrop(brightness, 200, 400, 300, 400, true);
 		m_lightbarRestoreTimer.start(200 + 400 + 300 + 400, true);
 		break;
-	case Qt::Key_CoreNavi_Previous:
-	case Qt::Key_CoreNavi_Back:
+    case KEYS::Key_CoreNavi_Previous:
+    case KEYS::Key_CoreNavi_Back:
 		g_debug("%s: rendering previous/back", __PRETTY_FUNCTION__);
 		m_lightbarSwipeLeftTimer.start(100, true);
 		break;
-	case Qt::Key_CoreNavi_Menu:
-	case Qt::Key_CoreNavi_Next:
+    case KEYS::Key_CoreNavi_Menu:
+    case KEYS::Key_CoreNavi_Next:
 		g_debug("%s: rendering next/menu", __PRETTY_FUNCTION__);
 		m_lightbarSwipeRightTimer.start(100, true);
 		break;
@@ -368,16 +375,20 @@ bool CoreNaviManager::handleEvent(QEvent *event) {
 		keyEvent = static_cast<QKeyEvent*> (event);
 	}
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	if (keyEvent && keyEvent->isGestureKey()) {
+#else
+    if (keyEvent && keyEvent->type() == QEvent::Gesture) {
+#endif
 		switch (keyEvent->key()) {
-		case Qt::Key_CoreNavi_QuickLaunch:
-		case Qt::Key_CoreNavi_Launcher:
-		case Qt::Key_CoreNavi_Previous:
-		case Qt::Key_CoreNavi_Next:
-		case Qt::Key_CoreNavi_Back:
-		case Qt::Key_CoreNavi_Menu:
-		case Qt::Key_CoreNavi_SwipeDown:
-		case Qt::Key_CoreNavi_Home:
+        case KEYS::Key_CoreNavi_QuickLaunch:
+        case KEYS::Key_CoreNavi_Launcher:
+        case KEYS::Key_CoreNavi_Previous:
+        case KEYS::Key_CoreNavi_Next:
+        case KEYS::Key_CoreNavi_Back:
+        case KEYS::Key_CoreNavi_Menu:
+        case KEYS::Key_CoreNavi_SwipeDown:
+        case KEYS::Key_CoreNavi_Home:
 			//One shot events
 			if (keyEvent->type() == QEvent::KeyPress) {
 				if (m_hasLightBar) {
@@ -387,7 +398,7 @@ bool CoreNaviManager::handleEvent(QEvent *event) {
 				}
 			}
 			break;
-		case Qt::Key_CoreNavi_Meta:
+        case KEYS::Key_CoreNavi_Meta:
 			if (!m_hasLightBar) {
 				//continous glow
 				if (keyEvent->type() == QEvent::KeyPress) {

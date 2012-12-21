@@ -322,7 +322,11 @@ void MenuWindowManager::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	QPointF pos = event->scenePos();
 	Event ev;
 
-	if(!event->canceled())
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    if(!event->canceled())
+#else
+    if(event->isAccepted())
+#endif
 		ev.type = Event::PenUp;
 	else
 		ev.type = Event::PenCancel;

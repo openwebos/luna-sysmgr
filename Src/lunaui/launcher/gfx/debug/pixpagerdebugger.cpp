@@ -128,7 +128,10 @@ void PixPagerDebugger::dumpPagesAsImagesToDisk(bool includeRegularPages,bool inc
 		if ((pAtlasPage != 0) && (includeAtlasPages == false))
 			continue;		//this is an atlas page, which was requested to be excluded
 
-		infoFileOut << it.key();
+// QT5_TODO: Is there a replacement for this?
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+        infoFileOut << it.key();
+#endif
 		infoFileOut << " size: " << pPage->m_sizeInBytes;
 		infoFileOut << " pinned: " << (pPage->m_pinned ? "true" : "false") << "\n";
 		infoFileOut << " access count: " << pPage->m_accessCounter
@@ -148,7 +151,13 @@ void PixPagerDebugger::dumpPagesAsImagesToDisk(bool includeRegularPages,bool inc
 			for (QHash<QUuid,PixPagerPage::PixmapRects>::const_iterator dir_it = pAtlasPage->m_directory.constBegin();
 					dir_it != pAtlasPage->m_directory.constEnd();++dir_it)
 			{
+
+// QT5_TODO: Is there a replacement for this?
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 				infoFileOut << "\t" << dir_it.key()
+#else
+                infoFileOut << "\t"
+#endif
 						<< " coord: " << dir_it.value().coordinateRect
 						<< " original size: " << dir_it.value().originalSize
 						<< "\n";

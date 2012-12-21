@@ -233,7 +233,11 @@ void PixmapHugeObject::paint(QPainter * painter,const QRect& targetRectInPainter
 		for (qint32 x=sx;x<m_arraySize.width();++x)
 		{
 			//intersect the sourceRect and this pixmap's rect...this is the paint area
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 			QRect intersectRect = sourceRect.intersect(m_pixmapRectCoords[base+x]);
+#else
+            QRect intersectRect = sourceRect.intersected(m_pixmapRectCoords[base+x]);
+#endif
 			if (intersectRect.isEmpty())
 			{
 				break;
@@ -351,8 +355,13 @@ QVector<PixmapHugeObject::FragmentedPaintCoordinate> PixmapHugeObject::paintCoor
 	if (indexStart == indexEnd)
 	{
 		//all inside same tile
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		QRect targetRect = rectInAbsolutePainterCS.intersect(m_pixmapRectCoords[indexStart]).translated(-(m_pixmapRectCoords[indexStart].topLeft()));
 		QRect sourceRect = rectInAbsolutePainterCS.intersect(m_pixmapRectCoords[indexStart]);
+#else
+        QRect targetRect = rectInAbsolutePainterCS.intersected(m_pixmapRectCoords[indexStart]).translated(-(m_pixmapRectCoords[indexStart].topLeft()));
+        QRect sourceRect = rectInAbsolutePainterCS.intersected(m_pixmapRectCoords[indexStart]);
+#endif
 
 		coords << PixmapHugeObject::FragmentedPaintCoordinate(indexStart,
 															sourceRect,
@@ -367,8 +376,13 @@ QVector<PixmapHugeObject::FragmentedPaintCoordinate> PixmapHugeObject::paintCoor
 		{
 			quint32 index = base+x;
 			//intersect the rect with the tile rect
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 			QRect targetRect = rectInAbsolutePainterCS.intersect(m_pixmapRectCoords[index]).translated(-(m_pixmapRectCoords[index].topLeft()));
 			QRect sourceRect = rectInAbsolutePainterCS.intersect(m_pixmapRectCoords[index]);
+#else
+            QRect targetRect = rectInAbsolutePainterCS.intersected(m_pixmapRectCoords[index]).translated(-(m_pixmapRectCoords[index].topLeft()));
+            QRect sourceRect = rectInAbsolutePainterCS.intersected(m_pixmapRectCoords[index]);
+#endif
 			coords << PixmapHugeObject::FragmentedPaintCoordinate(index,
 													sourceRect,
 													targetRect);

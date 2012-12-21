@@ -59,8 +59,14 @@
 #include <QPropertyAnimation>
 #include <QTextLayout>
 #include <QCoreApplication>
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
+#else
+#include <QQmlContext>
+#include <QQmlEngine>
+#endif
 
 #include "cjson/json.h"
 

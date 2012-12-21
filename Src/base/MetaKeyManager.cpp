@@ -36,7 +36,13 @@ bool MetaKeyManager::handleEvent(QEvent* event)
     // Preprocess the event to handle clipboard operations.
     // Filter c, x, v keys from ever getting into webkit so cut/copy/paste work
     // for non-frameworked text edit fields.
+
+// QT5_TODO: Qt::ExternalKeyboardModifier not present in Qt5
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     static Qt::KeyboardModifiers commandModifier = (Qt::ControlModifier|Qt::ExternalKeyboardModifier);
+#else
+    static Qt::KeyboardModifiers commandModifier = (Qt::ControlModifier);
+#endif
     if (keyEvent->modifiers() & Qt::MetaModifier 
         || (keyEvent->modifiers() & commandModifier) == commandModifier)
     { 

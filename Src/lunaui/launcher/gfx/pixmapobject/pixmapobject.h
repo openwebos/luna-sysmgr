@@ -44,7 +44,10 @@ class VirtualCamera;
 class PixmapObject : public QObject
 {
 	Q_OBJECT
-	Q_PROPERTY(QString id READ id WRITE setId)
+// QT5_TODO: Do we need someting to replace this?
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    Q_PROPERTY(QString id READ id WRITE setId)
+#endif
 
 public:
 
