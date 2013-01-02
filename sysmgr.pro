@@ -107,7 +107,7 @@ VPATH += ./Src/lunaui/launcher/test
 
 ####### LAUNCHER ADDITIONS ########
 
-INCLUDEPATH = $$VPATH $$(LUNA_STAGING)/usr/include $$(LUNA_STAGING)/include $$(LUNA_STAGING)/include/luna-sysmgr-common
+INCLUDEPATH = $$VPATH
 
 DEFINES += QT_WEBOS
 

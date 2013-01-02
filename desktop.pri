@@ -73,6 +73,8 @@ INCLUDEPATH += \
 	$$(LUNA_STAGING)/include/sysmgr-ipc \
 	$$(LUNA_STAGING)/include/ime \
 	$$(LUNA_STAGING)/usr/include \
+	$$(LUNA_STAGING)/include \
+	$$(LUNA_STAGING)/include/luna-sysmgr-common \
 
 
 #install
