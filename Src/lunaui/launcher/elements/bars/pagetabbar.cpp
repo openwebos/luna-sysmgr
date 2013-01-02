@@ -64,10 +64,10 @@ uint qHash(const QPointer<PageTab>& p)
 	return 0;
 }
 
-QFont PageTabBar::s_tabLabelFont = QFont();
-
 QFont PageTabBar::staticLabelFontForTabs()
 {
+	static QFont s_tabLabelFont;
+
 	//TODO: specify a proper font
 	static bool fontInitialized = false;
 	if (!fontInitialized)

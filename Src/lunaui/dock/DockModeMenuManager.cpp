@@ -70,6 +70,9 @@ DockModeMenuManager::DockModeMenuManager(int maxWidth, int maxHeight)
 	, m_sysMenu(0)
 	, m_systemMenuOpened(false)
 	, m_appMenuOpened (false)
+    , m_appMenuContainer(0)
+    , m_qmlNotifMenu(0)
+    , m_menuObject(0)
 {
 	setObjectName("DockModeMenuManager");
 
@@ -106,7 +109,8 @@ void DockModeMenuManager::init()
     if(qmlEngine) {
         QQmlContext* context =	qmlEngine->rootContext();
 #endif
-		m_appMenuContainer = new DockModeAppMenuContainer(this, kAppMenuWidth, 0);
+        (void)dockAppContainer();
+
 		if(context) {
 			context->setContextProperty("DockModeAppMenuContainer", m_appMenuContainer);
 		}
@@ -163,6 +167,16 @@ void DockModeMenuManager::init()
 	}
 
 	closeAllMenus();
+}
+
+DockModeAppMenuContainer* DockModeMenuManager::dockAppContainer()
+{
+    if (!m_appMenuContainer) {
+        m_appMenuContainer =
+            new DockModeAppMenuContainer(this, kAppMenuWidth, 0);
+    }
+
+    return m_appMenuContainer;
 }
 
 void DockModeMenuManager::resize(int width, int height)

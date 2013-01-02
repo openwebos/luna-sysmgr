@@ -427,7 +427,6 @@ protected:
 	bool	m_canRequestLauncher;
 
 	//text layout for the label
-	static QFont 			s_iconLabelFont;
 	QColor					m_labelColor;
 	QPoint					m_labelPosICS;				// position in ICS, and corresponds to m_labelGeom
 	QRect					m_labelMaxGeom;			// precomputed by recalculateLabelBoundsForCurrentGeom() , based on current icon size and settings
