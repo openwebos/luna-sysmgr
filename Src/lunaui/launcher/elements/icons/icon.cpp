@@ -65,10 +65,10 @@ const char * IconBase::IconLabelPropertyName = "iconlabel";
 const char * IconBase::IconLastPageVisitedIndexPropertyName = "lastpageindex";
 const char * IconBase::IconTransferContextPropertyName = "transfercontext";
 
-QFont IconBase::s_iconLabelFont = QFont();
-
 QFont IconBase::staticLabelFontForIcons()
 {
+	static QFont s_iconLabelFont = QFont();
+
 	//TODO: specify a proper font
 	static bool fontInitalized = false;
 	if (!fontInitalized)

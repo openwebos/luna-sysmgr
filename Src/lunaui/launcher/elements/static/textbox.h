@@ -102,7 +102,6 @@ protected:
 	QPointer<PixmapObject> m_qp_background;
 
 	//text layout for the label
-	static QFont s_textFont;
 	QPointF					m_innerTextPosICS;				// position in ICS, and corresponds to m_labelGeom
 	QPoint					m_innerTextPosPntCS;			// same, but precomputed to offscreen painter coords relative to 0,0 at top left
 	QRect					m_innerTextMaxGeom;			// precomputed by recalculateLabelBoundsForCurrentGeom()

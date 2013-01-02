@@ -42,10 +42,10 @@
 
 #include "Settings.h"
 
-QFont PixButton::s_standardButtonFont = QFont();
-
 QFont PixButton::staticLabelFontForButtons()
 {
+	static QFont s_standardButtonFont = QFont();
+
 	//TODO: specify a proper font
 	static bool fontInitialized = false;
 	if (!fontInitialized)
@@ -123,7 +123,7 @@ void PixButton::setLabel(const QString& v,quint32 fontSizePx)
 	m_label = v;
 	m_textFont = PixButton::staticLabelFontForButtons();
 	quint32 fontSize = qBound((quint32)2,fontSizePx,(quint32)100);
-	s_standardButtonFont.setPixelSize(fontSize);
+	m_textFont.setPixelSize(fontSize);
 	m_selectedColor = LayoutSettings::settings()->tabBarSelectedTabFontColor;
 	m_unselectedColor = LayoutSettings::settings()->doneButtonFontColor;
 	recalculateLabelBoundsForCurrentGeom();

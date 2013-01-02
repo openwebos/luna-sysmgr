@@ -68,7 +68,6 @@ protected:
 
 protected:
 
-	static QFont			s_standardButtonFont;
 	QString					m_label;
 	QFont					m_textFont;
 	QColor 					m_selectedColor;

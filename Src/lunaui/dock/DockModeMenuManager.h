@@ -52,7 +52,7 @@ public:
 
 	void resize(int width, int height);
 
-	DockModeAppMenuContainer* dockAppContainer() const { return m_appMenuContainer; }
+    DockModeAppMenuContainer* dockAppContainer();
 	QGraphicsObject* getAppMenu() const { return m_menuObject; }
 	StatusBar* statusBar() const { return m_statusBar; }
 	bool isAppMenuOpen() const { return m_appMenuOpened; }

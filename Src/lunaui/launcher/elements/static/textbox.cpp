@@ -33,10 +33,11 @@
 #include "Settings.h"
 
 const char * TextBox::InnerTextPropertyName = "innertext";
-QFont TextBox::s_textFont = QFont();
 
 QFont TextBox::staticLabelFontForTextBox()
 {
+	static QFont s_textFont = QFont();
+
 	//TODO: specify a proper font
 	static bool fontInitalized = false;
 	if (!fontInitalized)
