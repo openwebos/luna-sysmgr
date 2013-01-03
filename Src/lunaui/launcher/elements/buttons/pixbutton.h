@@ -169,7 +169,6 @@ protected:
 	qint32  m_trackingTouchId;
 	// --end touch related
 
-	static QFont			s_standardButtonFont;
 	qint32 					m_touchCount;
 	QString					m_label;
 	QFont					m_textFont;

@@ -165,9 +165,6 @@ private:
 	typedef QList<QPointer<PageTab> >::const_iterator PageTabConstIterator;
 	typedef QList<QPointer<PageTab> >::iterator PageTabIterator;
 	QList<QPointer<PageTab> > m_pageTabs;
-
-	static QFont s_tabLabelFont;
-
 };
 
 

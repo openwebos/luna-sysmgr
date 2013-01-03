@@ -89,7 +89,6 @@ protected:
 
 	//text layout for the label
 	QString 				m_labelString;
-	static QFont 			s_dividerLabelFont;
 	QColor					m_labelFontColor;
 
 	QPoint					m_labelPosICS;				// position in ICS, and corresponds to m_labelGeom

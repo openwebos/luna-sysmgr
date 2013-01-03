@@ -30,10 +30,10 @@
 
 #include "Settings.h"
 
-QFont LabeledButton::s_standardButtonFont = QFont();
-
 QFont LabeledButton::staticLabelFontForButtons()
 {
+	static QFont s_standardButtonFont = QFont();
+
 	//TODO: specify a proper font
 	static bool fontInitialized = false;
 	if (!fontInitialized)

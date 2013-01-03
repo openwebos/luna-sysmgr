@@ -30,10 +30,10 @@
 
 #include "Settings.h"	//for the font spec
 
-QFont HorizontalLabeledDivider::s_dividerLabelFont = QFont();
-
 QFont HorizontalLabeledDivider::staticLabelFontForHDiv()
 {
+	static QFont s_dividerLabelFont = QFont();
+
 	//TODO: specify a proper font
 	static bool fontInitalized = false;
 	if (!fontInitalized)
