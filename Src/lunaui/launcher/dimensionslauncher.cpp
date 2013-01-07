@@ -168,6 +168,8 @@ LauncherObject::LauncherObject(const QRectF& geometry,DimensionsUI * p_mainWindo
 , m_feedbackTimer(this)
 , m_p_pageMovementController(0)
 , m_blockingPageInteractions(false)
+, m_qmlAppInfoDialog(0)
+, m_appInfoDialog(0)
 {
 
 	if (!s_qp_primaryInstance)
