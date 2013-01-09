@@ -50,7 +50,7 @@ CONFIG += no_keywords
 CONFIG += link_pkgconfig
 PKGCONFIG = glib-2.0 gthread-2.0
 
-QT = core gui webkit network
+QT = core gui network
 
 contains(QT_VERSION, "^5.*") {
     QT += quick
@@ -166,7 +166,6 @@ SOURCES = \
 	Logging.cpp \
 	Utils.cpp \
 	Main.cpp \
-	JsUtil.cpp \
 #	JsSysObjectAnimationRunner.cpp \
 	SystemService.cpp \
 	EventThrottler.cpp \
@@ -228,7 +227,6 @@ SOURCES = \
 	DockModeClock.cpp \
 	DockModeMenuManager.cpp \
 	CardDropShadowEffect.cpp \
-#	WebKitKeyMap.cpp \
 	CardGroup.cpp \
 	SingleClickGestureRecognizer.cpp \
 #	BootupAnimation.cpp \
@@ -265,7 +263,6 @@ SOURCES = \
     UiNavigationController.cpp \
     NyxSensorConnector.cpp \
     BackupManager.cpp 
-#    WebKitSensorConnector.cpp
 
 HEADERS = \
 	AmbientLightSensor.h \
@@ -322,7 +319,6 @@ HEADERS = \
 	Time.h \
 	Timer.h \
 #	JsSysObjectAnimationRunner.h \
-	JsUtil.h \
 	ActiveCallBanner.h \
 	BannerMessageEventFactory.h \
 	BannerMessageHandler.h \
@@ -371,7 +367,6 @@ HEADERS = \
 	DockModeClock.h \
 	DockModeMenuManager.h \
 	CardDropShadowEffect.h \
-#	WebKitKeyMap.h \
 	CardGroup.h \
 	SingleClickGestureRecognizer.h \
 	SingleClickGesture.h \
@@ -413,7 +408,6 @@ HEADERS = \
     NyxSensorCommonTypes.h \
     NyxSensorConnector.h \
     BackupManager.h
-#    WebKitSensorConnector.h
 
 contains(QT_VERSION, "^5.*") {
     HEADERS += QmlInputItemQt5.h

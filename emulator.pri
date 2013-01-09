@@ -58,9 +58,6 @@ contains (CONFIG_BUILD, webosemulator) {
 
     INCLUDEPATH += \
             $$(STAGING_INCDIR)/glib-2.0 \
-            $$(STAGING_INCDIR)/webkit \
-            $$(STAGING_INCDIR)/QtWebKit \
-            $$(STAGING_INCDIR)/webkit/npapi \
             $$(STAGING_INCDIR)/sysmgr-ipc \
             $$(STAGING_INCDIR)/freetype2 \
             $$(STAGING_INCDIR)/PmLogLib/IncsPublic \
