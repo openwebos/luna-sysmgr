@@ -41,6 +41,27 @@
 #include <qsocketnotifier.h>
 #include <QObject>
 
+#if defined(USE_KEY_FILTER) || defined(USE_MOUSE_FILTER)
+#include <QApplication>
+#include <QWidget>
+#endif // USE_KEY_FILTER || USE_MOUSE_FILTER
+
+#if defined(USE_KEY_FILTER)
+#include <SysMgrDeviceKeydefs.h>
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+	#define KEYS Qt
+#else
+    #define KEYS
+#endif // QT_VERSION
+
+#include <QKeyEvent>
+#endif // USE_KEY_FILTER
+
+#if defined(USE_MOUSE_FILTER)
+#include <QMouseEvent>
+#endif // USE_MOUSE_FILTER
+
 #define KEYBOARD_TOKEN		"com.palm.properties.KEYoBRD"
 #define KEYBOARD_QWERTY		"z"
 #define KEYBOARD_AZERTY		"w"
@@ -81,6 +102,99 @@
 #define EV_GESTURE      0x06
 #define EV_FINGERID	0x07
 #endif
+
+#if defined(USE_MOUSE_FILTER)
+class HostArmQtMouseFilter : public QObject
+{
+    Q_OBJECT
+
+protected:
+    bool eventFilter(QObject *obj, QEvent *event)
+    {
+        bool handled = false;
+        if(event->type() == QEvent::MouseButtonRelease ||
+           event->type() == QEvent::MouseButtonPress ||
+           event->type() == QEvent::MouseMove)
+        {
+            QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+            Qt::KeyboardModifiers modifiers = mouseEvent->modifiers();
+            if(modifiers & Qt::ControlModifier)
+            {
+                modifiers &= ~Qt::ControlModifier;
+                modifiers |= Qt::AltModifier;
+                mouseEvent->setModifiers(modifiers);
+            }
+            if(event->type() == QEvent::MouseButtonRelease && mouseEvent->button() == Qt::LeftButton)
+            {
+                QWidget *grabber = QWidget::mouseGrabber();
+                if(grabber)
+                {
+                    grabber->releaseMouse();
+                }
+            }
+        }
+        return handled;
+    }
+};
+#endif // USE_MOUSE_FILTER
+
+#if defined(USE_KEY_FILTER)
+class HostArmQtKeyFilter : public QObject
+{
+    Q_OBJECT
+
+protected:
+    bool eventFilter(QObject *obj, QEvent* event)
+    {
+        bool handled = false;
+        if( (event->type() == QEvent::KeyPress) || (event->type() == QEvent::KeyRelease) )
+        {
+            int keyToRemapTo = 0;
+            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+
+            switch(keyEvent->key())
+            {
+                case Qt::Key_Home:
+                    keyToRemapTo = KEYS::Key_CoreNavi_Home;
+                    break;
+                case Qt::Key_Escape:
+                    keyToRemapTo = KEYS::Key_CoreNavi_Back;
+                    break;
+                case Qt::Key_End:
+                    keyToRemapTo = KEYS::Key_CoreNavi_Launcher;
+                    break;
+                case Qt::Key_Pause:
+                    keyToRemapTo = KEYS::Key_Power;
+                    break;
+            }
+            if(keyToRemapTo > 0) {
+                QWidget* window = NULL;
+                window = QApplication::focusWidget();
+                if(window)
+                {
+                    QApplication::postEvent(window, new QKeyEvent(event->type(), keyToRemapTo, 0));
+                }
+                handled = true;
+            }
+        }
+        else if(event->type() == QEvent::MouseButtonRelease)
+        {
+#if defined(USE_MOUSE_FILTER)
+            QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+            if(mouseEvent->button() == Qt::LeftButton)
+            {
+                QWidget *grabber = QWidget::mouseGrabber();
+                if(grabber)
+                {
+                    grabber->releaseMouse();
+                }
+            }
+#endif // USE_MOUSE_FILTER
+        }
+        return handled;
+    }
+};
+#endif // USE_KEY_FILTER
 
 typedef enum
 {
@@ -134,6 +248,13 @@ public:
     virtual bool bluetoothKeyboardActive() const;
 
 protected:
+
+#if defined(USE_KEY_FILTER)
+    HostArmQtKeyFilter* m_keyFilter;
+#endif // USE_KEY_FILTER
+#if defined(USE_MOUSE_FILTER)
+    HostArmQtMouseFilter* m_mouseFilter;
+#endif
 
 	QSocketNotifier* m_nyxLightNotifier;
 	QSocketNotifier* m_nyxProxNotifier;

@@ -112,6 +112,12 @@ HostArm::HostArm() :
 	, m_nyxLedControlKeypadAndDisplay(0)
     , m_bluetoothKeyboardActive(false)
     , m_OrientationSensor(0)
+#if defined(USE_KEY_FILTER)
+    , m_keyFilter(0)
+#endif // USE_KEY_FILTER
+#if defined(USE_MOUSE_FILTER)
+    , m_mouseFilter(0)
+#endif // USE_MOUSE_FILTER
 {
 #if defined(HAS_HIDLIB)
 	m_hwRev = HidGetHardwareRevision();
@@ -128,6 +134,13 @@ HostArm::~HostArm()
 	shutdownInput();
 
 	nyx_deinit();
+
+#if defined(USE_KEY_FILTER)
+    delete m_keyFilter;
+#endif
+#if defined(USE_MOUSE_FILTER)
+    delete m_mouseFilter;
+#endif
 }
 
 void HostArm::init(int w, int h)
@@ -503,6 +516,22 @@ void HostArm::setCentralWidget(QWidget* view)
 {
 	view->setWindowFlags(Qt::CustomizeWindowHint |
 						 Qt::WindowStaysOnTopHint);
+#if defined(USE_KEY_FILTER)
+    m_keyFilter = new HostArmQtKeyFilter;
+    qApp->installEventFilter(m_keyFilter);
+#endif // USE_KEY_FILTER
+
+#if defined(USE_MOUSE_FILTER)
+    m_mouseFilter = new HostArmQtMouseFilter;
+    QGraphicsView* gView = qobject_cast<QGraphicsView *>(view);
+    if(gView)
+    {
+        gView->viewport()->installEventFilter(m_mouseFilter);
+    } else {
+        view->installEventFilter(m_mouseFilter);
+    }
+#endif // USE_MOUSE_FILTER
+
 	QApplication::setActiveWindow(view);
 	view->show();    
 }
