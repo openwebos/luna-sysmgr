@@ -709,8 +709,8 @@ void LockWindow::slotWindowUpdated(Window* win)
 		return;
 
 	switch (win->type()) {
-	case Window::Type_PopupAlert:
-	case Window::Type_BannerAlert:
+	case WindowType::Type_PopupAlert:
+	case WindowType::Type_BannerAlert:
 		{
 			AlertWindow* alert = (AlertWindow*)win;
 			if(!alert->isTransientAlert()) {

@@ -56,7 +56,7 @@ DimensionsUI * DimensionsUI::primaryInstance()
 }
 
 DimensionsUI::DimensionsUI(quint32 width,quint32 height)
-: Window(Window::Type_QtNativePaintWindow,width,height)
+: Window(WindowType::Type_QtNativePaintWindow,width,height)
 {
 
 	if (!s_qp_primaryInstance)
@@ -269,7 +269,7 @@ Quicklauncher * Quicklauncher::primaryInstance()
 }
 
 Quicklauncher::Quicklauncher(quint32 width,quint32 height)
-: Window(Window::Type_QtNativePaintWindow,width,height)
+: Window(WindowType::Type_QtNativePaintWindow,width,height)
     , m_bgOpacity(1.0)
 {
 

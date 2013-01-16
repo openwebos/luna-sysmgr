@@ -68,7 +68,7 @@ private:
 };
 
 DockModeClockWindow::DockModeClockWindow(const QPixmap& pixmap, DockModeWindowManager* dm, int zValue)
-	: DockModeWindow (Window::Type_DockModeWindow, pixmap)
+	: DockModeWindow (WindowType::Type_DockModeWindow, pixmap)
 {
 	setFlag (QGraphicsItem::ItemHasNoContents);
 	setBoundingRect (pixmap.width(), pixmap.height());

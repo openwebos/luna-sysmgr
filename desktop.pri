@@ -47,9 +47,6 @@ CONFIG_BUILD += opengl
 
 #CONFIG_BUILD += openglcomposited
 
-SOURCES += HostQtDesktop.cpp FlickGestureRecognizer.cpp
-HEADERS += HostQtDesktop.h FlickGestureRecognizer.h FlickGesture.h
-
 LIBS += \
 	-Wl,-rpath $$(LUNA_STAGING)/lib \
 	-L$$(LUNA_STAGING)/lib \

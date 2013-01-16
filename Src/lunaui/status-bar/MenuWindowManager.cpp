@@ -170,7 +170,7 @@ void MenuWindowManager::resize(int width, int height)
 
 		for ( it=cachedWindows->begin() ; it != cachedWindows->end(); it++ ) {
 			Window* w = *it;
-			if(w->type() == Window::Type_Menu) {
+			if(w->type() == WindowType::Type_Menu) {
 				((MenuWindow*)w)->resizeEventSync(width, height - Settings::LunaSettings()->positiveSpaceTopPadding);
 			}
 		}
@@ -182,7 +182,7 @@ void MenuWindowManager::addWindow(Window* win)
 	if (m_winArray.contains(win))
 		return;
 
-	if (win->type() == Window::Type_StatusBar)
+	if (win->type() == WindowType::Type_StatusBar)
 		return;
 
 	win->setParentItem(this);

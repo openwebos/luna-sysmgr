@@ -39,7 +39,7 @@ Q_OBJECT
 
 public:
 
-	CardHostWindow(Window::Type type, HostWindowData* data, IpcClientHost* clientHost);
+    CardHostWindow(WindowType::Type type, HostWindowData* data, IpcClientHost* clientHost);
 	virtual ~CardHostWindow();
 
 	virtual void resizeEvent(int w, int h);

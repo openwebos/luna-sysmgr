@@ -28,7 +28,7 @@
 #include "IpcClientHost.h"
 
 MenuWindow::MenuWindow(HostWindowData* data, IpcClientHost* clientHost)
-	: HostWindow(Window::Type_Menu, data, clientHost)
+	: HostWindow(WindowType::Type_Menu, data, clientHost)
 {
 }
 

@@ -41,7 +41,7 @@ std::map<int, int> VolumeControlAlertWindow::s_bitmapOffsetMapping;
 VolumeControlAlertWindow::VolumeControlAlertWindow(int width, int height,
 												   bool hasAlpha, VolumeControlType drawWhat,
 												   int initialVolume)
-	: AlertWindow(Window::Type_BannerAlert, width, height, hasAlpha)
+	: AlertWindow(WindowType::Type_BannerAlert, width, height, hasAlpha)
 	, m_drawWhat(drawWhat)
 	, m_volumeLevel(initialVolume)
 {

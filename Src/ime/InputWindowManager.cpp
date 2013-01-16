@@ -69,7 +69,7 @@ void InputWindowManager::init()
     m_activeIME = m_imeMgr.createPreferredIME(
                 SystemUiController::instance()->currentUiWidth(),
                 SystemUiController::instance()->currentUiHeight(),
-                dpi, Preferences::instance()->locale());
+                dpi, LocalePreferences::instance()->locale());
 
 	Q_ASSERT(m_activeIME);
 

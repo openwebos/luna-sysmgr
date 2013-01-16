@@ -1741,7 +1741,7 @@ void OverlayWindowManager::addWindow(Window* win)
 {
 	WindowManagerBase::addWindow(win);
 
-	if( win->type() == Window::Type_Launcher )
+	if( win->type() == WindowType::Type_Launcher )
 	{
 		m_universalSearchWin = win;
 
@@ -1768,7 +1768,7 @@ void OverlayWindowManager::addWindow(Window* win)
         // IME Support: Set universal search window so SysUi can track it...
 		SystemUiController::instance()->setUniversalSearchWindow(m_universalSearchWin);
 	}
-	else if ( win->type() == Window::Type_QtNativePaintWindow )
+	else if ( win->type() == WindowType::Type_QtNativePaintWindow )
 	{
 		win->setZValue(Z_LAUNCHER_WIN);
 		win->setPos(0,0);

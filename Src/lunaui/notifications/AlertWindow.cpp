@@ -42,7 +42,7 @@
 #include "Preferences.h"
 #include "Settings.h"
 #include "SoundPlayerPool.h"
-#include "Utils.h"
+#include "LsmUtils.h"
 #include "WebAppMgrProxy.h"
 #include "WindowServer.h"
 #include "IpcClientHost.h"
@@ -56,7 +56,7 @@
 static const std::string kPhoneAppId 		= "com.palm.app.phone";
 static const std::string kIncomingCallAlert = "incoming";
 
-AlertWindow::AlertWindow(Window::Type winType, int width, int height, bool hasAlpha)
+AlertWindow::AlertWindow(WindowType::Type winType, int width, int height, bool hasAlpha)
 	: HostWindow(winType, width, height, hasAlpha)
 	, m_player(0)
 	, m_playedSound(false)
@@ -65,7 +65,7 @@ AlertWindow::AlertWindow(Window::Type winType, int width, int height, bool hasAl
 }
 
 // for IPC windows
-AlertWindow::AlertWindow(Window::Type winType, HostWindowData* data,
+AlertWindow::AlertWindow(WindowType::Type winType, HostWindowData* data,
 		                 IpcClientHost* clientHost)
 	: HostWindow(winType, data, clientHost)
 	, m_player(0)

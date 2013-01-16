@@ -59,8 +59,7 @@ Preferences* Preferences::instance()
 }
 
 Preferences::Preferences()
-	: m_currentTimeFormat("HH12")
-	, m_showAlertsWhenLocked(true)
+    : m_showAlertsWhenLocked(true)
 	, m_ledThrobberEnabled(true)
 	, m_playFeedbackSounds(true)
 	, m_sysUiNoHomeButtonMode(true)
@@ -89,30 +88,6 @@ Preferences::Preferences()
 
 Preferences::~Preferences()
 {
-}
-
-std::string Preferences::locale() const
-{
-	MutexLocker locker(&m_mutex);
-	return m_locale;
-}
-
-std::string Preferences::localeRegion() const
-{
-	MutexLocker locker(&m_mutex);
-	return m_localeRegion;
-}
-
-std::string Preferences::phoneRegion() const
-{
-	MutexLocker locker(&m_mutex);
-	return m_phoneRegion;
-}
-
-std::string Preferences::timeFormat() const
-{
-	MutexLocker locker(&m_mutex);
-	return m_currentTimeFormat;	
 }
 
 uint32_t Preferences::lockTimeout() const
@@ -327,13 +302,6 @@ void Preferences::setLockTimeout(uint32_t timeout)
 
 void Preferences::init()
 {
-	m_locale = s_defaultLocale;
-	m_localeRegion = s_defaultLocaleRegion;
-	m_phoneRegion = s_defaultPhoneRegion;
-
-	// We open the preferences database and read the locale setting.
-	// avoid waiting for the system-service to come up
-	// and we waiting synchronously to get the locale value
 
 	sqlite3* prefsDb = 0;
 	sqlite3_stmt* statement = 0;
@@ -341,7 +309,6 @@ void Preferences::init()
 	json_object* label = 0;
 	json_object* json = 0;
 	json_object* subobj = 0;
-	std::string localeCountryCode;
 	
 	int ret = sqlite3_open(s_prefsDbPath, &prefsDb);
 	if (ret) {
@@ -366,103 +333,8 @@ void Preferences::init()
 	else {
 		setLockTimeout(m_lockTimeout);
 	}
-
-	sqlite3_finalize(statement);
-
-	// immediately read locale
-	ret = sqlite3_prepare(prefsDb, "SELECT * FROM Preferences WHERE KEY='locale'",
-						  -1, &statement, &tail);
-	if (ret) {
-		luna_critical(s_logChannel, "Failed to prepare query");
-		goto Done;
-	}
-
-	ret = sqlite3_step(statement);
-	if (ret == SQLITE_ROW) {
-
-		std::string languageCode, countryCode;
-
-		const char* val = (const char*) sqlite3_column_text(statement, 1);
-		if (!val)
-			goto Done;
-
-		label = 0;		
-		json = json_tokener_parse(val);
-		if (!json || is_error(json))
-			goto Done;
-
-		label = json_object_object_get(json, "languageCode");
-		if (!label || is_error(label))
-			goto Done;
-		languageCode = json_object_get_string(label);
-
-		label = json_object_object_get(json, "countryCode");
-		if (!label || is_error(label))
-			goto Done;
-		countryCode = json_object_get_string(label);
-
-		localeCountryCode = countryCode;
-
-		m_locale = languageCode + "_" + countryCode;
-
-		subobj = json_object_object_get(json, "phoneRegion");
-
-		if (subobj && !is_error(subobj)){
-			label = json_object_object_get(subobj, "countryCode");
-
-			if (label && !is_error(label)){
-				m_phoneRegion = json_object_get_string(label);
-			}
-		}
-
-		json_object_put(json);
-		json = 0;
-	}
-
-	sqlite3_finalize(statement);
-	
-	// immediately read regon
-	ret = sqlite3_prepare(prefsDb, "SELECT * FROM Preferences WHERE KEY='region'",
-						  -1, &statement, &tail);
-	if (ret) {
-		luna_critical(s_logChannel, "Failed to prepare query");
-		goto Done;
-	}
-
-	ret = sqlite3_step(statement);
-	if (ret == SQLITE_ROW) {
-
-		const char* val = (const char*) sqlite3_column_text(statement, 1);
-		if (!val)
-			goto Done;
-
-		label = 0;		
-		json = json_tokener_parse(val);
-		if (!json || is_error(json))
-			goto Done;
-
-		label = json_object_object_get(json, "countryCode");
-		if (!label || is_error(label))
-			goto Done;
-		m_localeRegion = json_object_get_string(label);
-
-		json_object_put(json);
-		json = 0;
-	}
 	
 Done:
-
-	QLocale myLocale (m_locale.c_str());
-	g_message ("%s: setting locale country %d language %d", __PRETTY_FUNCTION__,
-			myLocale.country(), myLocale.language());
-	QLocale::setDefault (myLocale);
-
-	// locale region defaults to locale country code
-	if (m_localeRegion.empty())
-		m_localeRegion = localeCountryCode;
-
-	if (m_phoneRegion.empty())
-		m_phoneRegion = m_localeRegion;
 
 	if (json && !is_error(json))
 		json_object_put(json);
@@ -539,23 +411,12 @@ bool Preferences::serverConnectCallback(LSHandle *sh, LSMessage *message, void *
 		bool ret = false;
 		LSError error;
 		LSErrorInit(&error);
-		
-		ret = LSCall(Preferences::instance()->m_lsHandle,
-					 "palm://com.palm.systemservice/getPreferences", "{\"subscribe\":true, \"keys\": [ \"locale\" ]}",
-					 getPreferencesCallback, prefObjPtr, NULL, &error);
-		if (!ret) {
-			luna_critical(s_logChannel, "Failed in calling palm://com.palm.systemservice/getPreferences: %s",
-						  error.message);
-			LSErrorFree(&error);
-		}
 
 		ret = LSCall(Preferences::instance()->m_lsHandle,
 					 "palm://com.palm.systemservice/getPreferences",
 					 "{\"subscribe\":true, \"keys\": [ \"ringtone\",\
 													   \"alerttone\", \
 													   \"notificationtone\", \
-													   \"region\", \
-													   \"timeFormat\", \
 													   \"wallpaper\" , \
 													   \"dockwallpaper\" , \
 													   \"systemSounds\" , \
@@ -655,93 +516,6 @@ bool Preferences::getPreferencesCallback(LSHandle *sh, LSMessage *message, void 
             }
         }
 	}
-
-	value = json_object_object_get(json, "locale");
-	if ((value) && (!is_error(value))) {
-		
-		label = json_object_object_get(value, "languageCode");
-		if ((label) && (!is_error(label))) {
-			languageCode = json_object_get_string(label);
-		}
-
-		label = json_object_object_get(value, "countryCode");
-		if ((label) && (!is_error(label))) {
-			countryCode = json_object_get_string(label);
-		}
-
-		subobject = json_object_object_get(value, "phoneRegion");
-		if ((subobject) && (!is_error(subobject))) {
-			label = json_object_object_get(subobject, "countryCode");
-			if ((label) && (!is_error(label))) {
-				newPhoneRegion = json_object_get_string(label);
-			}
-		}
-
-		newLocale = languageCode;
-		newLocale += "_";
-		newLocale += countryCode;
-
-		if ((newLocale != prefObjPtr->m_locale && newLocale != "_") ||
-			(!newPhoneRegion.empty() && newPhoneRegion != prefObjPtr->m_phoneRegion )) {
-
-			prefObjPtr->m_mutex.lock();
-			if (newLocale != "_") {
-				prefObjPtr->m_locale = newLocale;
-			}
-			if (!newPhoneRegion.empty()){
-				prefObjPtr->m_phoneRegion =  newPhoneRegion;
-			}
-			prefObjPtr->m_mutex.unlock();
-
-			// Don't shutdown sysmgr for locale changes in minimal mode
-			if (Settings::LunaSettings()->uiType != Settings::UI_MINIMAL) {
-
-				VirtualKeyboardPreferences::instance().localeChanged();
-
-				g_warning("locale changed: %s (%s). shutting down sysmgr",
-						  newLocale.empty() ? "" : newLocale.c_str(),
-						  prefObjPtr->m_locale.empty() ? "" : prefObjPtr->m_locale.c_str());
-
-				// Locale has changed. SysMgr needs to be restarted
-				exit(0);
-			}
-			else
-			{   // first use: set the default keyboard layout based on the new locale
-				VirtualKeyboardPreferences::instance().applyFirstUseSettings();
-
-				// reload localization strings to get updated translations of non-cached strings
-				Localization::instance()->loadLocalizedStrings();
-			}
-		}
-	}
-
-	value = json_object_object_get(json, "region");
-	if (value && !is_error(value)) {
-
-		label = json_object_object_get(value, "countryCode");
-		if (label && !is_error(label))
-			newLocaleRegion = json_object_get_string(label);
-
-		if (!newLocaleRegion.empty() && newLocaleRegion != prefObjPtr->m_localeRegion) {
-
-			// Don't shutdown sysmgr for locale changes in minimal mode
-			if (Settings::LunaSettings()->uiType != Settings::UI_MINIMAL) {
-						
-				g_warning("region changed: %s (%s). shutting down sysmgr",
-										  newLocaleRegion.empty() ? "" : newLocaleRegion.c_str(),
-										  prefObjPtr->m_localeRegion.empty() ? "" : prefObjPtr->m_localeRegion.c_str());
-
-				prefObjPtr->m_mutex.lock();
-				prefObjPtr->m_localeRegion = newLocaleRegion;
-				prefObjPtr->m_mutex.unlock();
-
-
-			
-				// Region has changed. SysMgr needs to be restarted
-				exit(0);
-			}
-		}
-	}
 	
 	root_label = json_object_object_get(json, "ringtone");
 	if ((root_label) && (!is_error(root_label))) {
@@ -770,15 +544,6 @@ bool Preferences::getPreferencesCallback(LSHandle *sh, LSMessage *message, void 
 		if ((label) && (!is_error(label))) {
 			if (prefObjPtr)
 				prefObjPtr->m_currentNotificationtoneFile = json_object_get_string(label);
-		}
-	}
-		
-	label = json_object_object_get(json, "timeFormat");
-	if (label && !is_error(label)) {
-		if (prefObjPtr) {
-			MutexLocker locker(&prefObjPtr->m_mutex);
-			prefObjPtr->m_currentTimeFormat = json_object_get_string(label);
-			Q_EMIT prefObjPtr->signalTimeFormatChanged(prefObjPtr->m_currentTimeFormat.c_str());
 		}
 	}
 

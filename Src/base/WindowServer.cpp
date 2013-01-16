@@ -258,7 +258,7 @@ static WindowServerOverlay* s_overlay = 0;
 Runtime::Runtime(QObject* parent)
 	: QObject(parent), m_orientation(Orientation_Portrait), m_twelveHourClock (true)
 {
-	connect (Preferences::instance(), SIGNAL(signalTimeFormatChanged(const char*)),
+    connect (LocalePreferences::instance(), SIGNAL(signalTimeFormatChanged(const char*)),
 			this, SLOT(slotTimeFormatChanged (const char*)));
 }
 
@@ -286,7 +286,7 @@ void Runtime::setOrientation (OrientationEvent::Orientation orient)
 void Runtime::slotTimeFormatChanged (const char* format)
 {
 	bool oldSetting = m_twelveHourClock;
-	m_twelveHourClock = (Preferences::instance()->timeFormat() == "HH12");
+    m_twelveHourClock = (LocalePreferences::instance()->timeFormat() == "HH12");
 	if (oldSetting != m_twelveHourClock)
 		Q_EMIT clockFormatChanged();
 }
@@ -1292,10 +1292,10 @@ void WindowServer::setWindowProperties(Window* win, const WindowProperties& prop
 		return;
 
 	switch (win->type()) {
-	case (Window::Type_Card):
-	case (Window::Type_ChildCard):
-	case (Window::Type_Emergency):
-	case (Window::Type_Dashboard):
+    case (WindowType::Type_Card):
+    case (WindowType::Type_ChildCard):
+    case (WindowType::Type_Emergency):
+    case (WindowType::Type_Dashboard):
 		break;
 	default:
 		return;

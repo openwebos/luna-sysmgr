@@ -41,6 +41,8 @@ pbnjson::JValue jsonPair(const char * key1, const char * value1, const char * ke
 
 VirtualKeyboardPreferences::VirtualKeyboardPreferences() : mTapSounds(true), mSpaces2period(true), mKeyboardSize(0), mSettingsReceived(false), mPrefsReceived(false), mVirtualKeyboard(NULL)
 {	// will be created in every sysmgr based process. Don't do anything expensive here!
+    // take care of the locale change propagation to this class
+    connect(LocalePreferences::instance(), SIGNAL(prefsLocaleChanged()), SLOT(localeChanged()));
 }
 
 void VirtualKeyboardPreferences::applyInitSettings(VirtualKeyboard * keyboard)
@@ -275,7 +277,7 @@ VirtualKeyboardPreferences::SKeyboardCombo	VirtualKeyboardPreferences::getDefaul
 {
 	std::string	locale;
 	SKeyboardCombo	combo;
-	Preferences * prefs = Preferences::instance();
+    LocalePreferences * prefs = LocalePreferences::instance();
 	if (prefs)
 		locale = prefs->locale();
 	const char * language = NULL;

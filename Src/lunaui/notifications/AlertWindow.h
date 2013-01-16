@@ -38,8 +38,8 @@ class AlertWindow : public HostWindow
 {
 public:
 
-	AlertWindow(Type type, int width, int height, bool hasAlpha);
-	AlertWindow(Type type, HostWindowData* window, IpcClientHost* clientHost=0);
+    AlertWindow(WindowType::Type type, int width, int height, bool hasAlpha);
+    AlertWindow(WindowType::Type type, HostWindowData* window, IpcClientHost* clientHost=0);
 	virtual ~AlertWindow();
 
 	virtual void onMessageReceived(const PIpcMessage& msg);

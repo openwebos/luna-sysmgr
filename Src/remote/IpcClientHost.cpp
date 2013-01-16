@@ -154,11 +154,11 @@ void IpcClientHost::onPrepareAddWindow(int key, int type, int width, int height)
 	// 1 << 2: Emergency
 	switch (type) {
 	case 1 << 2:
-		type = Window::Type_Emergency;
+		type = WindowType::Type_Emergency;
 		break;
 	case 1 << 1:
 	default:
-		type = Window::Type_Card;
+		type = WindowType::Type_Card;
 		break;
 	}
 
@@ -172,9 +172,9 @@ void IpcClientHost::onPrepareAddWindow(int key, int type, int width, int height)
 
 	CardHostWindow* win = 0;
     if (isNativeQtWindow)
-        win = new QtHostWindow(static_cast<Window::Type>(type), data, this);
+        win = new QtHostWindow(static_cast<WindowType::Type>(type), data, this);
     else
-        win = new CardHostWindow(static_cast<Window::Type>(type), data, this);
+        win = new CardHostWindow(static_cast<WindowType::Type>(type), data, this);
 
 	// Set the appId to be the name.
 	if(0 < m_name.length()) {
@@ -390,7 +390,7 @@ void IpcClientHost::closeWindow(Window* w)
     }
 
 	// FIXME: the nuking decision should not be inferred based on window type
-	if ((w->type() != Window::Type_Emergency) && (m_closedWinSet == m_winSet)) {
+	if ((w->type() != WindowType::Type_Emergency) && (m_closedWinSet == m_winSet)) {
 		// All windows closed. Its ok to ask this process to be nuked
 		IpcServer::instance()->addProcessToNukeList(m_pid);
 	}

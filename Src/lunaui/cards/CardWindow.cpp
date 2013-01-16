@@ -94,7 +94,7 @@ QVariant positionInterpolator(const CardWindow::Position &start, const CardWindo
 	return qVariantFromValue(CardWindow::Position(start + (end - start) * progress));
 }
 
-CardWindow::CardWindow(Window::Type type, HostWindowData* data, IpcClientHost* clientHost)
+CardWindow::CardWindow(WindowType::Type type, HostWindowData* data, IpcClientHost* clientHost)
 	: HostWindow(type, data, clientHost)
 	, m_prepareAddedToWm(false)
 	, m_addedToWm(false)
@@ -135,7 +135,7 @@ CardWindow::CardWindow(Window::Type type, HostWindowData* data, IpcClientHost* c
     init();
 }
 
-CardWindow::CardWindow(Window::Type type, const QPixmap& pixmap)
+CardWindow::CardWindow(WindowType::Type type, const QPixmap& pixmap)
 	: HostWindow(type, pixmap.width(), pixmap.height(), false)
 	, m_prepareAddedToWm(false)
 	, m_addedToWm(false)
@@ -188,7 +188,7 @@ void CardWindow::init()
 	connect(IMEController::instance(), SIGNAL(signalShowIME()), SLOT(slotShowIME()));
 	connect(IMEController::instance(), SIGNAL(signalHideIME()), SLOT(slotHideIME()));
 
-	if (Window::Type_ModalChildWindowCard == type()) {
+    if (WindowType::Type_ModalChildWindowCard == type()) {
 		m_ModalWindowEndY = 0;
 		m_modalWindowShrinkHeight = 0;
 		m_fRecomputeInitPositionsValues = true;
@@ -214,7 +214,7 @@ CardWindow::~CardWindow()
 
 	delete m_loadingAnim;
 
-	if(m_maximized && Window::Type_ModalChildWindowCard != type()) {
+    if(m_maximized && WindowType::Type_ModalChildWindowCard != type()) {
 		// disable the direct rendering request for this window with SystemUiController
 		SystemUiController::instance()->setDirectRenderingForWindow(SystemUiController::CARD_WINDOW_MANAGER, this, false);
 	}
@@ -681,7 +681,7 @@ void CardWindow::resizeEventSync(int w, int h)
 {
 	// Ignore this check if we are modal window.
 
-	if(Window::Type_ModalChildWindowCard != type()) {
+    if(WindowType::Type_ModalChildWindowCard != type()) {
 		if(SystemUiController::instance()->isUiRotating())
 			return;
 	}
@@ -692,7 +692,7 @@ void CardWindow::resizeEventSync(int w, int h)
 
 		int dummy = 0;
 
-		if(Window::Type_ModalChildWindowCard != type()) {
+        if(WindowType::Type_ModalChildWindowCard != type()) {
 			if (m_adjustmentAngle == 90 || m_adjustmentAngle == -90){
 				if (m_channel)
 					m_channel->sendSyncMessage(new View_SyncResize(routingId(), h, w, false, &dummy));
@@ -1199,7 +1199,7 @@ bool CardWindow::coversScreenFully() const
 void CardWindow::enableFullScreen()
 {
 	// Modal Cards cannot be full screen - ever.
-	if (Window::Type_ModalChildWindowCard == type()) {
+    if (WindowType::Type_ModalChildWindowCard == type()) {
 		m_fullScreenEnabled = true;
 		return;
 	}
@@ -1327,7 +1327,7 @@ bool CardWindow::delayPrepare()
 
 void CardWindow::startLoadingOverlay()
 {
-	if (!m_loadingAnim && type() == Window::Type_Card) {
+    if (!m_loadingAnim && type() == WindowType::Type_Card) {
 
 		m_loadingAnim = new CardLoading(this);
 		connect(m_loadingAnim, SIGNAL(signalLoadingFinished()),
@@ -1407,7 +1407,7 @@ gboolean CardWindow::loadingTimeout(gpointer data)
 		else {
 
 			// still waiting for the window to get added
-			if(Window::Type_ModalChildWindowCard != win->type())
+            if(WindowType::Type_ModalChildWindowCard != win->type())
 				win->startLoadingTimer(AS(cardAddMaxDuration));
 			else
 				win->startLoadingTimer(AS(modalCardAddMaxDuration));
@@ -1441,7 +1441,7 @@ void CardWindow::setVisibleDimensions(int width, int height)
 {
 	if(!m_isResizing && m_flipsQueuedUp) {
 		if (m_data && !isHost() &&
-			(type() != Window::Type_ModalChildWindowCard) && (m_appFixedOrientation == Event::Orientation_Invalid)) {
+            (type() != WindowType::Type_ModalChildWindowCard) && (m_appFixedOrientation == Event::Orientation_Invalid)) {
 			// safeguard code in case the data buffer and the bounding rect dimensions get out of sync
 			bool isDataLandscape = m_data->width() >= m_data->height();
 			bool newDimLandscape = width >= height;
@@ -1478,7 +1478,7 @@ void CardWindow::setVisibleDimensions(int width, int height)
 
 	m_paintPath = QPainterPath();
 
-	if ((m_adjustmentAngle != 90 && m_adjustmentAngle != -90) || this->type() == Window::Type_ModalChildWindowCard) {
+    if ((m_adjustmentAngle != 90 && m_adjustmentAngle != -90) || this->type() == WindowType::Type_ModalChildWindowCard) {
                 m_paintPath.addRoundedRect(boundingRect(), 8, 6); //where you alter the loading rect stuff
 	} else {
 		m_paintPath.addRoundedRect(QRectF(m_boundingRect.y(), m_boundingRect.x(), m_boundingRect.height(), m_boundingRect.width()), 25, 25);
@@ -1555,7 +1555,7 @@ void CardWindow::paintBase(QPainter* painter, bool maximized)
                 initializeRoundedCornerStage();
 
                 // We don't need this for the modal card
-                if(Window::Type_ModalChildWindowCard != type())
+                if(WindowType::Type_ModalChildWindowCard != type())
                     m_roundedCornerShaderStage->setOnPainter(painter);
 
                 painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
@@ -1565,7 +1565,7 @@ void CardWindow::paintBase(QPainter* painter, bool maximized)
                 }
 
                 // If we are modal card and have resized, then our position is not (-w/2, -h/2)
-                if((Window::Type_ModalChildWindowCard != type()) || (Window::Type_ModalChildWindowCard == type() && boundingRect().height() == Settings::LunaSettings()->modalWindowHeight)) {
+                if((WindowType::Type_ModalChildWindowCard != type()) || (WindowType::Type_ModalChildWindowCard == type() && boundingRect().height() == Settings::LunaSettings()->modalWindowHeight)) {
                     if (m_adjustmentAngle == 90 || m_adjustmentAngle == -90) {
                         painter->drawPixmap(-brect.height()/2, -brect.width()/2, *pix);
                     } else {
@@ -1586,7 +1586,7 @@ void CardWindow::paintBase(QPainter* painter, bool maximized)
                 }
 
                 // We don't need this for the modal card
-                if(Window::Type_ModalChildWindowCard != type())
+                if(WindowType::Type_ModalChildWindowCard != type())
                     m_roundedCornerShaderStage->removeFromPainter(painter);
 
             } else {
@@ -1764,7 +1764,7 @@ void CardWindow::setModalChild(CardWindow* w)
 
 void CardWindow::setModalParent(CardWindow* parent)
 {
-	if (Window::Type_ModalChildWindowCard != type() || NULL == parent)
+    if (WindowType::Type_ModalChildWindowCard != type() || NULL == parent)
 		return;
 
 	// Set the parent item for the modal card.
@@ -1776,7 +1776,7 @@ void CardWindow::setModalParent(CardWindow* parent)
 
 QPointF CardWindow::positionModalWindowWrpParent(int spaceAvailableAbove, int windowHeight)
 {
-	if(!m_modalParent || Window::Type_ModalChildWindowCard != type())
+    if(!m_modalParent || WindowType::Type_ModalChildWindowCard != type())
 		return QPointF(0,0);
 
 	// This assumes that we have the entire +ve space and we position the modal accordingly
@@ -2011,7 +2011,7 @@ bool CardWindow::canPositionModalAtY(int yLoc, bool increasePositiveSpace, int& 
 
 void CardWindow::computeModalWindowPlacementInf(int newPosSpace)
 {
-	if (Window::Type_ModalChildWindowCard != type())
+    if (WindowType::Type_ModalChildWindowCard != type())
 		return;
 
 	SystemUiController* sysUi = SystemUiController::instance();
@@ -2162,7 +2162,7 @@ void CardWindow::resizeModalCard()
 }
 
 void CardWindow::positiveSpaceAboutToChange(const QRect& r, bool fullScreen) {
-	if (Window::Type_ModalChildWindowCard != this->type())
+    if (WindowType::Type_ModalChildWindowCard != this->type())
 		updateDirectRenderingPosition();
 	else {
 		m_posSpChangeNotificationState = GotPositiveSpaceAboutToChangeNotification;
@@ -2175,7 +2175,7 @@ void CardWindow::positiveSpaceAboutToChange(const QRect& r, bool fullScreen) {
 }
 
 void CardWindow::positiveSpaceChanged(const QRect& r) {
-	if (Window::Type_ModalChildWindowCard != this->type())
+    if (WindowType::Type_ModalChildWindowCard != this->type())
 		updateDirectRenderingPosition();
 	else {
 
@@ -2213,7 +2213,7 @@ void CardWindow::positiveSpaceChanged(const QRect& r) {
 
 void CardWindow::positiveSpaceChangeFinished(const QRect& r)
 {
-	if (Window::Type_ModalChildWindowCard != this->type())
+    if (WindowType::Type_ModalChildWindowCard != this->type())
 		updateDirectRenderingPosition();
 	else {
 
@@ -2416,7 +2416,7 @@ void CardWindow::initializeRoundedCornerStage()
 	height = m_boundingRect.height();
 
 	if (!m_isResizing && !m_flipsQueuedUp && m_data && !isHost() &&
-		(type() != Window::Type_ModalChildWindowCard) && (m_appFixedOrientation == Event::Orientation_Invalid)) {
+        (type() != WindowType::Type_ModalChildWindowCard) && (m_appFixedOrientation == Event::Orientation_Invalid)) {
 		// safeguard code in case the data buffer and the bounding rect dimensions get out of sync
 		bool isDataLandscape = m_data->width() >= m_data->height();
 		bool isBoundingRectLandscape = m_boundingRect.width() >= m_boundingRect.height();

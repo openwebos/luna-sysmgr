@@ -48,7 +48,7 @@ static QPixmap* s_scrimPixmap = 0;
 static const int kSyncCallTimeOutMs = 500;
 
 
-CardHostWindow::CardHostWindow(Window::Type type, HostWindowData* data, IpcClientHost* clientHost)
+CardHostWindow::CardHostWindow(WindowType::Type type, HostWindowData* data, IpcClientHost* clientHost)
 	: CardWindow(type, data, clientHost)
 	, m_paused(false)
 	, m_pausedDueToDisplayOff(false)
@@ -109,7 +109,7 @@ CardHostWindow::~CardHostWindow()
 
 void CardHostWindow::resizeEvent(int w, int h)
 {
-    if (type() == Window::Type_Emergency) {
+    if (type() == WindowType::Type_Emergency) {
         if (m_adjustmentAngle == 90 || m_adjustmentAngle == -90){
             setBoundingRect(h,w);
         } else {
@@ -131,7 +131,7 @@ void CardHostWindow::resizeEvent(int w, int h)
 
 void CardHostWindow::resizeEventSync(int w, int h)
 {
-    if (type() == Window::Type_Emergency) {
+    if (type() == WindowType::Type_Emergency) {
         if (m_adjustmentAngle == 90 || m_adjustmentAngle == -90){
             setBoundingRect(h,w);
         } else {

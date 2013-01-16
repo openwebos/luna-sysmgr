@@ -59,7 +59,7 @@ public:
 	void sendQueuedMessages();
 	
 	void closeWindow(Window* w);
-	void launchUrl(const char* url, Window::Type winType=Window::Type_Card,
+    void launchUrl(const char* url, WindowType::Type winType=WindowType::Type_Card,
 			       const char* appDesc="", const char* procId="",
 			       const char* params="", const char* launchingAppId="",
 			       const char* launchingProcId="");
@@ -147,7 +147,7 @@ private:
     void onLowMemoryActionsRequested(bool allowExpensive);
     void onModalDismissPreCreate(int errorCode);
 
-	Window* createWindowForWebApp(Window::Type winType, HostWindowData* data);
+    Window* createWindowForWebApp(WindowType::Type winType, HostWindowData* data);
 	
 	static void webKitDiedCallback(GPid pid, gint status, gpointer data);
 	void webKitDied(GPid pid, gint status);

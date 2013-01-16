@@ -55,7 +55,7 @@ QString SysmgrIMEModel::getLocalizedString(const std::string &str)
 
 std::string SysmgrIMEModel::getLocale()
 {
-    return Preferences::instance()->locale();
+    return LocalePreferences::instance()->locale();
 }
 
 QVariant SysmgrIMEModel::getLunaSystemSetting(const QString &key)

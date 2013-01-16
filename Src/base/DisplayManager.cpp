@@ -34,8 +34,10 @@
 #include "Time.h"
 #include "WindowServer.h"
 
+#ifdef HAS_NYX
 #include <nyx/nyx_client.h>
 #include "NyxSensorConnector.h"
+#endif
 
 #include <QApplication>
 
@@ -2898,14 +2900,14 @@ void DisplayManager::requestCurrentLocation()
 bool DisplayManager::updateNyxWithLocation(double latitude, double longitude)
 {
 	bool result = false;
-
+#ifdef HAS_NYX
     NYXBearingSensorConnector* pBearingSensor = static_cast<NYXBearingSensorConnector *> (NYXConnectorBase::getSensor(NYXConnectorBase::SensorBearing));
     if (pBearingSensor)
     {
         result = pBearingSensor->setLocation(latitude, longitude);
         delete pBearingSensor;
     }
-
+#endif
 	return result;
 }
 

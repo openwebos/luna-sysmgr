@@ -43,6 +43,8 @@
 #include "Logging.h"
 #include "BackupManager.h"
 
+#include <ProcessKiller.h>
+
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <glib.h>
@@ -690,8 +692,12 @@ int main( int argc, char** argv)
 	
 	initMallocStatsCb(HostBase::instance()->mainLoop(), s_mallocStatsInterval);
 
+
 	// Initialize Preferences handler
 	(void) Preferences::instance();
+
+    LocalePreferences* lp = LocalePreferences::instance();
+    QObject::connect(lp, SIGNAL(prefsLocaleChanged()), new ProcessKiller(), SLOT(localeChanged()));
 
 	// Initialize Localization handler
 	(void) Localization::instance();

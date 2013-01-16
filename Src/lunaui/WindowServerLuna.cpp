@@ -395,25 +395,25 @@ WindowManagerBase* WindowServerLuna::windowManagerForWindowType(int type) const
 	WindowManagerBase* wm = 0;
 
 	switch (type) {
-	case (Window::Type_ModalChildWindowCard):
-	case (Window::Type_Card):
+    case (WindowType::Type_ModalChildWindowCard):
+    case (WindowType::Type_Card):
 		wm = m_cardMgr; break;
-	case (Window::Type_DockModeWindow):
+    case (WindowType::Type_DockModeWindow):
 		wm = m_dockModeMgr; break;
-	case (Window::Type_Overlay):
-	case (Window::Type_Launcher):
-	case (Window::Type_QtNativePaintWindow):
+    case (WindowType::Type_Overlay):
+    case (WindowType::Type_Launcher):
+    case (WindowType::Type_QtNativePaintWindow):
 		wm = m_overlayMgr; break;
-	case (Window::Type_Dashboard):
-	case (Window::Type_PopupAlert):
-	case (Window::Type_BannerAlert):
+    case (WindowType::Type_Dashboard):
+    case (WindowType::Type_PopupAlert):
+    case (WindowType::Type_BannerAlert):
 		wm = m_dashboardMgr; break;
-	case (Window::Type_StatusBar):
-	case (Window::Type_Menu):
+    case (WindowType::Type_StatusBar):
+    case (WindowType::Type_Menu):
 		wm = m_menuMgr; break;
-	case (Window::Type_PIN):
+    case (WindowType::Type_PIN):
 		wm = m_topLevelMgr; break;
-	case (Window::Type_Emergency):
+    case (WindowType::Type_Emergency):
 		wm = m_emergencyModeMgr; break;
 	default:
 		g_critical("Unknown window type (%d) specified\n", type);

@@ -3710,7 +3710,7 @@ bool ApplicationInstaller::extractVersionFromAppInfo(const std::string& appBaseD
 	
 	////   (COPIED FROM APPLICATION MANAGER'S scanOneApplicationFolder() and modified
 	// Do we have a locale setting
-	std::string locale = Preferences::instance()->locale();
+	std::string locale = LocalePreferences::instance()->locale();
 
 	// Look for the language specific appinfo.json
 	std::string appJsonPath = appBaseDir + "/resources/" + locale + "/appinfo.json";
@@ -4199,7 +4199,7 @@ json_object * ApplicationInstaller::packageInfoFileToJson(const std::string& pac
 	const std::string packageFolderPath(Settings::LunaSettings()->packageInstallBase + std::string("/") + Settings::LunaSettings()->packageInstallRelative + std::string("/")+packageId);
 
 	// Do we have a locale setting
-	std::string locale = Preferences::instance()->locale();
+	std::string locale = LocalePreferences::instance()->locale();
 
 	// Look for the language/region specific packageinfo.json
 

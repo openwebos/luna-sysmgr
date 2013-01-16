@@ -40,6 +40,7 @@ INCLUDEPATH += \
         $$(STAGING_INCDIR)/sysmgr-ipc \
         $$(STAGING_INCDIR)/freetype2 \
         $$(STAGING_INCDIR)/PmLogLib/IncsPublic \
+        $$(STAGING_INCDIR)/include/luna-sysmgr-common \
         $$(STAGING_INCDIR)/ime \
 
 

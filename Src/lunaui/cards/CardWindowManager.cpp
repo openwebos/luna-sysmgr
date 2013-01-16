@@ -461,7 +461,7 @@ void CardWindowManager::prepareAddWindow(Window* win)
 		return;
 
 	if ((card->hostWindowData() != 0) &&
-	    !card->isHost() && (card->type() != Window::Type_ModalChildWindowCard) &&
+	    !card->isHost() && (card->type() != WindowType::Type_ModalChildWindowCard) &&
 	    (card->getCardFixedOrientation() == Event::Orientation_Invalid)) {
 		// safeguard code in case the data card was launched right before we changed orientation, resulting
 		// in possibly a landscape card in portrait mode or vice versa
@@ -484,7 +484,7 @@ void CardWindowManager::prepareAddWindow(Window* win)
 	}
 
 	// If we have a modal card and we cannot add it for whatever reason, just return
-	if(Window::Type_ModalChildWindowCard == win->type() && (SystemUiController::NoErr != (m_dismissModalImmediately = proceedToAddModalWindow(card)))) {
+	if(WindowType::Type_ModalChildWindowCard == win->type() && (SystemUiController::NoErr != (m_dismissModalImmediately = proceedToAddModalWindow(card)))) {
 		m_modalWindowState = ModalWindowAddInitCheckFail;
 		notifySysControllerOfModalStatus(m_dismissModalImmediately, false, ModalLaunch, win);
 		return;
@@ -494,10 +494,10 @@ void CardWindowManager::prepareAddWindow(Window* win)
 	card->enableShadow();
 
 	// Do this ONLY if we are not adding a MODAL window
-	if(Window::Type_ModalChildWindowCard != card->type()) {
+	if(WindowType::Type_ModalChildWindowCard != card->type()) {
 
 		// If the currently active card is a modal card, make sure we dismiss it as we are going to get a new active card - don't restore the state as the new card will be the active card
-		if(activeWindow() && Window::Type_ModalChildWindowCard == activeWindow()->type()) {
+		if(activeWindow() && WindowType::Type_ModalChildWindowCard == activeWindow()->type()) {
 
 			m_modalWindowState = ModalWindowDismissedParentSwitched;
 			notifySysControllerOfModalStatus(SystemUiController::ActiveCardsSwitched, true, ModalDismissNoAnimate, activeWindow());
@@ -547,7 +547,7 @@ void CardWindowManager::prepareAddWindowSibling(CardWindow* win)
 {
 	if (m_activeGroup && !win->launchInNewGroup()) {
 		CardWindow* activeWin = m_activeGroup->activeCard();
-		if(Window::Type_ModalChildWindowCard != win->type()) {
+		if(WindowType::Type_ModalChildWindowCard != win->type()) {
 			if ((activeWin->focused() &&
 				(win->launchingProcessId() == activeWin->processId() ||
 				(win->launchingAppId() == activeWin->appId())))) {
@@ -595,7 +595,7 @@ void CardWindowManager::addWindowTimedOut(Window* win)
 	if (card->isHost())
 		return;
 
-	if(Window::Type_ModalChildWindowCard == win->type() && -1 != m_dismissModalImmediately) {
+	if(WindowType::Type_ModalChildWindowCard == win->type() && -1 != m_dismissModalImmediately) {
 		m_dismissModalImmediately = -1;
 		return;
 	}
@@ -613,12 +613,12 @@ void CardWindowManager::addWindowTimedOutNormal(CardWindow* win)
 
 	Q_ASSERT(m_activeGroup && m_activeGroup->activeCard() == win);
 
-	if(Window::Type_ModalChildWindowCard != win->type()) {
+	if(WindowType::Type_ModalChildWindowCard != win->type()) {
 		setActiveCardOffScreen(false);
 		slideAllGroups();
 	}
 
-	if(Window::Type_ModalChildWindowCard == win->type() && -1 != m_dismissModalImmediately) {
+	if(WindowType::Type_ModalChildWindowCard == win->type() && -1 != m_dismissModalImmediately) {
 		m_dismissModalImmediately = -1;
 		return;
 	}
@@ -652,7 +652,7 @@ void CardWindowManager::removeWindow(Window* win)
 	Q_EMIT signalExitReorder();
 
 	// Either there are no modal window(s) OR we are not deleting the modal parent - default to the plain vanilla delete.
-	if((win->type() != Window::Type_ModalChildWindowCard && false == m_addingModalWindow) || (win->type() != Window::Type_ModalChildWindowCard && false == card->isCardModalParent())) {
+	if((win->type() != WindowType::Type_ModalChildWindowCard && false == m_addingModalWindow) || (win->type() != WindowType::Type_ModalChildWindowCard && false == card->isCardModalParent())) {
 		removeWindowNoModality(card);
 	}
 	else
@@ -701,10 +701,10 @@ void CardWindowManager::removeWindowWithModality(CardWindow* win)
 
 	card = win;
 
-	restore = (activeCard == card && Window::Type_ModalChildWindowCard == card->type()) ? true:false;
+	restore = (activeCard == card && WindowType::Type_ModalChildWindowCard == card->type()) ? true:false;
 
 	// If the modal card was deleted because it's parent was deleted externally, don't run any of these, simply remove the modal and return
-	if(Window::Type_ModalChildWindowCard == card->type() && m_modalWindowState == ModalParentDimissedWaitForChildDismissal && NULL == m_parentOfModalCard) {
+	if(WindowType::Type_ModalChildWindowCard == card->type() && m_modalWindowState == ModalParentDimissedWaitForChildDismissal && NULL == m_parentOfModalCard) {
 		handleModalRemovalForDeletedParent(card);
 		m_modalWindowState = NoModalWindow;
 		return;
@@ -726,11 +726,11 @@ void CardWindowManager::removeWindowWithModality(CardWindow* win)
 		SystemUiController::ModalWinDismissErrorReason dismiss = SystemUiController::DismissUnknown;
 
 		// We are removing a modal card externally
-		if(Window::Type_ModalChildWindowCard == card->type()) {
+		if(WindowType::Type_ModalChildWindowCard == card->type()) {
 			m_modalWindowState = ModalWindowDismissedExternally;
 		}
 		// check if w is a modal parent
-		else if(true == card->isCardModalParent() && (Window::Type_ModalChildWindowCard == activeWindow()->type())) {
+		else if(true == card->isCardModalParent() && (WindowType::Type_ModalChildWindowCard == activeWindow()->type())) {
 			m_modalWindowState = ModalParentDismissed;
 			dismiss = SystemUiController::ParentCardDismissed;
 		}
@@ -772,7 +772,7 @@ void CardWindowManager::removeWindowWithModality(CardWindow* win)
 	if(false == performCommonWindowRemovalTasks(card, (m_modalWindowState == ModalParentDismissed)?true:false))
 		return;
 
-	if(Window::Type_ModalChildWindowCard != card->type()) {
+	if(WindowType::Type_ModalChildWindowCard != card->type()) {
 		// slide card off the top of the screen
 		CardWindow::Position pos = card->position();
 		QRectF r = pos.toTransform().mapRect(card->boundingRect());
@@ -803,7 +803,7 @@ void CardWindowManager::removeWindowWithModality(CardWindow* win)
 
 void CardWindowManager::handleModalRemovalForDeletedParent(CardWindow* card)
 {
-	if(NULL == card || Window::Type_ModalChildWindowCard != card->type())
+	if(NULL == card || WindowType::Type_ModalChildWindowCard != card->type())
 		return;
 
 	// ignore the return value.
@@ -972,7 +972,7 @@ void CardWindowManager::performPostModalWindowRemovedActions(Window* win, bool r
 	}
 
 	// Finally - if the modal was dismissed externally then make it invisible here so that it doesn't linger around. ResetModal() will clear out the flags on the parent
-	if((ModalWindowDismissedExternally == m_modalWindowState || ModalWindowDismissedParentSwitched == m_modalWindowState) && (activeWin->type() == Window::Type_ModalChildWindowCard))
+	if((ModalWindowDismissedExternally == m_modalWindowState || ModalWindowDismissedParentSwitched == m_modalWindowState) && (activeWin->type() == WindowType::Type_ModalChildWindowCard))
 		activeWin->setVisible(false);
 }
 
@@ -983,7 +983,7 @@ void CardWindowManager::slotOpacityAnimationFinished()
 
 void CardWindowManager::removeCardFromGroup(CardWindow* win, bool adjustLayout)
 {
-	if(Window::Type_ModalChildWindowCard == win->type())
+	if(WindowType::Type_ModalChildWindowCard == win->type())
 		return;
 
 	CardGroup* group = win->cardGroup();
@@ -1017,7 +1017,7 @@ void CardWindowManager::removeCardFromGroupMaximized(CardWindow* win)
 {
 	IMEController::instance()->removeClient(win);
 
-	if(Window::Type_ModalChildWindowCard == win->type())
+	if(WindowType::Type_ModalChildWindowCard == win->type())
 		return;
 
 	// Switch out only if we are the active window
@@ -1075,7 +1075,7 @@ void CardWindowManager::maximizeActiveWindow(bool animate)
 	QRect r;
 
 	// If the currently active card window is a modal window, don't do any of these operations except If we are doing this as a part of rotation
-	if(activeWindow()->type() != Window::Type_ModalChildWindowCard || (activeWindow()->type() == Window::Type_ModalChildWindowCard && true == SystemUiController::instance()->isUiRotating())) {
+	if(activeWindow()->type() != WindowType::Type_ModalChildWindowCard || (activeWindow()->type() == WindowType::Type_ModalChildWindowCard && true == SystemUiController::instance()->isUiRotating())) {
 
 		m_activeGroup->raiseCards();
 
@@ -1086,7 +1086,7 @@ void CardWindowManager::maximizeActiveWindow(bool animate)
 		else
 			layoutAllGroups(false);
 
-		if(activeWindow()->type() != Window::Type_ModalChildWindowCard)
+		if(activeWindow()->type() != WindowType::Type_ModalChildWindowCard)
 			r = normalOrScreenBounds(m_activeGroup->activeCard());
 		else if(NULL != m_parentOfModalCard)
 			r = normalOrScreenBounds(m_parentOfModalCard);
@@ -2022,7 +2022,7 @@ void CardWindowManager::switchToNextAppMaximized()
 		return;
 
 	// Check if the currently active card is a modal card. If so dismiss it
-	if(Window::Type_ModalChildWindowCard == oldActiveCard->type()) {
+	if(WindowType::Type_ModalChildWindowCard == oldActiveCard->type()) {
 		// We don't need to run any animations
 		m_animateWindowForModalDismisal = false;
 		// Set the reason for dismissal
@@ -2105,7 +2105,7 @@ void CardWindowManager::switchToPrevAppMaximized()
 	CardWindow* oldActiveCard = activeWindow();
 
 	// Check if the currently active card is a modal card. If so dismiss it
-	if(Window::Type_ModalChildWindowCard == oldActiveCard->type()) {
+	if(WindowType::Type_ModalChildWindowCard == oldActiveCard->type()) {
 
 		// We don't need to run any animations
 		m_animateWindowForModalDismisal = false;
@@ -2410,7 +2410,7 @@ void CardWindowManager::focusWindow(Window* win)
 		return;
 
 	// If the active card is a modal window and we are focusing another window, we need to dismiss the modal first.
-	if(Window::Type_ModalChildWindowCard == activeWindow()->type() && card != activeWindow())
+	if(WindowType::Type_ModalChildWindowCard == activeWindow()->type() && card != activeWindow())
 	{
 		// Cehck if we are trying to focus the parent
 		m_modalWindowState = ModalWindowDismissedParentSwitched;
@@ -2524,7 +2524,7 @@ void CardWindowManager::restoreCardToMaximized()
 
 QRect CardWindowManager::normalOrScreenBounds(CardWindow* win) const
 {
-	if (win && win->fullScreen() && win->type() != Window::Type_ModalChildWindowCard) {
+	if (win && win->fullScreen() && win->type() != WindowType::Type_ModalChildWindowCard) {
 		return QRect(m_targetPositiveSpace.x(), m_targetPositiveSpace.y(),
 				     SystemUiController::instance()->currentUiWidth(), SystemUiController::instance()->currentUiHeight());
 	}
@@ -2543,7 +2543,7 @@ void CardWindowManager::closeWindow(CardWindow* win, bool angryCard)
 
 	QPropertyAnimation* anim = NULL;
 	/*// The only case we need to worry about here is if a modal parent called closeWindow() on itself. Then we need to close the child first and then continue
-	if(true == win->isCardModalParent() && (Window::Type_ModalChildWindowCard == activeWindow()->type())) {
+	if(true == win->isCardModalParent() && (WindowType::Type_ModalChildWindowCard == activeWindow()->type())) {
 		m_modalWindowState = ModalParentDismissed;
 		notifySysControllerOfModalStatus(SystemUiController::ParentCardDismissed, false, ModalDismissNoAnimate);
 		win->setCardIsModalParent(false);
@@ -2559,7 +2559,7 @@ void CardWindowManager::closeWindow(CardWindow* win, bool angryCard)
 	// remove the window from the current animation list
 	removeAnimationForWindow(win, true);
 
-	if(Window::Type_ModalChildWindowCard != win->type()) {
+	if(WindowType::Type_ModalChildWindowCard != win->type()) {
 		CardWindow::Position pos = win->position();
 		QRectF r = win->mapRectToParent(win->boundingRect());
 		qreal offTop = boundingRect().y() - (win->y() + (r.height()/2));
@@ -2581,7 +2581,7 @@ void CardWindowManager::closeWindow(CardWindow* win, bool angryCard)
 	anim->start();
 
 	// Modal cards are not a part of any card group.
-	if(Window::Type_ModalChildWindowCard != win->type()) {
+	if(WindowType::Type_ModalChildWindowCard != win->type()) {
 		removeCardFromGroup(win);
 	}
 
@@ -2795,7 +2795,7 @@ void CardWindowManager::slotTouchToShareAppUrlTransfered(const std::string& appI
 
 void CardWindowManager::slotDismissActiveModalWindow()
 {
-	if(Window::Type_ModalChildWindowCard == activeWindow()->type()) {
+	if(WindowType::Type_ModalChildWindowCard == activeWindow()->type()) {
 		m_modalWindowState = ModalWindowDismissedInternally;
 		notifySysControllerOfModalStatus(SystemUiController::ServiceDismissedModalCard, true, ModalDismissAnimate);
 	}
@@ -2807,7 +2807,7 @@ void CardWindowManager::slotDismissActiveModalWindow()
 void CardWindowManager::slotDismissModalTimerStopped()
 {
 	CardWindow* activeWin = activeWindow();
-	if(activeWin && (Window::Type_ModalChildWindowCard == activeWin->type()) && m_parentOfModalCard) {
+	if(activeWin && (WindowType::Type_ModalChildWindowCard == activeWin->type()) && m_parentOfModalCard) {
 		m_parentOfModalCard->setModalAcceptInputState(CardWindow::ModalLaunchedAcceptingInput);
 	}
 }

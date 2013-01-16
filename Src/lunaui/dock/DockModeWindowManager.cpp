@@ -301,7 +301,7 @@ int DockModeWindowManager::appIndexForId(const std::string appId)
 
 void DockModeWindowManager::prepareAddWindow(Window* win)
 {
-	if (win->type() != Window::Type_DockModeWindow)
+	if (win->type() != WindowType::Type_DockModeWindow)
 	    return;
 	
 	DockModeWindow* dockWin = static_cast<DockModeWindow*>(win);
@@ -370,7 +370,7 @@ void DockModeWindowManager::prepareAddWindow(Window* win)
 void DockModeWindowManager::addWindow(Window* win)
 {
 	// Dock Mode windows are the only type accepted
-	if (win->type() != Window::Type_DockModeWindow)
+	if (win->type() != WindowType::Type_DockModeWindow)
 	    return;
 	
 	DockModeWindow* dockWin = static_cast<DockModeWindow*>(win);
@@ -812,7 +812,7 @@ void DockModeWindowManager::closeWindow(Window* win)
 	if(m_sysUiLpInUse == dlp)
 		m_sysUiLpInUse = 0;
 
-	if(closingWindow->type() == Window::Type_DockModeLoadingWindow) {
+	if(closingWindow->type() == WindowType::Type_DockModeLoadingWindow) {
 		closingWindow->setVisible(false);
 		closingWindow->setRemoved();
 	
@@ -838,7 +838,7 @@ void DockModeWindowManager::closeWindow(Window* win)
 	if(!closingWindow) 
 		return;
 	
-	if(closingWindow->type() == Window::Type_DockModeWindow) {
+	if(closingWindow->type() == WindowType::Type_DockModeWindow) {
 		closingWindow->setVisible(false);
 		SystemUiController::instance()->setDirectRenderingForWindow(SystemUiController::DOCK_MODE_WINDOW_MANAGER, (DockModeWindow*)closingWindow, false);
 		closingWindow->setRemoved();

@@ -478,8 +478,8 @@ void DashboardWindowManager::setBannerHasContent(bool val)
 void DashboardWindowManager::focusWindow(Window* w)
 {
 	// we listen to focus and blur only for alert windows
-	if (!(w->type() == Window::Type_PopupAlert ||
-		  w->type() == Window::Type_BannerAlert))
+	if (!(w->type() == WindowType::Type_PopupAlert ||
+		  w->type() == WindowType::Type_BannerAlert))
 
 		return;
 
@@ -496,8 +496,8 @@ void DashboardWindowManager::focusWindow(Window* w)
 void DashboardWindowManager::unfocusWindow(Window* w)
 {
 	// we listen to focus and blur only for alert windows
-	if (w->type() != Window::Type_PopupAlert &&
-		w->type() != Window::Type_BannerAlert)
+	if (w->type() != WindowType::Type_PopupAlert &&
+		w->type() != WindowType::Type_BannerAlert)
 		return;
 
 	AlertWindow* win = static_cast<AlertWindow*>(w);
@@ -938,17 +938,17 @@ void DashboardWindowManager::addAlertWindowBasedOnPriority(AlertWindow* win)
 
 void DashboardWindowManager::addWindow(Window* win)
 {
-	if (win->type() == Window::Type_PopupAlert || win->type() == Window::Type_BannerAlert)
+	if (win->type() == WindowType::Type_PopupAlert || win->type() == WindowType::Type_BannerAlert)
 		addAlertWindow(static_cast<AlertWindow*>(win));
-	else if (win->type() == Window::Type_Dashboard)
+	else if (win->type() == WindowType::Type_Dashboard)
 		m_dashboardWinContainer->addWindow(static_cast<DashboardWindow*>(win));
 }
 
 void DashboardWindowManager::removeWindow(Window* win)
 {
-	if (win->type() == Window::Type_PopupAlert || win->type() == Window::Type_BannerAlert)
+	if (win->type() == WindowType::Type_PopupAlert || win->type() == WindowType::Type_BannerAlert)
 		removeAlertWindow(static_cast<AlertWindow*>(win));
-	else if (win->type() == Window::Type_Dashboard)
+	else if (win->type() == WindowType::Type_Dashboard)
 		m_dashboardWinContainer->removeWindow(static_cast<DashboardWindow*>(win));
 
 	/* if dashboard is empty, all throb requests should have been dismissed
@@ -1255,7 +1255,7 @@ void DashboardWindowManager::resize(int width, int height)
 
 		for ( it=cachedWindows->begin() ; it != cachedWindows->end(); it++ ) {
 			Window* w = *it;
-			if(w->type() == Window::Type_PopupAlert || w->type() == Window::Type_BannerAlert) {
+			if(w->type() == WindowType::Type_PopupAlert || w->type() == WindowType::Type_BannerAlert) {
 				((AlertWindow*)w)->resizeEventSync((m_isOverlay ? kTabletNotificationContentWidth : width), 
 													((AlertWindow*)w)->initialHeight());
 			}

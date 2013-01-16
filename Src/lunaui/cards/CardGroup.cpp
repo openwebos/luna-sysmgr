@@ -638,7 +638,7 @@ void CardGroup::setCompositionMode(QPainter::CompositionMode mode)
 void CardGroup::resize(int width, int height, QRect normalScreenBounds)
 {
 	Q_FOREACH(CardWindow* c, m_cards) {
-		if(c->type() != Window::Type_ModalChildWindowCard) {
+		if(c->type() != WindowType::Type_ModalChildWindowCard) {
 			c->resizeWindowBufferEvent(width, height, normalScreenBounds);
 		}
 	}

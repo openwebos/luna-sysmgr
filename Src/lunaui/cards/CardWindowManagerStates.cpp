@@ -52,7 +52,7 @@ void CardWindowManagerState::windowAdded(CardWindow* win)
 
 void CardWindowManagerState::windowRemoved(CardWindow* win)
 {
-	if(Window::Type_ModalChildWindowCard == win->type())
+	if(WindowType::Type_ModalChildWindowCard == win->type())
 		return;
 
 	m_wm->removeCardFromGroup(win);
@@ -83,7 +83,7 @@ bool CardWindowManagerState::lastWindowAddedType() const
 void CardWindowManagerState::resizeWindow(CardWindow* w, int width, int height)
 {
 	if (w->allowResizeOnPositiveSpaceChange()) {
-		if(w->type() == Window::Type_ModalChildWindowCard) {
+		if(w->type() == WindowType::Type_ModalChildWindowCard) {
 			w->resizeEvent(Settings::LunaSettings()->modalWindowWidth, Settings::LunaSettings()->modalWindowHeight);
 		}
 		else {
@@ -199,13 +199,13 @@ void MaximizeState::windowAdded(CardWindow* win)
 {
 	CardWindowManagerState::windowAdded(win);
 	// if the active window is already sitting/maximized, complete maximization setup
-	if (win == m_wm->activeWindow() && Window::Type_ModalChildWindowCard != win->type() && !m_wm->windowHasAnimation(win))
+	if (win == m_wm->activeWindow() && WindowType::Type_ModalChildWindowCard != win->type() && !m_wm->windowHasAnimation(win))
 		finishMaximizingActiveWindow();
 }
 
 void MaximizeState::windowRemoved(CardWindow* win)
 {
-	if(Window::Type_ModalChildWindowCard == win->type())
+	if(WindowType::Type_ModalChildWindowCard == win->type())
 		return;
 
 	m_wm->removeCardFromGroupMaximized(win);
@@ -219,7 +219,7 @@ void MaximizeState::positiveSpaceAboutToChange(const QRect& r, bool fullScreen)
 		const QRect& positiveSpace = SystemUiController::instance()->positiveSpaceBounds();
 		bool expanding = positiveSpace.height() < r.height();
 
-		if(Window::Type_ModalChildWindowCard == activeWin->type()) {
+		if(WindowType::Type_ModalChildWindowCard == activeWin->type()) {
 			// Pass on the info to the parent as well.
 			parent = m_wm->modalParent();
 			if(parent) {
@@ -237,7 +237,7 @@ void MaximizeState::positiveSpaceAboutToChange(const QRect& r, bool fullScreen)
 
         	// Send this out ONLY to the parent, but not the modal card.
     		if (expanding) {
-    			if(Window::Type_ModalChildWindowCard == activeWin->type() && NULL != parent) {
+    			if(WindowType::Type_ModalChildWindowCard == activeWin->type() && NULL != parent) {
     				parent->resizeEventSync(r.width(), r.height());
     			}
     			else {
@@ -258,7 +258,7 @@ void MaximizeState::positiveSpaceChangeFinished(const QRect& r)
 {
 	CardWindow* activeWin = m_wm->activeWindow();
 	if (activeWin) {
-		if(Window::Type_ModalChildWindowCard == activeWin->type()) {
+		if(WindowType::Type_ModalChildWindowCard == activeWin->type()) {
 			// Pass on the info to the parent as well.
 			CardWindow* parent = m_wm->modalParent();
 			if(parent) {
@@ -280,7 +280,7 @@ void MaximizeState::positiveSpaceChanged(const QRect& r)
 {
 	CardWindow* activeWin = m_wm->activeWindow();
 	if (activeWin) {
-		if(Window::Type_ModalChildWindowCard == activeWin->type()) {
+		if(WindowType::Type_ModalChildWindowCard == activeWin->type()) {
 
 			// Pass on the info to the parent as well.
 			CardWindow* parent = m_wm->modalParent();
@@ -304,7 +304,7 @@ void MaximizeState::animationsFinished()
 
 	CardWindow* activeWin = m_wm->activeWindow();
 	if (activeWin) {
-		if(Window::Type_ModalChildWindowCard != activeWin->type()) {
+		if(WindowType::Type_ModalChildWindowCard != activeWin->type()) {
 			boundingRect = m_wm->normalOrScreenBounds(activeWin);
 			activeWin->setBoundingRect(boundingRect.width(), boundingRect.height());
 		}
@@ -332,7 +332,7 @@ void MaximizeState::finishMaximizingActiveWindow()
         }
 	if (activeWin && activeWin->addedToWindowManager()) {
                 // allow direct rendering if no one has requested it to be disabled - Do this only if the window is NOT a modal window
-		if(Window::Type_ModalChildWindowCard != activeWin->type()) {
+		if(WindowType::Type_ModalChildWindowCard != activeWin->type()) {
 			const QRect& r = m_wm->targetPositiveSpace();
             resizeWindow(activeWin, r.width(), r.height());
 
@@ -367,7 +367,7 @@ void MaximizeState::focusMaximizedCardWindow(bool focus)
     if (!focus && m_disableDirectRendering == 1) {
 
         // disable direct rendering so the emergency windows can render. [This is applicable ONLY if the active window is not a modal window]
-    	if(activeWin->type() != Window::Type_ModalChildWindowCard) {
+    	if(activeWin->type() != WindowType::Type_ModalChildWindowCard) {
     		SystemUiController::instance()->setDirectRenderingForWindow(SystemUiController::CARD_WINDOW_MANAGER, activeWin, false);
     	}
 
@@ -383,7 +383,7 @@ void MaximizeState::focusMaximizedCardWindow(bool focus)
        if (!m_wm->windowHasAnimation(activeWin)) {
 
             // re-enable direct rendering or just wait for any animations to finish [This is applicable ONLY if the active window is not a modal window]
-        	if(activeWin->type() != Window::Type_ModalChildWindowCard) {
+        	if(activeWin->type() != WindowType::Type_ModalChildWindowCard) {
         		SystemUiController::instance()->setDirectRenderingForWindow(SystemUiController::CARD_WINDOW_MANAGER, activeWin, true);
         	}
 
@@ -414,7 +414,7 @@ void MaximizeState::relayout(const QRectF& r, bool animate)
 
 	CardWindow* activeWin = m_wm->activeWindow();
 	if(activeWin) {
-		if(Window::Type_ModalChildWindowCard != activeWin->type()) {
+		if(WindowType::Type_ModalChildWindowCard != activeWin->type()) {
 			boundingRect = m_wm->normalOrScreenBounds(activeWin);
 			activeWin->setBoundingRect(boundingRect.width(), boundingRect.height());
 		}
@@ -462,7 +462,7 @@ void MaximizeState::onEntry(QEvent* event)
 	m_wm->queueFocusAction(activeWin, true);
 	activeWin->setAttachedToGroup(false);
 
-	if(Window::Type_ModalChildWindowCard != activeWin->type()) {
+	if(WindowType::Type_ModalChildWindowCard != activeWin->type()) {
 		QRectF boundingRect = m_wm->normalOrScreenBounds(activeWin);
 		activeWin->setBoundingRect(boundingRect.width(), boundingRect.height());
 	}
@@ -569,7 +569,7 @@ void PreparingState::onEntry(QEvent* event)
 
 		if (win) {
 			QRectF boundingRect = m_wm->normalOrScreenBounds(0);
-			if(Window::Type_ModalChildWindowCard != win->type())
+			if(WindowType::Type_ModalChildWindowCard != win->type())
 				win->setBoundingRect(boundingRect.width(), boundingRect.height());
 			else {
 				win->setBoundingRect(Settings::LunaSettings()->modalWindowWidth, Settings::LunaSettings()->modalWindowHeight);

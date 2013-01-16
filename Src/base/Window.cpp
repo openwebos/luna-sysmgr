@@ -29,7 +29,7 @@
 #include "ApplicationManager.h"
 #include "WindowServer.h"
 
-Window::Window(Type type, const uint32_t bufWidth, const uint32_t bufHeight, bool hasAlpha)
+Window::Window(WindowType::Type type, const uint32_t bufWidth, const uint32_t bufHeight, bool hasAlpha)
 	: m_type(type)
 	, m_appDesc(0)
 	, m_removed(false)
@@ -41,7 +41,7 @@ Window::Window(Type type, const uint32_t bufWidth, const uint32_t bufHeight, boo
 {
 	setVisibleDimensions(bufWidth, bufHeight);
 
-	if (type != Type_QtNativePaintWindow)
+    if (type != WindowType::Type_QtNativePaintWindow)
 	{
 		//launcher windows have no backing store. They're purely natively drawn
 		m_screenPixmap = QPixmap(m_bufWidth, m_bufHeight);
@@ -56,7 +56,7 @@ Window::Window(Type type, const uint32_t bufWidth, const uint32_t bufHeight, boo
 	WindowServer::registerWindow(this);
 }
 
-Window::Window(Type type, const QPixmap& pix)
+Window::Window(WindowType::Type type, const QPixmap& pix)
 	: m_type(type)
 	, m_appDesc(0)
 	, m_removed(false)
@@ -82,7 +82,7 @@ void Window::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QW
 {
 	//lock();
 
-	if (m_type == Type_QtNativePaintWindow)
+    if (m_type == WindowType::Type_QtNativePaintWindow)
 	{
 		g_critical("%s: window of type QtNativePaintWindow attempting base-class paint()!",__PRETTY_FUNCTION__);
 		return;
@@ -177,97 +177,43 @@ ApplicationDescription* Window::appDescription() const
 	return m_appDesc;
 }
 
-// ------------------------------------------------------------------
-
-void WindowProperties::merge(const WindowProperties& props)
-{
-    if (props.flags & isSetBlockScreenTimeout)
-		setBlockScreenTimeout(props.isBlockScreenTimeout);
-
-	if (props.flags & isSetSubtleLightbar)
-		setSubtleLightbar(props.isSubtleLightbar);
-
-	if (props.flags & isSetFullScreen)
-		setFullScreen(props.fullScreen);
-
-	if (props.flags & isSetActiveTouchpanel)
-		setActiveTouchpanel(props.activeTouchpanel);
-
-	if (props.flags & isSetAlsDisabled)
-		setAlsDisabled(props.alsDisabled);
-
-	if (props.flags & isSetOverlayNotifications)
-		setOverlayNotificationsPosition(props.overlayNotificationsPosition);
-
-	if (props.flags & isSetSuppressBannerMessages)
-		setSuppressBannerMessages(props.suppressBannerMessages);
-
-	if (props.flags & isSetHasPauseUi)
-		setHasPauseUi(props.hasPauseUi);
-
-	if (props.flags & isSetSuppressGestures)
-		setSuppressGestures(props.suppressGestures);
-
-	if (props.flags & isSetDashboardManualDragMode)
-		setDashboardManualDragMode(props.dashboardManualDrag);
-
-	if (props.flags & isSetStatusBarColor)
-		setStatusBarColor(props.statusBarColor);
-
-	if (props.flags & isSetRotationLockMaximized)
-		setRotationLockMaximized(props.rotationLockMaximized);
-
-	if (props.flags & isSetAllowResizeOnPositiveSpaceChange)
-		setAllowResizeOnPositiveSpaceChange(props.allowResizeOnPositiveSpaceChange);
-
-	if (props.flags & isSetGyro)
-		setAllowGyroEvents(props.gyroEnabled);
-
-	if (props.flags & isSetEnableCompassEvents)
-		setCompassEvents(props.compassEnabled);
-}
-
-void WindowProperties::setOverlayNotificationsPosition(unsigned int position)
-{
-	flags |= isSetOverlayNotifications;
-	if (position > OverlayNotificationsBottom && position < OverlayNotificationsLast)
-		overlayNotificationsPosition = position;
-	else
-		overlayNotificationsPosition = OverlayNotificationsBottom;
-}
 
 void Window::setVisibleDimensions(uint32_t width, uint32_t height)
 {
-	if ((m_visibleBounds.width() == width && m_visibleBounds.height() == height) ||
-		(height > m_bufHeight || width > m_bufWidth))
-		return;
+    if ((m_visibleBounds.width() == width && m_visibleBounds.height() == height) ||
+        (height > m_bufHeight || width > m_bufWidth))
+    return;
 
-	prepareGeometryChange();
-	m_visibleBounds.setRect(-(int)width/2, -(int)height/2, width, height);
+    prepareGeometryChange();
+    m_visibleBounds.setRect(-(int)width/2, -(int)height/2, width, height);
 }
 
 QSize Window::getVisibleDimensions() const
 {
-	return m_visibleBounds.size().toSize();
+    return m_visibleBounds.size().toSize();
 }
 
 void Window::resize(int w, int h)
 {
-	m_bufWidth = w;
-	m_bufHeight = h;
+    m_bufWidth = w;
+    m_bufHeight = h;
 
-	setVisibleDimensions(w, h);
+    setVisibleDimensions(w, h);
 
-	// preserve alpha
-	bool hasAlpha = m_screenPixmap.hasAlpha();
-	if (m_type != Type_QtNativePaintWindow)
-	{
-		m_screenPixmap = QPixmap(w, h);
+    // preserve alpha
+    bool hasAlpha = m_screenPixmap.hasAlpha();
+    if (m_type != WindowType::Type_QtNativePaintWindow)
+    {
+        m_screenPixmap = QPixmap(w, h);
 
-		QColor fillColor(255, 255, 255, hasAlpha ? 0 : 255);
-		m_screenPixmap.fill(fillColor);
-	}
-//	g_debug("%s: Window resized to %d x %d", __PRETTY_FUNCTION__,
-//			m_bufWidth, m_bufHeight);
+        QColor fillColor(255, 255, 255, hasAlpha ? 0 : 255);
+        m_screenPixmap.fill(fillColor);
+    }
+//     g_debug("%s: Window resized to %d x %d", __PRETTY_FUNCTION__,
+//                     m_bufWidth, m_bufHeight);
 }
+
+
+
+// ------------------------------------------------------------------
 

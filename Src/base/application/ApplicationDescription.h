@@ -29,6 +29,7 @@
 #include "LaunchPoint.h"
 #include "KeywordMap.h"
 #include "CmdResourceHandlers.h"
+#include <ApplicationDescriptionBase.h>
 
 struct json_object;
 struct ApplicationStatus;
@@ -61,17 +62,9 @@ public:
 	std::string					m_builtIn_argsAsStringEncodedJson;
 };
 
-class ApplicationDescription
+class ApplicationDescription : public ApplicationDescriptionBase
 {
 public:
-
-	enum Type {
-		Type_Web = 0,
-		Type_Native, 
-		Type_PDK,
-		Type_SysmgrBuiltin,
-        Type_Qt
-	};
 
 	enum Status {
 		Status_Ready = 0,
@@ -93,7 +86,7 @@ public:
 	~ApplicationDescription();
 
 	static ApplicationDescription* fromFile(const std::string& filePath, const std::string& folderPath);
-	static ApplicationDescription* fromJsonString(const char* jsonStr);
+    static ApplicationDescription* fromJsonString(const char* jsonStr);
 	static ApplicationDescription* fromApplicationStatus(const ApplicationStatus& appStatus, bool isUpdating);
 	static ApplicationDescription* fromNativeDockApp(const std::string& id, const std::string& title, 
 						const std::string& version, const std::string& splashIcon,
@@ -102,14 +95,10 @@ public:
 						const std::string& appmenu);
 	static std::string	   versionFromFile(const std::string& filePath, const std::string& folderPath);
 	
-	const std::string& id()         const { return m_id; }
-	const std::string& title()         const { return m_title; }
 	const std::string& menuName()		const { return m_appmenuName; }
 	const std::string& category()   const { return m_category; } 
 	std::list<std::string> keywords() const { return m_keywords.allKeywords(); }
-	const std::string& entryPoint() const { return m_entryPoint; }
 	const std::string& version()    const { return m_version; }
-	bool               isHeadLess() const { return m_isHeadLess; }
 	bool               hasTransparentWindows() const { return m_hasTransparentWindows; }
 	bool			   isRemovable() const { return m_isRemovable; }
     bool               handlesRelaunch() const { return m_handlesRelaunch; }
@@ -185,8 +174,6 @@ public:
 
 	bool tapToShareSupported() const  { return m_tapToShareSupported; }
 
-	std::string requestedWindowOrientation() { return m_requestedWindowOrientation; }
-
 	bool operator==(const ApplicationDescription& cmp) const;
 	bool operator!=(const ApplicationDescription& cmp) const;
 
@@ -242,12 +229,8 @@ private:
 
 	static int 	utilExtractMimeTypes(struct json_object * jsonMimeTypeArray,std::vector<MimeRegInfo>& extractedMimeTypes);
 
-	std::string            		m_id;
-	std::string					m_title;				//copy of default launchpoint's title
 	std::string            		m_category;
-	std::string            		m_entryPoint;
 	std::string            		m_version;
-	bool                   		m_isHeadLess;
 	std::list<ResourceHandler> 	m_mimeTypes;
 	std::list<RedirectHandler> 	m_redirectTypes;
 	LaunchPointList        		m_launchPoints;
@@ -287,8 +270,6 @@ private:
 	std::string 				m_universalSearchJsonStr;
 	std::string					m_servicesJsonStr;
 	std::string					m_accountsJsonStr;
-
-	std::string            		m_requestedWindowOrientation;
 
 	// if type == SysmgrBuiltin
 

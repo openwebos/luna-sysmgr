@@ -87,11 +87,11 @@ void WindowManagerMinimal::prepareAddWindow(Window* win)
 void WindowManagerMinimal::addWindow(Window* win)
 {
 	switch (win->type()) {
-	case Window::Type_StatusBar:
+    case WindowType::Type_StatusBar:
 		// NO-OP
 		break;
-	case Window::Type_Card:
-	case Window::Type_Emergency:
+    case WindowType::Type_Card:
+    case WindowType::Type_Emergency:
 	default:
 		addCardWindow(win);
 		break;
@@ -101,11 +101,11 @@ void WindowManagerMinimal::addWindow(Window* win)
 void WindowManagerMinimal::removeWindow(Window* win)
 {
 	switch (win->type()) {
-	case Window::Type_StatusBar:
+    case WindowType::Type_StatusBar:
 		// NO-OP
 		break;
-	case Window::Type_Card:
-	case Window::Type_Emergency:
+    case WindowType::Type_Card:
+    case WindowType::Type_Emergency:
 	default:
 		removeCardWindow(win);
 		break;
@@ -115,11 +115,11 @@ void WindowManagerMinimal::removeWindow(Window* win)
 void WindowManagerMinimal::focusWindow(Window* win)
 {
 	switch (win->type()) {
-	case Window::Type_StatusBar:
+    case WindowType::Type_StatusBar:
 		// NO-OP
 		break;
-	case Window::Type_Card:
-	case Window::Type_Emergency:
+    case WindowType::Type_Card:
+    case WindowType::Type_Emergency:
 	default:
 		focusCardWindow(win);
 		break;

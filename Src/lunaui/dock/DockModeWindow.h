@@ -45,8 +45,8 @@ class DockModeWindow : public CardWindow
 	Q_PROPERTY(qreal pulseOpacity READ pulseOpacity WRITE setPulseOpacity)
 public:
 
-	DockModeWindow(Window::Type type, HostWindowData* data, IpcClientHost* clientHost=0);
-	DockModeWindow(Window::Type type, const QPixmap& pixmap);
+	DockModeWindow(WindowType::Type type, HostWindowData* data, IpcClientHost* clientHost=0);
+	DockModeWindow(WindowType::Type type, const QPixmap& pixmap);
 	virtual ~DockModeWindow();
 	
 	virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);

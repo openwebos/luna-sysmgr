@@ -33,7 +33,7 @@
 #define MESSAGES_INTERNAL_FILE "SysMgrMessagesInternal.h"
 #include <PIpcMessageMacros.h>
 
-HostWindow::HostWindow(Type type, int width, int height, bool hasAlpha)
+HostWindow::HostWindow(WindowType::Type type, int width, int height, bool hasAlpha)
 		: Window(type, width, height, hasAlpha)
 		, m_data(0)
 		, m_isIpcWindow(false)
@@ -41,7 +41,7 @@ HostWindow::HostWindow(Type type, int width, int height, bool hasAlpha)
 {
 }
 
-HostWindow::HostWindow(Type type, HostWindowData* data, IpcClientHost* clientHost)
+HostWindow::HostWindow(WindowType::Type type, HostWindowData* data, IpcClientHost* clientHost)
 	: Window(type, data->width(), data->height(), data->hasAlpha())
 	, m_data(data)
 	, m_isIpcWindow(false)

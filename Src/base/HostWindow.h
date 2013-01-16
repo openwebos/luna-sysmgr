@@ -43,8 +43,8 @@ class HostWindow : public Window
 public:
 
 	// for non-IPC windows
-	HostWindow(Type type, int width, int height, bool hasAlpha);
-	HostWindow(Type type, HostWindowData* data, IpcClientHost* clientHost=0);	
+    HostWindow(WindowType::Type type, int width, int height, bool hasAlpha);
+    HostWindow(WindowType::Type type, HostWindowData* data, IpcClientHost* clientHost=0);
 	virtual ~HostWindow();
 
 	int routingId() const;

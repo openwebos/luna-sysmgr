@@ -93,7 +93,7 @@ WebAppMgrProxy* WebAppMgrProxy::connectWebAppMgr(int pid, PIpcChannel* channel)
 		std::string backgroundPath = "file://" + Settings::LunaSettings()->lunaSystemPath + "/index.html";
 		std::string sysUiDescString;
 		sysUiAppDesc->getAppDescriptionString(sysUiDescString);
-		pThis->launchUrl(backgroundPath.c_str(), Window::Type_StatusBar,
+        pThis->launchUrl(backgroundPath.c_str(), WindowType::Type_StatusBar,
 		                 sysUiDescString.c_str(), "", "{\"launchedAtBoot\":true}");
 	}
 	else {
@@ -106,7 +106,7 @@ WebAppMgrProxy* WebAppMgrProxy::connectWebAppMgr(int pid, PIpcChannel* channel)
 		if (appDesc) {
 			std::string appDescString;
 			appDesc->getAppDescriptionString(appDescString);
-			pThis->launchUrl(appDesc->entryPoint().c_str(), Window::Type_Launcher,
+            pThis->launchUrl(appDesc->entryPoint().c_str(), WindowType::Type_Launcher,
 			                 appDescString.c_str(), "", "{\"launchedAtBoot\":true}");
 		}
 		else {
@@ -301,10 +301,10 @@ void WebAppMgrProxy::onReturnedInputEvent(const SysMgrKeyEvent& event)
 void WebAppMgrProxy::onPrepareAddWindow(int key, int type, int width, int height)
 {
 	bool hasAlpha = false;
-	switch (static_cast<Window::Type>(type)) {
-		case (Window::Type_Launcher):
-		case (Window::Type_Menu):
-		case (Window::Type_Dashboard):
+    switch (static_cast<WindowType::Type>(type)) {
+        case (WindowType::Type_Launcher):
+        case (WindowType::Type_Menu):
+        case (WindowType::Type_Dashboard):
 			hasAlpha = true;
 			break;
 
@@ -320,7 +320,7 @@ void WebAppMgrProxy::onPrepareAddWindow(int key, int type, int width, int height
 		return;
 	}
 
-	Window* win = createWindowForWebApp(static_cast<Window::Type>(type), data);
+    Window* win = createWindowForWebApp(static_cast<WindowType::Type>(type), data);
 
 	m_winMap[key] = win;
 	m_winSet.insert(win);
@@ -334,10 +334,10 @@ void WebAppMgrProxy::onPrepareAddWindow(int key, int type, int width, int height
 void WebAppMgrProxy::onPrepareAddWindowWithMetaData(int key, int metaDataKey, int type, int width, int height)
 {
 	bool hasAlpha = false;
-	switch (static_cast<Window::Type>(type)) {
-		case (Window::Type_Launcher):
-		case (Window::Type_Menu):
-		case (Window::Type_Dashboard):
+    switch (static_cast<WindowType::Type>(type)) {
+        case (WindowType::Type_Launcher):
+        case (WindowType::Type_Menu):
+        case (WindowType::Type_Dashboard):
 			hasAlpha = true;
 			break;
 
@@ -353,7 +353,7 @@ void WebAppMgrProxy::onPrepareAddWindowWithMetaData(int key, int metaDataKey, in
 		return;
 	}
 
-	Window* win = createWindowForWebApp(static_cast<Window::Type>(type), data);
+    Window* win = createWindowForWebApp(static_cast<WindowType::Type>(type), data);
 
 	m_winMap[key] = win;
 	m_winSet.insert(win);
@@ -446,37 +446,37 @@ void WebAppMgrProxy::onLowMemoryActionsRequested(bool allowExpensive)
 	Q_EMIT signalLowMemoryActionsRequested(allowExpensive);
 }
 
-Window* WebAppMgrProxy::createWindowForWebApp(Window::Type winType, HostWindowData* data)
+Window* WebAppMgrProxy::createWindowForWebApp(WindowType::Type winType, HostWindowData* data)
 {
 	Window* win = 0;
 
 	switch (winType) {
-		case (Window::Type_Launcher): {
+        case (WindowType::Type_Launcher): {
 			win = new HostWindow(winType, data, this);
 			break;
 		}
-		case (Window::Type_Menu): {
+        case (WindowType::Type_Menu): {
 			win = new MenuWindow(data, this);
 			break;
 		}
-		case (Window::Type_ModalChildWindowCard):
-		case (Window::Type_Card):
-		case (Window::Type_PIN):
-		case (Window::Type_Emergency):
-		case (Window::Type_ChildCard): {
+        case (WindowType::Type_ModalChildWindowCard):
+        case (WindowType::Type_Card):
+        case (WindowType::Type_PIN):
+        case (WindowType::Type_Emergency):
+        case (WindowType::Type_ChildCard): {
 		 	win = new CardWindow(winType, data, this);
 		 	break;
 		}
-		case (Window::Type_DockModeWindow): {
+        case (WindowType::Type_DockModeWindow): {
 		 	win = new DockModeWindow(winType, data, this);
 		 	break;
 		}
-		case (Window::Type_PopupAlert):
-		case (Window::Type_BannerAlert): {
+        case (WindowType::Type_PopupAlert):
+        case (WindowType::Type_BannerAlert): {
 			win = new AlertWindow(winType, data, this);
 			break;
 		}
-		case (Window::Type_Dashboard): {
+        case (WindowType::Type_Dashboard): {
 			win = new DashboardWindow(data, this);
 			break;
 		}
@@ -499,7 +499,7 @@ void WebAppMgrProxy::closeWindow(Window* w)
 	}
 }
 
-void WebAppMgrProxy::launchUrl(const char* url, Window::Type winType,
+void WebAppMgrProxy::launchUrl(const char* url, WindowType::Type winType,
                                const char* appDesc, const char* procId,
                                const char* params, const char* launchingAppId,
                                const char* launchingProcId)

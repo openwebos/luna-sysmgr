@@ -24,6 +24,7 @@
 
 #include "Common.h"
 
+#include <LocalePreferences.h>
 #include <string>
 #include <lunaservice.h>
 
@@ -43,10 +44,6 @@ public:
 	/*
 	 * MT safe
 	 */
-	std::string locale() const;
-	std::string localeRegion() const;
-	std::string phoneRegion() const;
-	std::string timeFormat() const;
 	uint32_t lockTimeout() const;
 	void setLockTimeout(uint32_t timeout);
 	
@@ -100,7 +97,6 @@ Q_SIGNALS:
 	void signalAirplaneModeChanged(bool enabled);
 	void signalRoamingIndicatorChanged();
 	void signalDualRssiEnabled();
-	void signalTimeFormatChanged(const char* format);
 	void signalVoiceDialSettingChanged(bool v);
     void signalRotationLockChanged(OrientationEvent::Orientation rotationLock);
 	void signalMuteSoundChanged(bool muteOn);
@@ -117,13 +113,9 @@ private:
 	static bool serverConnectCallback(LSHandle *sh, LSMessage *message, void *ctx);
 	static bool getPreferencesCallback(LSHandle *sh, LSMessage *message, void *ctx);
 
-	std::string m_locale;
-	std::string m_localeRegion;
-	std::string m_phoneRegion;
 	std::string m_currentRingtoneFile;		//path and filename of ringtone
 	std::string m_currentAlerttoneFile;		//path and filename of alert tone
 	std::string m_currentNotificationtoneFile;	//path and filename of alert tone
-	std::string m_currentTimeFormat;
 	bool m_showAlertsWhenLocked;
 	bool m_ledThrobberEnabled;
 	bool m_playFeedbackSounds;

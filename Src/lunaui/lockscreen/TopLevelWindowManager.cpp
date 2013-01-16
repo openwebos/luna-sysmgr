@@ -112,7 +112,7 @@ void TopLevelWindowManager::resize(int width, int height)
 void TopLevelWindowManager::addWindow(Window* win)
 {
 	// phone app is the only acceptable creator of the Lock Screen Phone window
-	if (win->type() != Window::Type_PIN)
+	if (win->type() != WindowType::Type_PIN)
 	    return;
 
 	if (win->appId() != "com.palm.app.phone") {
@@ -129,7 +129,7 @@ void TopLevelWindowManager::addWindow(Window* win)
 void TopLevelWindowManager::removeWindow(Window* win)
 {
 	// we only own PIN type windows
-	if (win->type() != Window::Type_PIN)
+	if (win->type() != WindowType::Type_PIN)
 		return;
 
 //	g_error("%s: PIN app requested to be removed", __PRETTY_FUNCTION__);
@@ -217,7 +217,7 @@ void TopLevelWindowManager::createBrickModeWindow()
 	// clean up
 	delete painter;
 
-	m_brickWindow = new Window(Window::Type_Invalid, *m_brickSurf);
+	m_brickWindow = new Window(WindowType::Type_Invalid, *m_brickSurf);
 	m_brickWindow->setOpacity(opacity);
 	m_brickWindow->setParentItem(this);
 }

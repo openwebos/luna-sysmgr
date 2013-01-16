@@ -26,7 +26,7 @@
 #include "Settings.h"
 #include "HostBase.h"
 #include "WebAppMgrProxy.h"
-#include "Utils.h"
+#include "LsmUtils.h"
 #include "QtUtils.h"
 
 #include <QPainter>

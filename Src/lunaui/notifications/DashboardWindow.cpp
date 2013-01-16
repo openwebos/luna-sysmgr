@@ -22,6 +22,7 @@
 #include "Common.h"
 
 #include "DashboardWindow.h"
+#include <WindowProperties.h>
 
 #include "Settings.h"
 #include <PIpcBuffer.h>
@@ -35,7 +36,7 @@
 
 
 DashboardWindow::DashboardWindow(HostWindowData* data, IpcClientHost* clientHost)
-	: HostWindow(Window::Type_Dashboard, data, clientHost)
+	: HostWindow(WindowType::Type_Dashboard, data, clientHost)
 	, m_clickableWhenLocked(false)
 	, m_persistent(false)
 	, m_manualDragMode(false)

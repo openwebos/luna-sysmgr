@@ -39,7 +39,7 @@
 #include "WindowServerLuna.h"
 
 QmlAlertWindow::QmlAlertWindow(const QString& path, int width, int height)
-	: AlertWindow(Window::Type_PopupAlert, width, height, true)
+	: AlertWindow(WindowType::Type_PopupAlert, width, height, true)
 {
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	QDeclarativeEngine* qmlEngine = WindowServer::instance()->declarativeEngine();

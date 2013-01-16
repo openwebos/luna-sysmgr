@@ -99,7 +99,7 @@ CardLoading::CardLoading(Window* win)
 
         // Initialize to the scene specific splash background if applicable:
         if (Settings::LunaSettings()->enableSplashBackgrounds) {
-            luna_assert(Window::Type_Card == m_win->type());
+            luna_assert(WindowType::Type_Card == m_win->type());
             CardWindow *cardWin = static_cast<CardWindow*>(m_win);
             std::string sceneBackgroundName  = cardWin->splashBackgroundName();
             // If the scene did not specify a specific scene background, then use
@@ -239,7 +239,7 @@ void CardLoading::paint(QPainter* painter, bool maximized)
 	painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
 	painter->setOpacity(fadeOpacity());
 
-	if (Window::Type_Card == m_win->type()) {
+	if (WindowType::Type_Card == m_win->type()) {
 		// clip the background to the card
 		QRectF r = m_win->boundingRect();
 		QPainterPath path;

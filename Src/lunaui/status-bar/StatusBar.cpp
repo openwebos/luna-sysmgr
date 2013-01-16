@@ -293,7 +293,7 @@ void StatusBar::init()
 		}
 	}
 
-	connect(Preferences::instance(),SIGNAL(signalTimeFormatChanged(const char*)), SLOT(slotTimeFormatChanged(const char*)));
+    connect(LocalePreferences::instance(),SIGNAL(signalTimeFormatChanged(const char*)), SLOT(slotTimeFormatChanged(const char*)));
 	connect(m_svcConnector,SIGNAL(signalPhoneTypeUpdated()), SLOT(slotPhoneTypeUpdated()));
 	connect(m_svcConnector,SIGNAL(signalCarrierTextChanged(const char*)), SLOT(slotCarrierTextChanged(const char*)));
 	connect(m_svcConnector,SIGNAL(signalRssiIndexChanged(bool, StatusBar::IndexRSSI)), SLOT(slotRssiIndexChanged(bool, StatusBar::IndexRSSI)));

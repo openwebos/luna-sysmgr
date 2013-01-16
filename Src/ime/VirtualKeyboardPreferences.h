@@ -64,7 +64,7 @@ public:
 	void						applyInitSettings(VirtualKeyboard * keyboard);
 
     void                        applyFirstUseSettings();
-    void                        localeChanged();
+    Q_INVOKABLE void            localeChanged();
 
 	void						selectNextKeyboardCombo();
 	void						selectKeyboardCombo(int index);

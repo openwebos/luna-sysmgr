@@ -45,7 +45,6 @@ ApplicationDescription::ApplicationDescription()
 	, m_tapToShareSupported(false)
     , m_handlesRelaunch(false)
 {
-	m_isHeadLess = false;
 	m_hasTransparentWindows = false;
 	m_entryPoint = "index.html";
 	m_miniIconName = "miniicon.png";
@@ -67,7 +66,6 @@ ApplicationDescription::ApplicationDescription()
 	m_runtimeMemoryRequired = 0;
 	m_universalSearchJsonStr = "";
 	m_pBuiltin_launcher = 0;
-	m_requestedWindowOrientation = "";
 }
 
 ApplicationDescription::~ApplicationDescription()
@@ -558,22 +556,17 @@ ApplicationDescription* ApplicationDescription::fromApplicationStatus(const Appl
 
 ApplicationDescription* ApplicationDescription::fromJsonString(const char* jsonStr)
 {
-	ApplicationDescription* appDesc = new ApplicationDescription();
+    struct json_object* root = json_tokener_parse( jsonStr );
+    if( !root || is_error( root ) )
+    {
+        fprintf( stderr, "ApplicationDescriptionBase::fromJsonString: Failed to parse string into a JSON string.\n" );
+        return 0;
+    }
+    ApplicationDescription* appDesc = new ApplicationDescription();
 
-	struct json_object* root=0;
+    bool success = appDesc->fromJsonObject(root);
 	
-	root = json_tokener_parse( jsonStr );
-	if( !root || is_error( root ) )
-	{
-		fprintf( stderr, "ApplicationDescription::fromJsonString: Failed to parse string into a JSON string.\n" );
-		return 0;
-	}
-
-	bool success = true;
-	
-	success &= extractFromJson(root, "id", appDesc->m_id);
 	success &= extractFromJson(root, "category", appDesc->m_category);
-	success &= extractFromJson(root, "main", appDesc->m_entryPoint);
 	success &= extractFromJson(root, "version", appDesc->m_version);
 	success &= extractFromJson(root, "splashicon", appDesc->m_splashIconName);
 	success &= extractFromJson(root, "splashBackground", appDesc->m_splashBackgroundName);
@@ -584,18 +577,15 @@ ApplicationDescription* ApplicationDescription::fromJsonString(const char* jsonS
 	success &= extractFromJson(root, "vendorUrl", appDesc->m_vendorUrl);
 	success &= extractFromJson(root, "appmenu", appDesc->m_appmenuName);
 
-	success &= extractFromJson(root, "noWindow", appDesc->m_isHeadLess);
 	success &= extractFromJson(root, "transparent", appDesc->m_hasTransparentWindows);
 	success &= extractFromJson(root, "removable", appDesc->m_isRemovable);
 	success &= extractFromJson(root, "userHideable", appDesc->m_isUserHideable);
 	success &= extractFromJson(root, "visible", appDesc->m_isVisible);
 	success &= extractFromJson(root, "launchinnewgroup", appDesc->m_launchInNewGroup);
-	success &= extractFromJson(root, "requestedWindowOrientation", appDesc->m_requestedWindowOrientation);
 	success &= extractFromJson(root, "tapToShareSupported", appDesc->m_tapToShareSupported);
 
-        success &= extractFromJson(root, "handlesRelaunch", appDesc->m_handlesRelaunch);
+    success &= extractFromJson(root, "handlesRelaunch", appDesc->m_handlesRelaunch);
 
-	
 	int temp;
 	success &= extractFromJson(root, "hardwareFeaturesNeeded", temp);
 	appDesc->m_hardwareFeaturesNeeded = (uint32_t)temp;
@@ -608,16 +598,14 @@ ApplicationDescription* ApplicationDescription::fromJsonString(const char* jsonS
 	
 	success &= extractFromJson(root, "runtimeMemoryRequired", temp);
 	appDesc->m_runtimeMemoryRequired = (unsigned int)temp;
-	
-	if( root && !is_error(root) )json_object_put(root);
 
-	if(!success) {
-		fprintf(stderr,"ApplicationDescription::fromJsonString : error decodeing app description JSON string.\n" );
-		delete appDesc;
-		return 0;
-	}
-	
-	return appDesc;
+    if(!success) {
+        delete appDesc;
+        appDesc = 0;
+    }
+    if(root && !is_error(root))
+        json_object_put(root);
+    return appDesc;
 }
 
 ApplicationDescription* ApplicationDescription::fromNativeDockApp(const std::string& id, 
@@ -994,13 +982,10 @@ void ApplicationDescription::getAppDescriptionString(std::string &descString) co
 	// Compose json string from the app description object  -------------------------------
 	// This will only include the integer and string fields of App Description
 
-	json_object* json = json_object_new_object();
+    json_object* json = ApplicationDescriptionBase::getAppDescription();
 
-	json_object_object_add(json, (char*) "id",   json_object_new_string((char*) m_id.c_str()));
 	json_object_object_add(json, (char*) "category",   json_object_new_string((char*) m_category.c_str()));
-	json_object_object_add(json, (char*) "main",   json_object_new_string((char*) m_entryPoint.c_str()));
 	json_object_object_add(json, (char*) "version",   json_object_new_string((char*) m_version.c_str()));
-	json_object_object_add(json, (char*) "noWindow",   json_object_new_boolean(m_isHeadLess));
 	json_object_object_add(json, (char*) "splashicon", json_object_new_string((char*) m_splashIconName.c_str()));
 	json_object_object_add(json, (char*) "splashBackground", json_object_new_string((char*) m_splashBackgroundName.c_str()));
 	json_object_object_add(json, (char*) "miniicon", json_object_new_string((char*) m_miniIconName.c_str()));
@@ -1018,7 +1003,6 @@ void ApplicationDescription::getAppDescriptionString(std::string &descString) co
 	json_object_object_add(json, (char*) "runtimeMemoryRequired", json_object_new_int((int)m_runtimeMemoryRequired));
 	json_object_object_add(json, (char*) "appmenu",json_object_new_string((char*) m_appmenuName.c_str()));
 	json_object_object_add(json, (char*) "launchinnewgroup", json_object_new_boolean(m_launchInNewGroup));
-	json_object_object_add(json, (char*) "requestedWindowOrientation", json_object_new_string((char*) m_requestedWindowOrientation.c_str()));
 	json_object_object_add(json, (char*) "tapToShareSupported",   json_object_new_boolean(m_tapToShareSupported));
         json_object_object_add(json, (char*) "handlesRelaunch", json_object_new_boolean(m_handlesRelaunch));
 
@@ -1163,7 +1147,7 @@ void ApplicationDescription::updateSysmgrBuiltinWithLocalization()
 		return;			//not a valid app descriptor to call this fn on
 
 	// Do we have a locale setting
-	std::string locale = Preferences::instance()->locale();
+    std::string locale = LocalePreferences::instance()->locale();
 
 	// Look for the language/region specific appinfo.json
 

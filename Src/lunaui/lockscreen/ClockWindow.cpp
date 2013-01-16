@@ -121,7 +121,7 @@ void ClockWindow::paint(QPainter* painter, const QStyleOptionGraphicsItem* optio
 
 void ClockWindow::updateTimeFormat()
 {
-	m_twelveHour = Preferences::instance()->timeFormat() == "HH12";
+    m_twelveHour = LocalePreferences::instance()->timeFormat() == "HH12";
 }
 
 void ClockWindow::tick()

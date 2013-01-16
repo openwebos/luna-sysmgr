@@ -26,7 +26,7 @@
 #define MESSAGES_INTERNAL_FILE "SysMgrMessagesInternal.h"
 #include <PIpcMessageMacros.h>
 
-QtHostWindow::QtHostWindow(Window::Type type, HostWindowData* data, IpcClientHost* clientHost)
+QtHostWindow::QtHostWindow(WindowType::Type type, HostWindowData* data, IpcClientHost* clientHost)
 	: CardHostWindow(type, data, clientHost)
 {
 }

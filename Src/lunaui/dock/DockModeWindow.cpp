@@ -52,12 +52,12 @@
 unsigned int DockModeWindow::s_dockGlowRefCount = 0;
 QPixmap* DockModeWindow::s_dockGlow = 0;
 
-DockModeWindow::DockModeWindow(Window::Type type, HostWindowData* data, IpcClientHost* clientHost)
+DockModeWindow::DockModeWindow(WindowType::Type type, HostWindowData* data, IpcClientHost* clientHost)
 	: CardWindow(type, data, clientHost), m_pulseOpacity(0.0), m_nativeApp (false), m_loadingOverlayEnabled (true)
 {
 }
 
-DockModeWindow::DockModeWindow(Window::Type type, const QPixmap& pixmap)
+DockModeWindow::DockModeWindow(WindowType::Type type, const QPixmap& pixmap)
 	: CardWindow(type, pixmap), m_pulseOpacity(0.0), m_nativeApp (true), m_loadingOverlayEnabled (true)
 {
 }
@@ -145,7 +145,7 @@ void DockModeWindow::setPulseOpacity(qreal opacity)
 
 void DockModeWindow::setMaximized(bool enable)
 {
-	if(type() == Window::Type_DockModeWindow) {
+	if(type() == WindowType::Type_DockModeWindow) {
 		CardWindow::setMaximized(enable);
 	} else {
 		m_maximized = enable;		

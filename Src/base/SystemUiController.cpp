@@ -1023,7 +1023,7 @@ void SystemUiController::setMaximizedCardWindow(Window* window)
 
 	if(Settings::LunaSettings()->displayUiRotates) {
 		if (m_maximizedCardWindow != NULL) {
-			if (m_maximizedCardWindow->type() == Window::Type_Card) {
+            if (m_maximizedCardWindow->type() == WindowType::Type_Card) {
 				CardWindow* cardWindow = static_cast<CardWindow*>(m_maximizedCardWindow);
 				setRequestedSystemOrientation(cardWindow->getCardFixedOrientation(), true);
 			}

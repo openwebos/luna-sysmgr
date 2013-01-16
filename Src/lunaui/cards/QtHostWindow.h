@@ -30,7 +30,7 @@ class QtHostWindow : public CardHostWindow
 {
 public:
 
-	QtHostWindow(Window::Type type, HostWindowData* data, IpcClientHost* clientHost);
+    QtHostWindow(WindowType::Type type, HostWindowData* data, IpcClientHost* clientHost);
 	virtual ~QtHostWindow();
 
 protected:

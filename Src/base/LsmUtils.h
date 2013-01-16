@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2011-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2008-2012 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -19,26 +19,14 @@
 
 
 
-#ifndef _NYXINPUTCONTROL_H_
-#define _NYXINPUTCONTROL_H_
+#ifndef LSMUTILS_H
+#define LSMUTILS_H
 
 #include "Common.h"
-#include "InputControl.h"
 
-class NyxInputControl: public InputControl {
+#include <string>
 
-public:
-	NyxInputControl(nyx_device_type_t type, nyx_device_id_t id);
-    virtual ~NyxInputControl();
+std::string getResourcePathFromString(const std::string& entry, const std::string& appId,
+									  const std::string& systemResourceFolder);
 
-    virtual bool on();
-    virtual bool off();
-    virtual bool setRate(nyx_report_rate_t rate);
-
-    virtual nyx_device_handle_t getHandle() { return m_handle; }
-
-private:
-    nyx_device_handle_t m_handle;
-};
-
-#endif /* _NYXINPUTCONTROL_H_ */
+#endif /* LSMUTILS_H */

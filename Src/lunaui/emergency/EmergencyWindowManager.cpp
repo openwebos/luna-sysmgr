@@ -167,7 +167,7 @@ bool EmergencyWindowManager::sceneEvent(QEvent* event)
 
 void EmergencyWindowManager::addWindow(Window* win)
 {
-	if (win->type() != Window::Type_Emergency)
+	if (win->type() != WindowType::Type_Emergency)
 		return;
 
 	if (m_emergencyWindow) {
