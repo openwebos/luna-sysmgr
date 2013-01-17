@@ -497,7 +497,8 @@ void LockWindow::init()
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
                 m_unlockPanel->setPos (-m_unlockPanel->boundingRect().width()/2, -m_unlockPanel->boundingRect().height()/2);
 #else
-                m_unlockPanel->setPos (QPointF(-m_unlockPanel->boundingRect().width()/2, -m_unlockPanel->boundingRect().height()/2));
+                m_unlockPanel->setX (-m_unlockPanel->boundingRect().width()/2);
+                m_unlockPanel->setY (-m_unlockPanel->boundingRect().height()/2);
 #endif
 
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
@@ -2070,10 +2071,14 @@ void LockWindow::showPinPanel()
  	else
  		m_unlockPanel->setPos (-m_unlockPanel->boundingRect().width()/2, -m_unlockPanel->boundingRect().height());
 #else
-    if(isPin)
-        m_unlockPanel->setPos (QPointF(-m_unlockPanel->boundingRect().width()/2, -m_unlockPanel->boundingRect().height()/2));
-    else
-        m_unlockPanel->setPos (QPointF(-m_unlockPanel->boundingRect().width()/2, -m_unlockPanel->boundingRect().height()));
+    if(isPin) {
+        m_unlockPanel->setX (-m_unlockPanel->boundingRect().width()/2);
+        m_unlockPanel->setY (-m_unlockPanel->boundingRect().height()/2);
+    }
+    else {
+        m_unlockPanel->setX (-m_unlockPanel->boundingRect().width()/2);
+        m_unlockPanel->setY (-m_unlockPanel->boundingRect().height());
+    }
 #endif
 
 	QMetaObject::invokeMethod(m_unlockPanel, "fade", Q_ARG(QVariant, true), Q_ARG(QVariant, AS(lockFadeDuration)));
