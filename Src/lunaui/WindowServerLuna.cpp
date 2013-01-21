@@ -1150,9 +1150,18 @@ bool WindowServerLuna::sysmgrEventFilters(QEvent* event)
 		return true;
 	}
 
-	if((type == QEvent::MouseButtonPress) || (type == QEvent::MouseButtonRelease) || (type == QEvent::MouseMove) ||
-		(type == QEvent::KeyPress) || (type == QEvent::KeyRelease) || (type == QEvent::GestureOverride))
-	{
+	if (type == QEvent::MouseButtonPress ||
+        type == QEvent::MouseButtonRelease ||
+        type == QEvent::MouseMove ||
+		type == QEvent::KeyPress ||
+        type == QEvent::KeyRelease ||
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        type == QEvent::TouchBegin ||
+        type == QEvent::TouchEnd ||
+        type == QEvent::TouchUpdate ||
+#endif
+        type == QEvent::GestureOverride)
+    {
 		if(!SystemUiController::instance()->isInDockMode()) {
 			if (m_topLevelMgr && ((TopLevelWindowManager*)m_topLevelMgr)->handleEvent(event)) {
 				luna_log(kWindowSrvChnl, "event consumed by TopLevelWindowManager: %d", type);

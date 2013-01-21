@@ -55,7 +55,7 @@ class QMouseEvent;
 class QGraphicsPixmapItem;
 class GraphicsItemContainer;
 class InputItem;
-
+class QTouchEvent;
 
 class LockWindow : public QGraphicsObject
 {
@@ -156,6 +156,10 @@ private:
 
 	void changeState(State newState);
 
+    bool handleMouseEvent(QMouseEvent *event);
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    bool handleTouchEvent(QTouchEvent *event);
+#endif
 	void handlePenDownEvent(Event* event);
 	void handlePenMoveEvent(Event* event);
 	void handlePenUpEvent(Event* event);

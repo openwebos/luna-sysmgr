@@ -38,6 +38,7 @@ QT_BEGIN_NAMESPACE
 class QGestureEvent;
 class QTapGesture;
 class QTapAndHoldGesture;
+class QTouchEvent;
 QT_END_NAMESPACE
 
 class CardWindowManagerState : public QState
@@ -75,6 +76,12 @@ public:
 
     virtual bool handleKeyNavigation(QKeyEvent* keyEvent) { return true; }
 
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    virtual void handleTouchBegin(QTouchEvent *e);
+    virtual void handleTouchEnd(QTouchEvent *e);
+    virtual void handleTouchUpdate(QTouchEvent *e);
+#endif
+
 protected:
 	virtual void onEntry(QEvent* event);
 	bool lastWindowAddedType() const;
@@ -107,6 +114,12 @@ public:
 	virtual void relayout(const QRectF& r, bool animate);
 
     virtual bool handleKeyNavigation(QKeyEvent* keyEvent);
+
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    virtual void handleTouchBegin(QTouchEvent *e);
+    virtual void handleTouchEnd(QTouchEvent *e);
+    virtual void handleTouchUpdate(QTouchEvent *e);
+#endif
 
 protected:
 	virtual void onEntry(QEvent* event);
@@ -197,6 +210,10 @@ public:
 
 	virtual bool supportLauncherOverlay() const;
 
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    virtual void handleTouchBegin(QTouchEvent *e);
+#endif
+
 protected:
 	virtual void onEntry(QEvent* event);
 };
@@ -218,6 +235,10 @@ public:
 	virtual bool supportLauncherOverlay() const;
 
     virtual void relayout(const QRect& r, bool animate);
+
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    virtual void handleTouchBegin(QTouchEvent *e);
+#endif
 
 protected:
 	virtual void onExit(QEvent* event);
@@ -249,6 +270,11 @@ public:
 	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
 
 	virtual void animationsFinished();
+
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    virtual void handleTouchEnd(QTouchEvent *e);
+    virtual void handleTouchUpdate(QTouchEvent *e);
+#endif
 
 protected:
 	virtual void onExit(QEvent* event);

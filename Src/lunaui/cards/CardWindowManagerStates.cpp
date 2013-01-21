@@ -95,6 +95,23 @@ void CardWindowManagerState::resizeWindow(CardWindow* w, int width, int height)
 	}
 }
 
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+void CardWindowManagerState::handleTouchBegin(QTouchEvent *e)
+{
+    e->ignore();
+}
+
+void CardWindowManagerState::handleTouchEnd(QTouchEvent *e)
+{
+    e->ignore();
+}
+
+void CardWindowManagerState::handleTouchUpdate(QTouchEvent *e)
+{
+    e->ignore();
+}
+#endif
+
 // --------------------------------------------------------------------------------------------------
 
 void MinimizeState::mousePressEvent(QGraphicsSceneMouseEvent* event)
@@ -172,6 +189,26 @@ void MinimizeState::onEntry(QEvent* event)
 	SystemUiController::instance()->setCardWindowMaximized(false);
 	SystemUiController::instance()->setMaximizedCardWindow(0);
 }
+
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+void MinimizeState::handleTouchBegin(QTouchEvent *e)
+{
+    e->accept();
+    m_wm->handleTouchBeginMinimized(e);
+}
+
+void MinimizeState::handleTouchEnd(QTouchEvent *e)
+{
+    e->accept();
+	m_wm->handleTouchEndMinimized(e);
+}
+
+void MinimizeState::handleTouchUpdate(QTouchEvent *e)
+{
+    e->accept();
+	m_wm->handleTouchUpdateMinimized(e);
+}
+#endif
 
 // --------------------------------------------------------------------------------------------------
 
@@ -615,6 +652,14 @@ bool PreparingState::supportLauncherOverlay() const
 	return false;
 }
 
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+void PreparingState::handleTouchBegin(QTouchEvent *e)
+{
+    e->accept();
+    m_wm->minimizeActiveWindow();
+}
+#endif
+
 // --------------------------------------------------------------------------------------------------
 
 void LoadingState::mousePressEvent(QGraphicsSceneMouseEvent* event)
@@ -667,6 +712,14 @@ void LoadingState::onExit(QEvent* event)
 		activeWin->stopLoadingOverlay();
 	}
 }
+
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+void LoadingState::handleTouchBegin(QTouchEvent *e)
+{
+    e->accept();
+    m_wm->minimizeActiveWindow();
+}
+#endif
 
 // --------------------------------------------------------------------------------------------------
 
@@ -739,3 +792,17 @@ void ReorderState::onEntry(QEvent* event)
 
 	SystemUiController::instance()->enterOrExitCardReorder(true);
 }
+
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+void ReorderState::handleTouchEnd(QTouchEvent *e)
+{
+    e->accept();
+    m_wm->handleTouchEndReorder(e);
+}
+
+void ReorderState::handleTouchUpdate(QTouchEvent *e)
+{
+    e->accept();
+    m_wm->handleTouchUpdateReorder(e);
+}
+#endif

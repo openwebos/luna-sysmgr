@@ -45,6 +45,10 @@
 
 #include <ProcessKiller.h>
 
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include "MouseEventEater.h"
+#endif
+
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <glib.h>
@@ -688,8 +692,12 @@ int main( int argc, char** argv)
 	QApplication app(argc, argv);
 	QApplication::setStartDragDistance(settings->tapRadius);
 	QApplication::setDoubleClickInterval (Settings::LunaSettings()->tapDoubleClickDuration);
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QCoreApplication::setAttribute(Qt::AA_SynthesizeTouchForUnhandledMouseEvents, true);
+#endif
+
 	host->show();
-	
+
 	initMallocStatsCb(HostBase::instance()->mainLoop(), s_mallocStatsInterval);
 
 
@@ -726,6 +734,11 @@ int main( int argc, char** argv)
 	WindowServer *windowServer = WindowServer::instance();
 	windowServer->installEventFilter(windowServer);
 
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    MouseEventEater *eater = new MouseEventEater();
+    QCoreApplication::instance()->installEventFilter(eater);
+#endif
+
 	// Initialize the SysMgr MemoryMonitor
 	MemoryMonitor::instance();
 
@@ -742,5 +755,10 @@ int main( int argc, char** argv)
 	    g_timeout_add(0, finishBootup, 0);
 	
 	app.exec();
+
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    delete eater;
+#endif
+
 	return 0;
 }

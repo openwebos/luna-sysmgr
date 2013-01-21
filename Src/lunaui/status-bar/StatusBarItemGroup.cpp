@@ -63,6 +63,9 @@ StatusBarItemGroup::StatusBarItemGroup(int height, bool hasArrow, bool showSepar
 	}
 
 	layout();
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    setAcceptTouchEvents(true);
+#endif
 }
 
 StatusBarItemGroup::~StatusBarItemGroup()
@@ -308,6 +311,29 @@ void StatusBarItemGroup::slotOverlayAnimationFinished()
 	if(m_menuObj)
 		m_menuObj->setVisible(false);
 }
+
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+bool StatusBarItemGroup::sceneEvent(QEvent *event)
+{
+    bool ret = false;
+
+    if (event->type() == QEvent::TouchBegin) {
+        if (m_actionable && isVisible()) {
+            m_mouseDown = true;
+            ret = true;
+        }
+    } else if (event->type() == QEvent::TouchEnd) {
+        if (m_actionable && m_mouseDown) {
+            actionTriggered();
+        }
+
+        m_mouseDown = false;
+        ret = true;
+    }
+
+    return ret;
+}
+#endif
 
 void StatusBarItemGroup::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {

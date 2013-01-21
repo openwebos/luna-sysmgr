@@ -378,6 +378,9 @@ LockWindow::LockWindow(uint32_t maxWidth, uint32_t maxHeight)
 	connect(this, SIGNAL(visibleChanged()), SLOT(slotVisibilityChanged()));
 
 	setLockTimeout(Preferences::instance()->lockTimeout());
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    setAcceptTouchEvents(true);
+#endif
 }
 
 LockWindow::~LockWindow()
@@ -1646,12 +1649,114 @@ void LockWindow::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
 }
 
 static const int kSlopFactorForClicks = 5;
+static QPointF mouseDownPos;
+static bool mouseDown = false;
+
+bool LockWindow::handleMouseEvent(QMouseEvent *event)
+{
+    bool ret = true;
+    Event ev;
+	ev.setMainFinger(true);
+
+	ev.x = mapFromScene(event->pos()).x();
+	ev.y = mapFromScene(event->pos()).y();
+	ev.modifiers = Event::modifiersFromQt(event->modifiers());
+
+	switch (event->type()) {
+        case QEvent::MouseButtonPress:
+            mouseDown = true;
+            mouseDownPos = event->pos();
+
+            ev.type = Event::PenDown;
+            handlePenDownEvent(&ev);
+            break;
+
+        case QEvent::MouseButtonRelease:
+            if (mouseDown) {
+                mouseDown = false;
+                QPointF diff = event->pos() - mouseDownPos;
+                ev.setClicked(diff.manhattanLength() <= kSlopFactorForClicks);
+            }
+
+            ev.type = Event::PenUp;
+            handlePenUpEvent(&ev);
+            break;
+
+        case QEvent::MouseMove:
+            if (!mouseDown) {
+                mouseDown = true; // fake the mouse down
+                mouseDownPos = event->pos();
+            }
+
+            ev.type = Event::PenMove;
+            handlePenMoveEvent(&ev);
+            break;
+
+        default:
+            ret = false;
+            break;
+	}
+
+    return ret;
+}
+
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+bool LockWindow::handleTouchEvent(QTouchEvent *event)
+{
+    if (event->touchPoints().isEmpty()) {
+        return false;
+    }
+
+    QPointF point = event->touchPoints().first().pos();
+    bool ret = true;
+    Event ev;
+	ev.setMainFinger(true);
+
+	ev.x = mapFromScene(point).x();
+	ev.y = mapFromScene(point).y();
+	ev.modifiers = Event::modifiersFromQt(event->modifiers());
+
+	switch (event->type()) {
+        case QEvent::TouchBegin:
+            mouseDown = true;
+            mouseDownPos = point;
+
+            ev.type = Event::PenDown;
+            handlePenDownEvent(&ev);
+            break;
+
+        case QEvent::TouchEnd:
+            if (mouseDown) {
+                mouseDown = false;
+                QPointF diff = point - mouseDownPos;
+                ev.setClicked(diff.manhattanLength() <= kSlopFactorForClicks);
+            }
+
+            ev.type = Event::PenUp;
+            handlePenUpEvent(&ev);
+            break;
+
+        case QEvent::TouchUpdate:
+            if (!mouseDown) {
+                mouseDown = true; // fake the mouse down
+                mouseDownPos = point;
+            }
+
+            ev.type = Event::PenMove;
+            handlePenMoveEvent(&ev);
+            break;
+
+        default:
+            ret = false;
+            break;
+	}
+
+    return ret;
+}
+#endif
 
 bool LockWindow::handleFilteredSceneEvent(QEvent* event)
 {
-	static QPointF mouseDownPos;
-	static bool mouseDown = false;
-
 	if ((event->type() == QEvent::KeyPress) || (event->type() == QEvent::KeyRelease)) { // filter the key events
 		if((m_state == StateNormal) || (m_state == StateDockMode) || ((m_state == StateUnlocked) && (isVisible())))
 			return true; // eat away all keys is the screen is locked
@@ -1676,52 +1781,21 @@ bool LockWindow::handleFilteredSceneEvent(QEvent* event)
 		return true;
 	}
 
-	QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
-	Event ev;
-	ev.setMainFinger(true);
-
-	ev.x = mapFromScene(mouseEvent->pos()).x();
-	ev.y = mapFromScene(mouseEvent->pos()).y();
-	ev.modifiers = Event::modifiersFromQt(mouseEvent->modifiers());
-
-	switch (mouseEvent->type()) {
-	case QEvent::MouseButtonPress: {
-		mouseDown = true;
-		mouseDownPos = mouseEvent->pos();
-
-		ev.type = Event::PenDown;
-		handlePenDownEvent(&ev);
-	}
-	break;
-
-	case QEvent::MouseButtonRelease:{
-		if (mouseDown) {
-			mouseDown = false;
-			QPointF diff = mouseEvent->pos() - mouseDownPos;
-			ev.setClicked(diff.manhattanLength() <= kSlopFactorForClicks);
-		}
-		ev.type = Event::PenUp;
-		handlePenUpEvent(&ev);
-	}
-	break;
-
-	case QEvent::MouseMove:{
-		if(!mouseDown)
-		{
-			mouseDown = true; // fake the mouse down
-			mouseDownPos = mouseEvent->pos();
-		}
-
-		ev.type = Event::PenMove;
-		handlePenMoveEvent(&ev);
-	}
-	break;
-
-	default:
-		break;
-	}
-
-	return true;
+    if (event->type() == QEvent::MouseButtonPress ||
+        event->type() == QEvent::MouseButtonRelease ||
+        event->type() == QEvent::MouseMove) {
+        return handleMouseEvent(static_cast<QMouseEvent *>(event));
+    }
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    else if (event->type() == QEvent::TouchBegin ||
+               event->type() == QEvent::TouchEnd ||
+               event->type() == QEvent::TouchUpdate) {
+        return handleTouchEvent(static_cast<QTouchEvent *>(event));
+    }
+	return false;
+#else
+    return true;
+#endif
 }
 
 

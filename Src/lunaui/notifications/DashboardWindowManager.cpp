@@ -128,6 +128,9 @@ DashboardWindowManager::DashboardWindowManager(int maxWidth, int maxHeight)
 	                       this, SLOT(slotOpenDashboard()));
 	connect(SystemUiController::instance(), SIGNAL(signalCloseAlert()),
 	                       this, SLOT(slotCloseAlert()));
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    setAcceptTouchEvents(true);
+#endif
 }
 
 DashboardWindowManager::~DashboardWindowManager()
@@ -1059,14 +1062,55 @@ bool DashboardWindowManager::sceneEvent(QEvent* event)
 		}
 		break;
 	}
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    case QEvent::TouchBegin:
+    case QEvent::TouchUpdate:
+        if (!m_isOverlay) {
+            return true;
+        }
 
+        if (dashboardOpen()) {
+            return true;
+        }
+
+        return false;
+
+    case QEvent::TouchEnd: {
+        QTouchEvent *te = static_cast<QTouchEvent *>(event);
+
+        if (te->touchPoints().isEmpty()) {
+            return false;
+        }
+
+        if (!m_isOverlay) {
+            return true;
+        }
+
+        if (dashboardOpen()) {
+            hideDashboardWindow();
+            event->accept();
+
+            QPointF pos = mapToItem(m_bannerWin,
+                                    te->touchPoints().first().pos());
+
+            if (m_bannerWin->boundingRect().contains(pos)) {
+                m_bannerWin->resetIgnoreGestureUpEvent();
+            }
+
+            m_dashboardWinContainer->resetLocalState();
+        } else {
+            event->ignore();
+        }
+
+        return event->isAccepted();
+        }
+#endif
 	default:
 		break;
 	}
 
 	return WindowManagerBase::sceneEvent(event);
 }
-
 
 void DashboardWindowManager::raiseAlertWindow(AlertWindow* window)
 {

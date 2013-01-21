@@ -104,7 +104,11 @@ CardWindow::CardWindow(WindowType::Type type, HostWindowData* data, IpcClientHos
 	, m_maximized(false)
 	, m_forceFocus(true)
 	, m_focused(false)
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    , m_touchEventsEnabled(true)
+#else
 	, m_touchEventsEnabled(false)
+#endif
 	, m_pendingFocus(PendingFocusNone)
 	, m_loadingAnim(0)
 	, m_loadingTimerId(0)
@@ -145,7 +149,11 @@ CardWindow::CardWindow(WindowType::Type type, const QPixmap& pixmap)
 	, m_maximized (false)
 	, m_forceFocus(true)
 	, m_focused(false)
-	, m_touchEventsEnabled(false)
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    , m_touchEventsEnabled(true)
+#else
+    , m_touchEventsEnabled(false)
+#endif
 	, m_pendingFocus(PendingFocusNone)
 	, m_loadingAnim(0)
 	, m_loadingTimerId(0)
@@ -351,15 +359,27 @@ bool CardWindow::sceneEvent(QEvent* event)
 				}
 			}
 		}
-		else if (event->type() == QEvent::TouchBegin
-			|| event->type() == QEvent::TouchUpdate
-			|| event->type() == QEvent::TouchEnd) 
-		{
-		    QTouchEvent* te = static_cast<QTouchEvent*>(event);
-		    if (touchEvent (te)) {
-				return true;
-			}
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        else if (event->type() == QEvent::TouchBegin ||
+                   event->type() == QEvent::TouchUpdate ||
+                   event->type() == QEvent::TouchEnd) {
+		    QTouchEvent* te = static_cast<QTouchEvent *>(event);
+
+            if (te->touchPoints().isEmpty()) {
+                return false;
+            }
+
+            if (te->type() == QEvent::TouchBegin) {
+                handleTouchBegin(te);
+            } else if (te->type() == QEvent::TouchEnd) {
+                handleTouchEnd(te);
+            } else if (te->type() == QEvent::TouchUpdate) {
+                handleTouchUpdate(te);
+            }
+
+            return touchEvent(te);
 		}
+#endif
         else if (event->type() == QEvent::KeyPress) {
             // Tab is normally treated as focus shifting in qgraphicsitems
             if (static_cast<QKeyEvent*>(event)->key() == Qt::Key_Tab) {
@@ -392,8 +412,6 @@ void CardWindow::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
 	event->accept();
 
-	QRectF br = boundingRect();
-
 	Event ev;
 	ev.type = Event::PenDown;
 	ev.setMainFinger(true);
@@ -420,8 +438,6 @@ void CardWindow::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 			m_modalChild->mouseDoubleClickEvent(event);
 			return;
 	}
-
-	QRectF br = boundingRect();
 
 	Event ev;
 	ev.type = Event::PenDown;
@@ -450,8 +466,6 @@ void CardWindow::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 			return;
 	}
 
-	QRectF br = boundingRect();
-
 	Event ev;
 	ev.type = Event::PenMove;
 	ev.setMainFinger(true);
@@ -478,8 +492,6 @@ void CardWindow::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 			return;
 	}
 
-	QRectF br = boundingRect();
-
 	Event ev;
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	if (event->canceled())
@@ -502,6 +514,108 @@ void CardWindow::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	inputEvent(&ev);
 }
 
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+void CardWindow::handleTouchBegin(QTouchEvent *te)
+{
+    switch (forwardToModal()) {
+        case ParentHandleEvent:
+          break;
+
+        case WaitForChildToAcceptEvents:
+            te->accept();
+            return;
+
+        case ForwardEventToChild:
+            m_modalChild->handleTouchBegin(te);
+            return;
+    }
+
+    if (!m_focused || m_pendingFocus == PendingFocusFalse) {
+        te->ignore();
+        return;
+    }
+
+    Event ev;
+    ev.type = Event::PenDown;
+    ev.setMainFinger(true);
+    qreal x = te->touchPoints().first().pos().x();
+    qreal y = te->touchPoints().first().pos().y();
+    mapCoordinates(x, y);
+    ev.x = x;
+    ev.y = y;
+    ev.clickCount = 1;
+    ev.modifiers = Event::modifiersFromQt(te->modifiers());
+    ev.time = Time::curSysTimeMs();
+
+    inputEvent(&ev);
+}
+
+void CardWindow::handleTouchEnd(QTouchEvent *te)
+{
+    switch (forwardToModal()) {
+        case ParentHandleEvent:
+            break;
+
+        case WaitForChildToAcceptEvents:
+            return;
+
+        case ForwardEventToChild:
+            m_modalChild->handleTouchEnd(te);
+            return;
+    }
+
+    QPointF pos = te->touchPoints().first().pos();
+    Event ev;
+
+    if (te->type() == QTouchEvent::TouchCancel) {
+        ev.type = Event::PenCancel;
+    } else {
+        ev.type = Event::PenUp;
+    }
+
+    ev.setMainFinger(true);
+    qreal x = pos.x();
+    qreal y = pos.y();
+    mapCoordinates(x,y);
+    ev.x = x;
+    ev.y = y;
+    ev.clickCount = 0;
+    ev.modifiers = Event::modifiersFromQt(te->modifiers());
+    ev.time = Time::curSysTimeMs();
+
+    inputEvent(&ev);
+}
+
+void CardWindow::handleTouchUpdate(QTouchEvent *te)
+{
+    switch (forwardToModal()) {
+        case ParentHandleEvent:
+            break;
+
+        case WaitForChildToAcceptEvents:
+            return;
+
+        case ForwardEventToChild:
+            m_modalChild->handleTouchUpdate(te);
+            return;
+    }
+
+    QPointF pos = te->touchPoints().first().pos();
+    Event ev;
+    ev.type = Event::PenMove;
+    ev.setMainFinger(true);
+    qreal x = pos.x();
+    qreal y = pos.y();
+    mapCoordinates(x,y);
+    ev.x = x;
+    ev.y = y;
+    ev.modifiers = Event::modifiersFromQt(te->modifiers());
+    ev.time = Time::curSysTimeMs();
+
+    inputEvent(&ev);
+}
+#endif
+
 bool CardWindow::mouseFlickEvent(QGestureEvent* event)
 {
 	switch(forwardToModal()) {
@@ -517,7 +631,6 @@ bool CardWindow::mouseFlickEvent(QGestureEvent* event)
 	FlickGesture* flick = static_cast<FlickGesture*>(g);
 
 	QPointF pos = mapFromScene(event->mapToGraphicsScene(flick->hotSpot()));
-	QRectF br = boundingRect();
 
 	Event ev;
 	ev.type = Event::PenFlick;
@@ -552,7 +665,6 @@ bool CardWindow::mouseSingleClickEvent(QGestureEvent* singleClickEvent)
 	SingleClickGesture* singleClick = static_cast<SingleClickGesture*>(g);
 
 	QPointF pos = mapFromScene(singleClickEvent->mapToGraphicsScene(singleClick->hotSpot()));
-	QRectF br = boundingRect();
 
 	Event ev;
 	ev.type = Event::PenSingleTap;
@@ -603,8 +715,6 @@ bool CardWindow::pinchEvent(QGestureEvent* event)
 		return false;
 	}
 
-	QRectF br = boundingRect();
-	
 	ev.gestureScale = pinch->totalScaleFactor();
 	ev.gestureRotate = pinch->totalRotationAngle();
 	QPointF centerPt = mapFromScene(event->mapToGraphicsScene(pinch->centerPoint()));

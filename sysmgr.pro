@@ -379,7 +379,8 @@ HEADERS = \
     LsmUtils.h
 
 contains(QT_VERSION, "^5.*") {
-    HEADERS += QmlInputItemQt5.h
+    HEADERS += QmlInputItemQt5.h \
+        MouseEventEater.h
 } else {
     HEADERS += QmlInputItem.h
 }

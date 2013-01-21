@@ -472,6 +472,12 @@ private:
 	bool canPositionModalAtY(int yLoc, bool increasePositiveSpace, int& correctYLoc);
 
 	int forwardToModal();
+
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    void handleTouchBegin(QTouchEvent *te);
+    void handleTouchEnd(QTouchEvent *te);
+    void handleTouchUpdate(QTouchEvent *te);
+#endif
 };
 
 QDebug operator<<(QDebug, const CardWindow::Position &);

@@ -119,8 +119,11 @@ QuickLaunchBar::QuickLaunchBar(const QRectF& geom,Quicklauncher * p_quicklaunche
 	{
 		m_qp_launcherAccessButton->setParentItem(this);
 		m_qp_launcherAccessButton->setVisible(false);
-
-		connect(m_qp_launcherAccessButton,SIGNAL(signalContact()),this,SIGNAL(signalToggleLauncher()));
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        connect(m_qp_launcherAccessButton,SIGNAL(signalActivated()),this,SIGNAL(signalToggleLauncher()));
+#else
+        connect(m_qp_launcherAccessButton,SIGNAL(signalContact()),this,SIGNAL(signalToggleLauncher()));
+#endif
 	}
 	setAcceptTouchEvents(true);
 	grabGesture((Qt::GestureType) SysMgrGestureFlick);

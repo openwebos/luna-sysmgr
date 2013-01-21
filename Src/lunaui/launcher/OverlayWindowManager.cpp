@@ -758,10 +758,100 @@ bool OverlayWindowManager::sceneEvent(QEvent* event)
 			if (mouseFlickEvent(static_cast<FlickGesture*>(g)))
 				return true;
 		}
-	}
+    }
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    else if (event->type() == QEvent::TouchBegin ||
+               event->type() == QEvent::TouchEnd ||
+               event->type() == QEvent::TouchCancel ||
+               event->type() == QEvent::TouchUpdate) {
+        QTouchEvent *e = static_cast<QTouchEvent *>(event);
+
+        if (e->touchPoints().isEmpty()) {
+            return false;
+        } else if (e->type() == QEvent::TouchBegin) {
+            return handleTouchBegin(e);
+        } else if (e->type() == QEvent::TouchEnd ||
+                   e->type() == QEvent::TouchCancel) {
+            return handleTouchEnd(e);
+        } else if (e->type() == QEvent::TouchBegin) {
+            return handleTouchUpdate(e);
+        }
+    }
+#endif
 	return QGraphicsObject::sceneEvent(event);
 }
 
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+bool OverlayWindowManager::handleTouchBegin(QTouchEvent *e)
+{
+    QPointF p = e->touchPoints().first().pos();
+    Event ev;
+	ev.type = Event::PenDown;
+	ev.setMainFinger(true);
+	ev.x = p.x();
+	ev.y = p.y();
+	ev.modifiers = Event::modifiersFromQt(e->modifiers());
+	ev.clickCount = 1;
+	ev.time = Time::curSysTimeMs();
+
+    if (handlePenDownEvent(&ev)) {
+		e->accept();
+	} else {
+		e->ignore();
+    }
+
+    return e->isAccepted();
+}
+
+bool OverlayWindowManager::handleTouchEnd(QTouchEvent *e)
+{
+    QPointF p = e->touchPoints().first().pos();
+    Event ev;
+	ev.setMainFinger(true);
+	ev.x = p.x();
+	ev.y = p.y();
+	ev.modifiers = Event::modifiersFromQt(e->modifiers());
+	ev.clickCount = 0;
+	ev.time = Time::curSysTimeMs();
+    bool handled = false;
+
+    if (e->type() == QEvent::TouchEnd){
+		ev.type = Event::PenUp;
+		handled = handlePenUpEvent(&ev);
+	} else {
+		ev.type = Event::PenCancel;
+		handled = handlePenCancelEvent(&ev);
+	}
+
+    if (handled) {
+        e->accept();
+    } else {
+        e->ignore();
+    }
+
+    return e->isAccepted();
+}
+
+bool OverlayWindowManager::handleTouchUpdate(QTouchEvent *e)
+{
+    QPointF p = e->touchPoints().first().pos();
+    Event ev;
+	ev.type = Event::PenMove;
+	ev.setMainFinger(true);
+	ev.x = p.x();
+	ev.y = p.y();
+	ev.modifiers = Event::modifiersFromQt(e->modifiers());
+	ev.time = Time::curSysTimeMs();
+
+    if (handlePenMoveEvent(&ev)) {
+        e->accept();
+    } else {
+        e->ignore();
+    }
+
+    return e->isAccepted();
+}
+#endif
 
 void OverlayWindowManager::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {

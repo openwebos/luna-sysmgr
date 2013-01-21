@@ -69,6 +69,8 @@ static const int s_marginSlice = 5;
 
 int kAngryCardThreshold = 0;
 
+static const qreal kReorderEndWindowOpacity = 1.0f;
+
 // -------------------------------------------------------------------------------------------------------------
 
 CardWindowManager::CardWindowManager(int maxWidth, int maxHeight)
@@ -143,7 +145,9 @@ CardWindowManager::CardWindowManager(int maxWidth, int maxHeight)
 	grabGesture(Qt::TapGesture);
 	grabGesture(Qt::TapAndHoldGesture);
 	grabGesture((Qt::GestureType) SysMgrGestureFlick);
-
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    setAcceptTouchEvents(true);
+#endif
 }
 
 CardWindowManager::~CardWindowManager()
@@ -1320,8 +1324,253 @@ bool CardWindowManager::sceneEvent(QEvent* event)
 			return true;
 		}
 	}
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    else if (event->type() == QEvent::TouchBegin ||
+               event->type() == QEvent::TouchEnd ||
+               event->type() == QEvent::TouchCancel ||
+               event->type() == QEvent::TouchUpdate) {
+        QTouchEvent *e = static_cast<QTouchEvent *>(event);
+
+        if (e->touchPoints().isEmpty()) {
+            return false;
+        } else if (e->type() == QEvent::TouchBegin) {
+            return handleTouchBegin(e);
+        } else if (e->type() == QEvent::TouchEnd ||
+                   e->type() == QEvent::TouchCancel) {
+            return handleTouchEnd(e);
+        } else if (e->type() == QEvent::TouchUpdate) {
+            return handleTouchUpdate(e);
+        }
+    }
+#endif
 	return QGraphicsObject::sceneEvent(event);
 }
+
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+bool CardWindowManager::handleTouchBegin(QTouchEvent *e)
+{
+    if (m_penDown) {
+        e->accept();
+		return true;
+    }
+
+	resetMouseTrackState();
+
+    if (m_groups.empty() || !m_activeGroup) {
+		return false;
+    }
+
+	m_penDown = true;
+	updateAllowWindowUpdates();
+
+	m_curState->handleTouchBegin(e);
+
+    return e->isAccepted();
+}
+
+bool CardWindowManager::handleTouchEnd(QTouchEvent *e)
+{
+    if (m_penDown) {
+        m_curState->handleTouchEnd(e);
+        e->accept();
+    }
+
+	resetMouseTrackState();
+
+    return e->isAccepted();
+}
+
+bool CardWindowManager::handleTouchUpdate(QTouchEvent *e)
+{
+    if (!m_penDown) {
+        return false;
+    }
+
+    m_curState->handleTouchUpdate(e);
+
+    return e->isAccepted();
+}
+
+void CardWindowManager::handleTouchBeginMinimized(QTouchEvent* e)
+{
+    // try to capture the card the user first touched
+    if (m_activeGroup &&
+        m_activeGroup->setActiveCard(e->touchPoints().first().scenePos())) {
+        m_draggedWin = m_activeGroup->activeCard();
+    }
+}
+
+void CardWindowManager::handleTouchUpdateMinimized(QTouchEvent* e)
+{
+    if (m_groups.isEmpty() || !m_activeGroup) {
+        return;
+    }
+
+    QTouchEvent::TouchPoint p = e->touchPoints().first();
+    QPointF delta = p.scenePos() - p.startScenePos();
+    QPointF diff; // distance move between last and current mouse position
+
+    // lock movement to an axis
+    if (m_movement == MovementUnlocked) {
+        if ((delta.x() * delta.x() + delta.y() * delta.y()) <
+            Settings::LunaSettings()->tapRadiusSquared) {
+            return;
+        }
+
+        if (abs(delta.x()) > 0.866 * abs(delta.y())) {
+            m_movement = MovementHLocked;
+            m_activeGroupPivot = m_activeGroup->x();
+        } else {
+			m_movement = MovementVLocked;
+        }
+
+        diff = delta;
+    } else {
+        diff = p.scenePos() - p.lastScenePos();
+    }
+
+    if (m_movement == MovementHLocked) {
+        if (m_trackWithinGroup) {
+            m_trackWithinGroup = !m_activeGroup->atEdge(diff.x());
+
+            if (m_trackWithinGroup) {
+                // shift cards within the active group
+                m_activeGroup->adjustHorizontally(diff.x());
+
+                slideAllGroups();
+            } else {
+                m_activeGroupPivot = m_activeGroup->x();
+            }
+        }
+
+        if (!m_trackWithinGroup) {
+            m_activeGroupPivot += diff.x();
+            slideAllGroupsTo(m_activeGroupPivot);
+        }
+    } else if (m_movement == MovementVLocked) {
+        if (!m_draggedWin) {
+            if (m_activeGroup->setActiveCard(p.scenePos())) {
+                m_draggedWin = m_activeGroup->activeCard();
+            }
+
+            if (!m_draggedWin) {
+                return;
+            }
+        }
+
+        // ignore pen movements outside the vertical pillar around
+        // the active window
+        QPointF mappedPos = m_draggedWin->mapFromParent(p.scenePos());
+
+        if (mappedPos.x() < m_draggedWin->boundingRect().x() ||
+            mappedPos.x() >= m_draggedWin->boundingRect().right()) {
+            return;
+        }
+
+        if (delta.y() == 0) {
+            return;
+        }
+
+        if (!m_playedAngryCardStretchSound &&
+            (delta.y() > kAngryCardThreshold) && playAngryCardSounds()) {
+            SoundPlayerPool::instance()->playFeedback("carddrag");
+            m_playedAngryCardStretchSound = true;
+        }
+
+        removeAnimationForWindow(m_draggedWin);
+
+        // cards are always offset from the parents origin
+        CardWindow::Position pos = m_draggedWin->position();
+        pos.trans.setY(delta.y());
+        m_draggedWin->setPosition(pos);
+    }
+}
+
+void CardWindowManager::handleTouchUpdateReorder(QTouchEvent* e)
+{
+    CardWindow* activeWin = activeWindow();
+
+    if (!activeWin) {
+        return;
+    }
+
+    QTouchEvent::TouchPoint p = e->touchPoints().first();
+
+    // track the active window under the users finger
+    QPointF delta = p.scenePos() - p.lastScenePos();
+    CardWindow::Position pos;
+    pos.trans = QVector3D(activeWin->position().trans.x() + delta.x(),
+                          activeWin->position().trans.y() + delta.y(),
+                          kActiveScale);
+    activeWin->setPosition(pos);
+
+    // should we switch zones?
+    ReorderZone newZone = getReorderZone(p.scenePos().toPoint());
+
+    if (newZone == m_reorderZone && newZone == ReorderZone_Center) {
+        moveReorderSlotCenter(p.scenePos());
+    } else if (newZone != m_reorderZone) {
+        if (newZone == ReorderZone_Right) {
+            m_reorderZone = newZone;
+            moveReorderSlotRight();
+        } else if (newZone == ReorderZone_Left) {
+            m_reorderZone = newZone;
+            moveReorderSlotLeft();
+        } else {
+            m_reorderZone = newZone;
+        }
+    }
+}
+
+void CardWindowManager::handleTouchEndMinimized(QTouchEvent* e)
+{
+    Q_UNUSED(e);
+
+    if (m_groups.empty() || m_seenFlickOrTap) {
+        return;
+    }
+
+    if (m_movement == MovementVLocked) {
+        // Did we go too close to the top?
+        if (m_draggedWin) {
+            QRectF pr = m_draggedWin->
+                mapRectToParent(m_draggedWin->boundingRect());
+
+            if (pr.center().y() > boundingRect().bottom()) {
+                closeWindow(m_draggedWin, true);
+            } else if (pr.center().y() < boundingRect().top()) {
+                closeWindow(m_draggedWin);
+            } else {
+                // else just restore all windows back to original position
+                slideAllGroups();
+            }
+        }
+    } else if (m_movement == MovementHLocked) {
+        setActiveGroup(groupClosestToCenterHorizontally());
+        slideAllGroups();
+    }
+}
+
+void CardWindowManager::handleTouchEndReorder(QTouchEvent* e)
+{
+    Q_UNUSED(e);
+
+    Q_EMIT signalExitReorder(false);
+
+    CardWindow* activeWin = activeWindow();
+
+    if (!activeWin) {
+        return;
+    }
+
+    // TODO: fix the y for the draggedWin
+    activeWin->setOpacity(kReorderEndWindowOpacity);
+    activeWin->enableShadow();
+    activeWin->setAttachedToGroup(true);
+
+    slideAllGroups();
+}
+#endif
 
 void CardWindowManager::tapGestureEvent(QTapGesture* event)
 {
@@ -1839,7 +2088,7 @@ void CardWindowManager::handleMouseReleaseMinimized(QGraphicsSceneMouseEvent* ev
 
 void CardWindowManager::handleMouseReleaseReorder(QGraphicsSceneMouseEvent* event)
 {
-	Q_UNUSED(event)
+	Q_UNUSED(event);
 
 	Q_EMIT signalExitReorder(false);
 
@@ -1848,7 +2097,7 @@ void CardWindowManager::handleMouseReleaseReorder(QGraphicsSceneMouseEvent* even
 		return;
 
 	// TODO: fix the y for the draggedWin
-	activeWin->setOpacity(1.0);
+	activeWin->setOpacity(kReorderEndWindowOpacity);
 	activeWin->enableShadow();
 	activeWin->setAttachedToGroup(true);
 

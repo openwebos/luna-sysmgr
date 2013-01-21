@@ -145,6 +145,16 @@ private:
 	void handleMouseReleaseMinimized(QGraphicsSceneMouseEvent* event);
 	void handleMouseReleaseReorder(QGraphicsSceneMouseEvent* event);
 
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    void handleTouchBeginMinimized(QTouchEvent* e);
+
+    void handleTouchUpdateMinimized(QTouchEvent* e);
+    void handleTouchUpdateReorder(QTouchEvent* e);
+
+    void handleTouchEndMinimized(QTouchEvent* e);
+    void handleTouchEndReorder(QTouchEvent* e);
+#endif
+
 	void handleFlickGestureMinimized(QGestureEvent* event);
 
 	void handleTapGestureMinimized(QTapGesture* event);
@@ -251,6 +261,12 @@ private:
     void updateAngryCardThreshold();
 
         void markFirstCardDone();
+
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    bool handleTouchBegin(QTouchEvent *e);
+    bool handleTouchEnd(QTouchEvent *e);
+    bool handleTouchUpdate(QTouchEvent *e);
+#endif
 
 	QSet<CardWindow*> m_pendingActionWinSet;
     QSet<CardWindow*> m_pendingTouchToShareWinSet;

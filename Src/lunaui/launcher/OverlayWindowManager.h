@@ -323,6 +323,12 @@ private:
 	void animateShowLauncher();
 	void animateHideLauncher();
 
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    bool handleTouchBegin(QTouchEvent *e);
+    bool handleTouchEnd(QTouchEvent *e);
+    bool handleTouchUpdate(QTouchEvent *e);
+#endif
+
 private:
 
 	enum DragIconState {
