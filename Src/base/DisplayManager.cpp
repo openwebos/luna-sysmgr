@@ -3485,8 +3485,11 @@ void DisplayManager::updateLockState (DisplayLockState lockState, DisplayState d
         switch (lockState) {
             case DisplayLockLocked:
                 {
-                    g_debug ("%s: firing DISPLAY_LOCK_SCREEN", __PRETTY_FUNCTION__);
-                    Q_EMIT signalLockStateChange (DISPLAY_LOCK_SCREEN, displayEvent);
+                    if(!Settings::LunaSettings()->disableLocking)
+                    {
+                        g_debug ("%s: firing DISPLAY_LOCK_SCREEN", __PRETTY_FUNCTION__);
+                        Q_EMIT signalLockStateChange (DISPLAY_LOCK_SCREEN, displayEvent);
+                    }
                 }
                 break;
             case DisplayLockUnlocked:
