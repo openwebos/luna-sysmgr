@@ -1200,6 +1200,28 @@ bool WindowServerLuna::sysmgrEventFilters(QEvent* event)
 		}
 	}
 
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    if (m_overlayMgr && (type == QEvent::TouchBegin ||
+                         type == QEvent::TouchEnd ||
+                         type == QEvent::TouchCancel ||
+                         type == QEvent::TouchUpdate)) {
+        QTouchEvent *te = static_cast<QTouchEvent *>(event);
+        OverlayWindowManager *owm =
+            static_cast<OverlayWindowManager *>(m_overlayMgr);
+
+        if (!te->touchPoints().isEmpty() && owm->universalSearchState() ==
+            OverlayWindowManager::StateUSearchVisible) {
+            if (type == QEvent::TouchBegin) {
+                return owm->handleTouchBegin(te);
+            } else if (type == QEvent::TouchEnd || type == QEvent::TouchCancel) {
+                return owm->handleTouchEnd(te);
+            } else if (type == QEvent::TouchUpdate) {
+                return owm->handleTouchUpdate(te);
+            }
+        }
+    }
+#endif
+
 	return false;
 }
 

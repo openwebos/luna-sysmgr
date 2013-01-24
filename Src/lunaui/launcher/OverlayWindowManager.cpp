@@ -89,6 +89,10 @@ static const int kMaxDragSide = 64; // clamp the drag image to 128x128
 
 static const char *kOverlayState = "overlayViewState";
 
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+static const int kTouchPointYOffset = 50;
+#endif
+
 #define TEST_DISABLE_LAUNCHER3	1
 
 #define SEARCHPILL_BACKGROUND_FILEPATH QString("search-field-bg-launcher.png")
@@ -784,7 +788,7 @@ bool OverlayWindowManager::sceneEvent(QEvent* event)
 #if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 bool OverlayWindowManager::handleTouchBegin(QTouchEvent *e)
 {
-    QPointF p = e->touchPoints().first().pos();
+    QPointF p = e->touchPoints().first().scenePos();
     Event ev;
 	ev.type = Event::PenDown;
 	ev.setMainFinger(true);
@@ -805,7 +809,7 @@ bool OverlayWindowManager::handleTouchBegin(QTouchEvent *e)
 
 bool OverlayWindowManager::handleTouchEnd(QTouchEvent *e)
 {
-    QPointF p = e->touchPoints().first().pos();
+    QPointF p = e->touchPoints().first().scenePos();
     Event ev;
 	ev.setMainFinger(true);
 	ev.x = p.x();
@@ -834,7 +838,7 @@ bool OverlayWindowManager::handleTouchEnd(QTouchEvent *e)
 
 bool OverlayWindowManager::handleTouchUpdate(QTouchEvent *e)
 {
-    QPointF p = e->touchPoints().first().pos();
+    QPointF p = e->touchPoints().first().scenePos();
     Event ev;
 	ev.type = Event::PenMove;
 	ev.setMainFinger(true);
@@ -1008,7 +1012,7 @@ void OverlayWindowManager::keyReleaseEvent(QKeyEvent* event)
 bool OverlayWindowManager::handlePenDownEvent(Event* event)
 {
 	bool handled = false;
-	
+
 	if (m_penDownState != PenDownInvalid || event->rejected())
 		return false;
 
@@ -1337,13 +1341,17 @@ void OverlayWindowManager::slotPositiveSpaceChanged(const QRect& r)
 
 void OverlayWindowManager::mapCoordToWindow(Window* win, int& x, int& y) const
 {
-	if (!win)
-		return;
+    if (!win)
+        return;
 
-	QPointF pt = win->mapFromItem(this, x, y);
-	QRectF br = win->boundingRect();
-	x = pt.x() - br.x();
-	y = pt.y() - br.y();
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    y -= kTouchPointYOffset;
+#else
+    QPointF pt = win->mapFromItem(this, x, y);
+    QRectF br = win->boundingRect();
+    x = pt.x() - br.x();
+    y = pt.y() - br.y();
+#endif
 }
 
 void OverlayWindowManager::slotLauncherOpened()
