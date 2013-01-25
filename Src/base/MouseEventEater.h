@@ -22,12 +22,12 @@
 #ifndef MOUSEEVENTEATER_H
 #define MOUSEEVENTEATER_H
 
+#include <QApplication>
+#include <QMouseEvent>
 #include <QObject>
-#include <QEvent>
+#include <QWidget>
 
-QT_BEGIN_NAMESPACE
-class QEvent;
-QT_END_NAMESPACE
+#include "HostBase.h"
 
 class MouseEventEater : public QObject
 {
@@ -42,11 +42,25 @@ protected:
             e->type() == QEvent::MouseButtonPress ||
             e->type() == QEvent::MouseButtonDblClick ||
             e->type() == QEvent::MouseMove) {
-            e->ignore();
-            return true;
+            QMouseEvent *me = static_cast<QMouseEvent *>(e);
+            HostInfo info = HostBase::instance()->getInfo();
+            int frameHeight = 0;
+            QWidget *w = QApplication::activeWindow();
+
+            if (w) {
+                frameHeight = w->frameGeometry().height() -
+                              w->geometry().height();
+            }
+
+            // Filter out mouse events inside the window area, they will
+            // be converted to touch events by Qt
+            if (me->globalY() < (info.displayHeight + frameHeight)) {
+                e->ignore();
+                return true;
+            }
         }
 
-        return QObject::eventFilter(o, e);
+        return false;
     }
 };
 
