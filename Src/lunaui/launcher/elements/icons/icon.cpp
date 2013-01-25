@@ -1652,7 +1652,11 @@ bool IconBase::sceneEvent(QEvent * event)
 		//			}
 		//			return true;
 		//		}
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		g = ge->gesture((Qt::GestureType) SysMgrGestureFlick);
+#else
+        g = ge->gesture(FlickGesture::gestureType());
+#endif
 		if (g) {
 			FlickGesture* flick = static_cast<FlickGesture*>(g);
 			if (flick->state() == Qt::GestureFinished) {

@@ -269,7 +269,11 @@ bool SystemUiController::handleGestureEvent (QGestureEvent* event)
 
 	if (!t) {
 		if (Settings::LunaSettings()->uiType != Settings::UI_MINIMAL && !m_emergencyMode) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 			t = event->gesture((Qt::GestureType) SysMgrGestureScreenEdgeFlick);
+#else
+			t = event->gesture(ScreenEdgeFlickGesture::gestureType());
+#endif
 			if (t)
 				handleScreenEdgeFlickGesture(t);
 		}

@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2010-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include <QGesture>
 #include <QTapGesture>
 #include "SingleClickGesture.h"
+#include "WebosTapAndHoldGesture.h"
 #include "FlickGesture.h"
 #include "ScreenEdgeFlickGesture.h"
 
@@ -43,12 +44,18 @@ IMEView::IMEView(QGraphicsItem* parent)
 	setAcceptTouchEvents(true);
 
 	grabGesture(Qt::TapGesture);
-	grabGesture(Qt::TapAndHoldGesture);
 	grabGesture(Qt::PinchGesture);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+	grabGesture(Qt::TapAndHoldGesture);
 	grabGesture((Qt::GestureType) SysMgrGestureFlick);
 	grabGesture((Qt::GestureType) SysMgrGestureSingleClick);
 	grabGesture((Qt::GestureType) SysMgrGestureScreenEdgeFlick);
-
+#else
+    grabGesture(WebosTapAndHoldGesture::gestureType());
+    grabGesture((Qt::GestureType) FlickGesture::gestureType());
+    grabGesture((Qt::GestureType) SingleClickGesture::gestureType());
+    grabGesture((Qt::GestureType) ScreenEdgeFlickGesture::gestureType());
+#endif
     setVisible(false);
 }
 
@@ -110,7 +117,7 @@ bool IMEView::sceneEvent(QEvent* event)
 				return true;
 			}
 		}
-		else if ((g = ge->gesture(Qt::TapAndHoldGesture))) {
+        else if ((g = ge->gesture(WebosTapAndHoldGesture::gestureType()))) {
 			if (acceptPoint(mapFromScene(ge->mapToGraphicsScene(g->hotSpot())))) {
 				event->accept();
 				return true;
@@ -122,19 +129,27 @@ bool IMEView::sceneEvent(QEvent* event)
 				return true;
 			}
 		}
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		else if ((g = ge->gesture((Qt::GestureType) SysMgrGestureFlick))) {
+#else
+        else if ((g = ge->gesture(FlickGesture::gestureType()))) {
+#endif
 			if (acceptPoint(mapFromScene(ge->mapToGraphicsScene(g->hotSpot())))) {
 				event->accept();
 				return true;
 			}
 		}
-		else if ((g = ge->gesture((Qt::GestureType) SysMgrGestureSingleClick))) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+        else if ((g = ge->gesture(SingleClickGesture::gestureType()))) {
+#else
+        else if ((g = ge->gesture(ScreenEdgeFlickGesture::gestureType()))) {
+#endif
 			if (acceptPoint(mapFromScene(ge->mapToGraphicsScene(g->hotSpot())))) {
 				event->accept();
 				return true;
 			}
 		}
-		else if ((g = ge->gesture((Qt::GestureType) SysMgrGestureSingleClick))) {
+        else if ((g = ge->gesture(SingleClickGesture::gestureType()))) {
 			if (acceptPoint(mapFromScene(ge->mapToGraphicsScene(g->hotSpot())))) {
 				event->accept();
 				return true;
@@ -150,7 +165,11 @@ bool IMEView::sceneEvent(QEvent* event)
 			return true;
 		}
 		if (!g) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 			QGesture* g = ge->gesture((Qt::GestureType) SysMgrGestureScreenEdgeFlick);
+#else
+            QGesture* g = ge->gesture(ScreenEdgeFlickGesture::gestureType());
+#endif
 			if (g && g->state() == Qt::GestureFinished) {
 				screenEdgeFlickEvent(static_cast<ScreenEdgeFlickGesture*>(g));
 				return true;

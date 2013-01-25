@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2010-2013 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,34 +15,21 @@
 * limitations under the License.
 *
 * LICENSE@@@ */
-
-
-
-
-#ifndef SINGLECLICKGESTURERECOGNIZER_H
-#define SINGLECLICKGESTURERECOGNIZER_H
-
-#include "Common.h"
-
+#ifndef WEBOSTAPANDHOLDGESTURERECOGNIZER_H
+#define WEBOSTAPANDHOLDGESTURERECOGNIZER_H
 #include <QGestureRecognizer>
-#include <QPoint>
-#include <QQueue>
+class WebosTapAndHoldGesture;
 
-class SingleClickGesture;
-
-class SingleClickGestureRecognizer : public QGestureRecognizer
+class WebosTapAndHoldGestureRecognizer : public QGestureRecognizer
 {
 public:
 
-    SingleClickGestureRecognizer() { }
-    virtual ~SingleClickGestureRecognizer() { }
+    WebosTapAndHoldGestureRecognizer() { }
+    virtual ~WebosTapAndHoldGestureRecognizer() { }
 
     virtual QGesture* create (QObject* target);
     virtual QGestureRecognizer::Result recognize (QGesture* gesture, QObject* watched, QEvent* event);
     virtual void reset (QGesture* gesture);
 
-    static bool g_logSingleClick;
-
 };
-
-#endif // SINGLECLICKGESTURERECOGNIZER_H
+#endif // WEBOSTAPANDHOLDGESTURERECOGNIZER_H

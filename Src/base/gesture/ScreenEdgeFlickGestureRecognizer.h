@@ -17,32 +17,25 @@
 * LICENSE@@@ */
 
 
-
-
-#ifndef SINGLECLICKGESTURERECOGNIZER_H
-#define SINGLECLICKGESTURERECOGNIZER_H
-
-#include "Common.h"
+#ifndef SCREENEDGEFLICKGESTURERECOGNIZER_H
+#define SCREENEDGEFLICKGESTURERECOGNIZER_H
+//#include "Common.h"
 
 #include <QGestureRecognizer>
 #include <QPoint>
 #include <QQueue>
 
-class SingleClickGesture;
+class ScreenEdgeFlickGesture;
 
-class SingleClickGestureRecognizer : public QGestureRecognizer
+class ScreenEdgeFlickGestureRecognizer : public QGestureRecognizer
 {
 public:
 
-    SingleClickGestureRecognizer() { }
-    virtual ~SingleClickGestureRecognizer() { }
+    ScreenEdgeFlickGestureRecognizer();
+    virtual ~ScreenEdgeFlickGestureRecognizer();
 
-    virtual QGesture* create (QObject* target);
-    virtual QGestureRecognizer::Result recognize (QGesture* gesture, QObject* watched, QEvent* event);
+    virtual QGesture* create(QObject* target);
+    virtual QGestureRecognizer::Result recognize(QGesture* gesture, QObject* watched, QEvent* event);
     virtual void reset (QGesture* gesture);
-
-    static bool g_logSingleClick;
-
 };
-
-#endif // SINGLECLICKGESTURERECOGNIZER_H
+#endif // SCREENEDGEFLICKGESTURERECOGNIZER_H

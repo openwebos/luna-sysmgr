@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2011-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2011-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@
 #else
 #include <FlickGesture.h>
 #endif
-
+#include "WebosTapAndHoldGesture.h"
 #include "Settings.h"
 
 QFont PixButton::staticLabelFontForButtons()
@@ -186,7 +186,7 @@ bool PixButton::sceneEvent(QEvent * event)
 			}
 			return true;
 		}
-		g = ge->gesture(Qt::TapAndHoldGesture);
+		g = ge->gesture(WebosTapAndHoldGesture::gestureType());
 		if (g) {
 			QTapAndHoldGesture* hold = static_cast<QTapAndHoldGesture*>(g);
 			if (hold->state() == Qt::GestureFinished) {

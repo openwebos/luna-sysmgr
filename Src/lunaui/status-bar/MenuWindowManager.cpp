@@ -42,7 +42,7 @@
 #include "HostWindow.h"
 #include "MenuWindow.h"
 #include "StatusBar.h"
-
+#include "WebosTapAndHoldGesture.h"
 static const int kTopLeftWindowIndex     = 0;
 static const int kTopRightWindowIndex    = 1;
 static const int kBottomLeftWindowIndex  = 2;
@@ -66,11 +66,19 @@ MenuWindowManager::MenuWindowManager(int maxWidth, int maxHeight)
 
 	kStatusBarTapMoveTolerance = HostBase::instance()->getInfo().displayHeight;
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	grabGesture(Qt::TapGesture);
+	grabGesture(Qt::TapAndHoldGesture);
+	grabGesture(Qt::PinchGesture);
 	grabGesture((Qt::GestureType) SysMgrGestureFlick);
 	grabGesture((Qt::GestureType) SysMgrGestureSingleClick);
-	grabGesture((Qt::GestureType) Qt::PinchGesture);
-	grabGesture(Qt::TapAndHoldGesture);
+#else
+	grabGesture(Qt::TapGesture);
+	grabGesture(WebosTapAndHoldGesture::gestureType());
+	grabGesture(Qt::PinchGesture);
+    grabGesture(FlickGesture::gestureType());
+    grabGesture(SingleClickGesture::gestureType());
+#endif
 
 	m_statusBar = new StatusBar(StatusBar::TypeNormal, maxWidth, Settings::LunaSettings()->positiveSpaceTopPadding);
 	if(m_statusBar) {
@@ -290,7 +298,11 @@ void MenuWindowManager::flickGestureEvent(QGestureEvent* event)
 	}
 
 	if (!m_winArray.empty()) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		QGesture* g = event->gesture((Qt::GestureType) SysMgrGestureFlick);
+#else
+        QGesture* g = event->gesture(FlickGesture::gestureType());
+#endif
 		Q_ASSERT(g != 0);
 		FlickGesture* flick = static_cast<FlickGesture*>(g);
 
@@ -516,7 +528,11 @@ bool MenuWindowManager::sceneEvent(QEvent* event)
 	case QEvent::Gesture: {
 
 		QGestureEvent* ge = static_cast<QGestureEvent*>(event);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		QGesture* g = ge->gesture((Qt::GestureType) SysMgrGestureFlick);
+#else
+        QGesture* g = ge->gesture(FlickGesture::gestureType());
+#endif
 		if (g && g->state() == Qt::GestureFinished) {
 			flickGestureEvent(ge);
 			return true;

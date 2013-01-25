@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2010-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@
 #endif
 
 #include "Localization.h"
-
+#include "WebosTapAndHoldGesture.h"
 //TEST:////////////// test ////////////////
 #define PAGE_ICONFRAME_FILEPATH	QString("icon-bg-small-light.png")
 #define PAGE_ICON_FILEPATH		QString("icon-maps.png")
@@ -102,11 +102,15 @@ Page::Page(const QRectF& pageGeometry,LauncherObject * p_belongsTo)
 {
 	if (m_qp_currentUIOwner)
 		this->setParentItem(m_qp_currentUIOwner);
-
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	grabGesture((Qt::GestureType) SysMgrGestureFlick);
 	grabGesture(Qt::TapAndHoldGesture);
 	grabGesture(Qt::TapGesture);
-
+#else
+    grabGesture(FlickGesture::gestureType());
+	grabGesture(WebosTapAndHoldGesture::gestureType());
+	grabGesture(Qt::TapGesture);
+#endif
 //	m_normalKineticFriction = scrollPhysicsControl.coeffKineticFriction();
 //	scrollPhysicsControl.setAutocount(0.1);
 //	connect(&m_scrollPhysicsTimer,SIGNAL(timeout()),
@@ -152,9 +156,12 @@ Page::Page(const QUuid& specificUid,const QRectF& pageGeometry,LauncherObject * 
 {
 	if (m_qp_currentUIOwner)
 		this->setParentItem(m_qp_currentUIOwner);
-
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	grabGesture((Qt::GestureType) SysMgrGestureFlick);
-	grabGesture(Qt::TapAndHoldGesture);
+#else
+    grabGesture(FlickGesture::gestureType());
+#endif
+	grabGesture(WebosTapAndHoldGesture::gestureType());
 	grabGesture(Qt::TapGesture);
 
 	m_topBorderShadowPixmap = QPixmap(GraphicsSettings::DiUiGraphicsSettings()->graphicsAssetBaseDirectory
@@ -600,14 +607,18 @@ bool Page::sceneEvent(QEvent* event)
 				return tapGesture(tap,ge);
 			}
 		}
-		g = ge->gesture(Qt::TapAndHoldGesture);
+		g = ge->gesture(WebosTapAndHoldGesture::gestureType());
 		if (g) {
 			QTapAndHoldGesture* hold = static_cast<QTapAndHoldGesture*>(g);
 			if (hold->state() == Qt::GestureFinished) {
 				return tapAndHoldGesture(hold,ge);
 			};
 		}
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		g = ge->gesture((Qt::GestureType) SysMgrGestureFlick);
+#else
+        g = ge->gesture(FlickGesture::gestureType());
+#endif
 		if (g) {
 			FlickGesture* flick = static_cast<FlickGesture*>(g);
 			if (flick->state() == Qt::GestureFinished) {

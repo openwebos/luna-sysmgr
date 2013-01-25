@@ -44,7 +44,7 @@
 #else
 #include <FlickGesture.h>
 #endif
-
+#include "WebosTapAndHoldGesture.h"
 #include <QDebug>
 
 const char * PageTab::PropertyNameIndex = "tab_index";
@@ -519,7 +519,7 @@ bool PageTab::sceneEvent(QEvent* event)
 			}
 			return true;
 		}
-		g = ge->gesture(Qt::TapAndHoldGesture);
+		g = ge->gesture(WebosTapAndHoldGesture::gestureType());
 		if (g) {
 			QTapAndHoldGesture* hold = static_cast<QTapAndHoldGesture*>(g);
 			if (hold->state() == Qt::GestureFinished) {

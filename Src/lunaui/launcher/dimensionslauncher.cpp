@@ -184,9 +184,11 @@ LauncherObject::LauncherObject(const QRectF& geometry,DimensionsUI * p_mainWindo
 	}
 	initObjects();
 	initSignalSlotConnections();
-
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	grabGesture((Qt::GestureType) SysMgrGestureFlick);
-
+#else
+    grabGesture(FlickGesture::gestureType());
+#endif
 	setObjectName("launcher_object");
 
 	connect(&m_feedbackTimer, SIGNAL(timeout()), this, SLOT(slotCancelLaunchFeedback()));
@@ -2159,7 +2161,11 @@ bool LauncherObject::sceneEvent(QEvent* event)
 //				return tapAndHoldGesture(hold,ge);
 //			}
 //		}
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		g = ge->gesture((Qt::GestureType) SysMgrGestureFlick);
+#else
+        g = ge->gesture(FlickGesture::gestureType());
+#endif
 		if (g) {
 			FlickGesture* flick = static_cast<FlickGesture*>(g);
 			if (flick->state() == Qt::GestureFinished) {

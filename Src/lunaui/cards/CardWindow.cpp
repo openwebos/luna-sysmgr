@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2008-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2008-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -180,9 +180,14 @@ CardWindow::CardWindow(WindowType::Type type, const QPixmap& pixmap)
 void CardWindow::init()
 {
 	setFlags(QGraphicsItem::ItemIsFocusable);
+	grabGesture(Qt::PinchGesture);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	grabGesture((Qt::GestureType) SysMgrGestureFlick);
 	grabGesture((Qt::GestureType) SysMgrGestureSingleClick);
-	grabGesture(Qt::PinchGesture);
+#else
+    grabGesture(FlickGesture::gestureType());
+    grabGesture(SingleClickGesture::gestureType());
+#endif
 
 	connect(DisplayManager::instance(), SIGNAL(signalDisplayStateChange(int)),
 										   SLOT(slotDisplayStateChanged(int)));
@@ -221,9 +226,14 @@ CardWindow::~CardWindow()
 		SystemUiController::instance()->setDirectRenderingForWindow(SystemUiController::CARD_WINDOW_MANAGER, this, false);
 	}
 
+	ungrabGesture(Qt::PinchGesture);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	ungrabGesture((Qt::GestureType) SysMgrGestureSingleClick);
 	ungrabGesture((Qt::GestureType) SysMgrGestureFlick);
-	ungrabGesture(Qt::PinchGesture);
+#else
+    ungrabGesture(SingleClickGesture::gestureType());
+    ungrabGesture(FlickGesture::gestureType());
+#endif
 
 #if defined(USE_ROUNDEDCORNER_SHADER)
 	delete m_roundedCornerShaderStage;
@@ -319,13 +329,16 @@ bool CardWindow::sceneEvent(QEvent* event)
 				event->accept();
 				return true;
 			}
-
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 			g = ge->gesture((Qt::GestureType) SysMgrGestureFlick);
+#else
+            g = ge->gesture(FlickGesture::gestureType());
+#endif
 			if (g) {
 				event->accept();
 				return true;
 			}
-			g = ge->gesture((Qt::GestureType) SysMgrGestureSingleClick);
+            g = ge->gesture(SingleClickGesture::gestureType());
 			if (g) {
 				event->accept();
 				return true;
@@ -333,7 +346,11 @@ bool CardWindow::sceneEvent(QEvent* event)
 		}
 		else if (event->type() == QEvent::Gesture) {
 			QGestureEvent* ge = static_cast<QGestureEvent*>(event);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 			QGesture* g = ge->gesture((Qt::GestureType) SysMgrGestureFlick);
+#else
+            QGesture* g = ge->gesture(FlickGesture::gestureType());
+#endif
 			if (g && g->state() == Qt::GestureFinished) {
 				if (mouseFlickEvent(ge)) {
 					return true;
@@ -346,7 +363,7 @@ bool CardWindow::sceneEvent(QEvent* event)
 					return true;
 				}
 			}
-			g = ge->gesture((Qt::GestureType) SysMgrGestureSingleClick);
+            g = ge->gesture(SingleClickGesture::gestureType());
 			if (g && g->state() == Qt::GestureFinished) {
 			    if (mouseSingleClickEvent (ge)) {
 					return true;
@@ -620,8 +637,11 @@ bool CardWindow::mouseFlickEvent(QGestureEvent* event)
 		case ForwardEventToChild:
 			return m_modalChild->mouseFlickEvent(event);
 	}
-
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	QGesture* g = event->gesture((Qt::GestureType) SysMgrGestureFlick);
+#else
+    QGesture* g = event->gesture(FlickGesture::gestureType());
+#endif
 	FlickGesture* flick = static_cast<FlickGesture*>(g);
 
 	QPointF pos = mapFromScene(event->mapToGraphicsScene(flick->hotSpot()));
@@ -655,7 +675,7 @@ bool CardWindow::mouseSingleClickEvent(QGestureEvent* singleClickEvent)
 			return m_modalChild->mouseSingleClickEvent(singleClickEvent);
 	}
 
-	QGesture* g = singleClickEvent->gesture((Qt::GestureType) SysMgrGestureSingleClick);
+    QGesture* g = singleClickEvent->gesture(SingleClickGesture::gestureType());
 	SingleClickGesture* singleClick = static_cast<SingleClickGesture*>(g);
 
 	QPointF pos = mapFromScene(singleClickEvent->mapToGraphicsScene(singleClick->hotSpot()));

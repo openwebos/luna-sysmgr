@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2008-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2008-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@
 #include "FlickGesture.h"
 #include "GhostCard.h"
 #include "IMEController.h"
+#include "WebosTapAndHoldGesture.h"
 
 #include <QTapGesture>
 #include <QTapAndHoldGesture>
@@ -142,9 +143,16 @@ CardWindowManager::CardWindowManager(int maxWidth, int maxHeight)
 
 	connect(&m_anims, SIGNAL(finished()), SLOT(slotAnimationsFinished()));
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	grabGesture(Qt::TapGesture);
 	grabGesture(Qt::TapAndHoldGesture);
 	grabGesture((Qt::GestureType) SysMgrGestureFlick);
+#else
+	grabGesture(Qt::TapGesture);
+	grabGesture(WebosTapAndHoldGesture::gestureType());
+    grabGesture(FlickGesture::gestureType());
+#endif
+
 #if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     setAcceptTouchEvents(true);
 #endif
@@ -1283,12 +1291,16 @@ bool CardWindowManager::sceneEvent(QEvent* event)
 			event->accept();
 			return true;
 		}
-		g = ge->gesture(Qt::TapAndHoldGesture);
+		g = ge->gesture(WebosTapAndHoldGesture::gestureType());
 		if (g) {
 			event->accept();
 			return true;
 		}
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		g = ge->gesture((Qt::GestureType) SysMgrGestureFlick);
+#else
+        g = ge->gesture(FlickGesture::gestureType());
+#endif
 		if (g) {
 			event->accept();
 			return true;
@@ -1305,7 +1317,7 @@ bool CardWindowManager::sceneEvent(QEvent* event)
 			}
 			return true;
 		}
-		g = ge->gesture(Qt::TapAndHoldGesture);
+		g = ge->gesture(WebosTapAndHoldGesture::gestureType());
 		if (g) {
 			QTapAndHoldGesture* hold = static_cast<QTapAndHoldGesture*>(g);
 			if (hold->state() == Qt::GestureFinished) {
@@ -1314,7 +1326,11 @@ bool CardWindowManager::sceneEvent(QEvent* event)
 			}
 			return true;
 		}
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		g = ge->gesture((Qt::GestureType) SysMgrGestureFlick);
+#else
+        g = ge->gesture(FlickGesture::gestureType());
+#endif
 		if (g) {
 			FlickGesture* flick = static_cast<FlickGesture*>(g);
 			if (flick->state() == Qt::GestureFinished) {
@@ -1627,7 +1643,11 @@ void CardWindowManager::flickGestureEvent(QGestureEvent* event)
 
 void CardWindowManager::handleFlickGestureMinimized(QGestureEvent* event)
 {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	QGesture* g = event->gesture((Qt::GestureType) SysMgrGestureFlick);
+#else
+    QGesture* g = event->gesture(FlickGesture::gestureType());
+#endif
 	if (!g)
 		return;
 

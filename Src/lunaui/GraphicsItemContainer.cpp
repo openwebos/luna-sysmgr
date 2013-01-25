@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2010-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -34,7 +34,8 @@
 // includes for the 9tile
 #include "pixmaploader.h"
 #include "pixmap9tileobject.h"
-
+#include "WebosTapAndHoldGesture.h"
+#include "SingleClickGesture.h"
 
 static const int kPopupImgMargin = 20;
 
@@ -61,17 +62,33 @@ void GraphicsItemContainer::setBlockGesturesAndMouse(bool block)
 	m_blockGesturesAndMouse = block;
 
 	if(m_blockGesturesAndMouse) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		grabGesture(Qt::TapGesture);
 		grabGesture(Qt::TapAndHoldGesture);
 		grabGesture(Qt::PinchGesture);
 		grabGesture((Qt::GestureType) SysMgrGestureFlick);
 		grabGesture((Qt::GestureType) SysMgrGestureSingleClick);
+#else
+		grabGesture(Qt::TapGesture);
+		grabGesture(WebosTapAndHoldGesture::gestureType());
+		grabGesture(Qt::PinchGesture);
+    	grabGesture(FlickGesture::gestureType());
+    	grabGesture(SingleClickGesture::gestureType());
+#endif
 	} else {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		ungrabGesture(Qt::TapGesture);
 		ungrabGesture(Qt::TapAndHoldGesture);
 		ungrabGesture(Qt::PinchGesture);
 		ungrabGesture((Qt::GestureType) SysMgrGestureFlick);
 		ungrabGesture((Qt::GestureType) SysMgrGestureSingleClick);
+#else
+		ungrabGesture(Qt::TapGesture);
+        ungrabGesture(WebosTapAndHoldGesture::gestureType());
+		ungrabGesture(Qt::PinchGesture);
+        ungrabGesture(FlickGesture::gestureType());
+        ungrabGesture(SingleClickGesture::gestureType());
+#endif
 	}
 }
 

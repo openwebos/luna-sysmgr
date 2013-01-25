@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2008-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2008-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -61,7 +61,8 @@
 #include "Utils.h"
 #include "FlickGesture.h"
 #include "DockModeWindowManager.h"
-
+#include "WebosTapAndHoldGesture.h"
+#include "SingleClickGesture.h"
 #include <QGraphicsPixmapItem>
 
 static const int kTabletAlertWindowPadding       = 5;
@@ -97,12 +98,20 @@ DashboardWindowManager::DashboardWindowManager(int maxWidth, int maxHeight)
 
 	// grab all gestures handled by the scenes viewport widget so
 	// we can prevent them from being propogated to items below the dashboard
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	grabGesture(Qt::TapGesture);
 	grabGesture(Qt::TapAndHoldGesture);
 	grabGesture(Qt::PinchGesture);
 	grabGesture((Qt::GestureType) SysMgrGestureFlick);
 	grabGesture((Qt::GestureType) SysMgrGestureSingleClick);
-
+#else
+	grabGesture(Qt::TapGesture);
+	grabGesture(WebosTapAndHoldGesture::gestureType());
+	grabGesture(Qt::PinchGesture);
+    grabGesture(FlickGesture::gestureType());
+    grabGesture(SingleClickGesture::gestureType());
+#endif
 	SystemUiController* suc = SystemUiController::instance();
 	m_isOverlay = !suc->dashboardOwnsNegativeSpace();
 

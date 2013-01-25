@@ -231,8 +231,11 @@ OverlayWindowManager::OverlayWindowManager(int maxWidth, int maxHeight)
 	////////// LAUNCHER CONTROL SIGNALS
 	connect(SystemUiController::instance(),SIGNAL(signalToggleLauncher()),
 			this,SLOT(slotSystemAPIToggleLauncher()));
-
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	grabGesture((Qt::GestureType) SysMgrGestureFlick);
+#else
+    grabGesture(FlickGesture::gestureType());
+#endif
 }
 
 OverlayWindowManager::~OverlayWindowManager()
@@ -751,13 +754,21 @@ void OverlayWindowManager::resize(int width, int height)
 bool OverlayWindowManager::sceneEvent(QEvent* event)
 {
 	if (event->type() == QEvent::GestureOverride) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		QGesture* g = static_cast<QGestureEvent*>(event)->gesture((Qt::GestureType) SysMgrGestureFlick);
+#else
+        QGesture* g = static_cast<QGestureEvent*>(event)->gesture(FlickGesture::gestureType());
+#endif
 		if (g && m_universalSearchShown) {
 			event->accept();
 			return true;
 		}
 	} else if (event->type() == QEvent::Gesture) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		QGesture* g = static_cast<QGestureEvent*>(event)->gesture((Qt::GestureType) SysMgrGestureFlick);
+#else
+        QGesture* g = static_cast<QGestureEvent*>(event)->gesture(FlickGesture::gestureType());
+#endif
 		if (g && g->state() == Qt::GestureFinished && m_universalSearchShown) {
 			if (mouseFlickEvent(static_cast<FlickGesture*>(g)))
 				return true;

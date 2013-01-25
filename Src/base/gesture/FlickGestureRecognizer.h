@@ -19,8 +19,8 @@
 
 
 
-#ifndef SINGLECLICKGESTURERECOGNIZER_H
-#define SINGLECLICKGESTURERECOGNIZER_H
+#ifndef FLICKGESTURERECOGNIZER_H
+#define FLICKGESTURERECOGNIZER_H
 
 #include "Common.h"
 
@@ -28,21 +28,18 @@
 #include <QPoint>
 #include <QQueue>
 
-class SingleClickGesture;
+class FlickGesture;
 
-class SingleClickGestureRecognizer : public QGestureRecognizer
+class FlickGestureRecognizer : public QGestureRecognizer
 {
 public:
 
-    SingleClickGestureRecognizer() { }
-    virtual ~SingleClickGestureRecognizer() { }
+	FlickGestureRecognizer();
+	virtual ~FlickGestureRecognizer();
 
-    virtual QGesture* create (QObject* target);
-    virtual QGestureRecognizer::Result recognize (QGesture* gesture, QObject* watched, QEvent* event);
+	virtual QGesture* create(QObject* target);
+	virtual QGestureRecognizer::Result recognize(QGesture* gesture, QObject* watched, QEvent* event);
     virtual void reset (QGesture* gesture);
-
-    static bool g_logSingleClick;
-
 };
 
-#endif // SINGLECLICKGESTURERECOGNIZER_H
+#endif /* FLICKGESTURERECOGNIZER_H */

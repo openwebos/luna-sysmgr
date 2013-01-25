@@ -81,7 +81,11 @@ DashboardWindowContainer::DashboardWindowContainer(DashboardWindowManager* wm, i
 	m_isMenu = m_wm->isOverlay();
 
 	grabGesture(Qt::TapGesture);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	grabGesture((Qt::GestureType) SysMgrGestureFlick);
+#else
+    grabGesture(FlickGesture::gestureType());
+#endif
 		
 	connect(&m_anim, SIGNAL(finished()), SLOT(slotProcessAnimationComplete()));
 	connect(&m_deleteAnim, SIGNAL(finished()), SLOT(slotDeleteAnimationFinished()));
@@ -415,7 +419,11 @@ bool DashboardWindowContainer::sceneEvent(QEvent* event)
 		}
 
 		if(!m_isMenu) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 			g = static_cast<QGestureEvent*>(event)->gesture((Qt::GestureType) SysMgrGestureFlick);
+#else
+            g = static_cast<QGestureEvent*>(event)->gesture(FlickGesture::gestureType());
+#endif
 			if (g) {
 				FlickGesture* flick = static_cast<FlickGesture*>(g);
 				if (flick->state() == Qt::GestureFinished) {

@@ -91,8 +91,11 @@ PageTabBar::PageTabBar(const QRectF& pageTabBarGeometry,LauncherObject * p_belon
 	resetTabSpaces();
 	if (m_qp_currentUIOwner)
 		this->setParentItem(m_qp_currentUIOwner);
-
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	grabGesture((Qt::GestureType) SysMgrGestureFlick);
+#else
+    grabGesture(FlickGesture::gestureType());
+#endif
 
 	m_backgroundGeom = m_geom;
 	m_backgroundShadowGeom = m_geom;
@@ -515,7 +518,11 @@ bool PageTabBar::sceneEvent(QEvent* event)
 //			}
 //			return true;
 //		}
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		g = ge->gesture((Qt::GestureType) SysMgrGestureFlick);
+#else
+        g = ge->gesture(FlickGesture::gestureType());
+#endif
 		if (g) {
 			FlickGesture* flick = static_cast<FlickGesture*>(g);
 			if (flick->state() == Qt::GestureFinished) {

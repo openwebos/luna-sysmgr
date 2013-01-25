@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2011-2013 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2010-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -19,43 +19,37 @@
 
 
 
-#ifndef SCREENEDGEFLICKGESTURE_H
-#define SCREENEDGEFLICKGESTURE_H
+#ifndef FLICKGESTURE_H
+#define FLICKGESTURE_H
 
 #include "Common.h"
 
 #include <QGesture>
 #include <QPoint>
+#include <SysMgrDefs.h>
 
-class ScreenEdgeFlickGesture : public QGesture
+
+class FlickGesture : public QGesture
 {
 public:
-
-	enum Edge {
-		EdgeUnknown = 0,
-		EdgeTop,
-		EdgeBottom,
-		EdgeLeft,
-		EdgeRight
-	};
-
-    ScreenEdgeFlickGesture(QObject* parent = 0)
-        : QGesture(parent)
-		, m_edge(EdgeUnknown)
-		, m_yDistance(0){
-	}
-
-	Edge edge() const { return m_edge; }
-	int yDistance() const { return m_yDistance; }
-    static Qt::GestureType gestureType() {return type;}
+//#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+//    FlickGesture(QObject* parent = 0) : QGesture(parent, (Qt::GestureType) SysMgrGestureFlick) {}
+//#else
+	FlickGesture(QObject* parent = 0) : QGesture(parent) {}
+//#endif
+	QPoint velocity() const { return m_velocity; }
+	QPoint startPos() const { return m_startPos; }
+	QPoint endPos() const { return m_endPos; }
+    static Qt::GestureType gestureType() { return type;}
     static void setGestureType (Qt::GestureType t) {  type = t;}
 private:
 
-	Edge m_edge;
-	int m_yDistance;
+	QPoint m_velocity;
+	QPoint m_endPos;
+	QPoint m_startPos;
+
     static Qt::GestureType type;
-private:
-    friend class ScreenEdgeFlickGestureRecognizer;
+	friend class FlickGestureRecognizer;
 };
 
-#endif /* SCREENEDGEFLICKGESTURE_H */
+#endif /* FLICKGESTURE_H */

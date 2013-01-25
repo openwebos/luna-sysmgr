@@ -1,6 +1,6 @@
 # @@@LICENSE
 #
-#      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+#      Copyright (c) 2010-2013 Hewlett-Packard Development Company, L.P.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -248,7 +248,13 @@ SOURCES = \
     QtHostWindow.cpp \
     UiNavigationController.cpp \
     BackupManager.cpp \
-    LsmUtils.cpp
+    LsmUtils.cpp \
+    WebosTapGestureRecognizer.cpp \
+    WebosTapAndHoldGestureRecognizer.cpp \
+    FlickGestureRecognizer.cpp \
+    ScreenEdgeFlickGestureRecognizer.cpp
+
+
 
 HEADERS = \
 	AmbientLightSensor.h \
@@ -376,7 +382,15 @@ HEADERS = \
     QtHostWindow.h \
     BackupManager.h \
     UiNavigationController.h \
-    LsmUtils.h
+    LsmUtils.h \
+    WebosTapGestureRecognizer.h \
+    WebosTapAndHoldGestureRecognizer.h \
+    FlickGestureRecognizer.h \
+    FlickGesture.h \
+    ScreenEdgeFlickGesture.h \
+    WebosTapAndHoldGesture.h \
+    ScreenEdgeFlickGestureRecognizer.h \
+    FlickEvent.h
 
 contains(QT_VERSION, "^5.*") {
     HEADERS += QmlInputItemQt5.h \

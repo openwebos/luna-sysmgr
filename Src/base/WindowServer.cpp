@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2008-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2008-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -85,7 +85,13 @@
 #include "Preferences.h"            // Neeed for IME
 
 #include "NativeAlertManager.h"
+#include "SingleClickGesture.h"
 #include "SingleClickGestureRecognizer.h"
+#include "WebosTapAndHoldGesture.h"
+#include "WebosTapAndHoldGestureRecognizer.h"
+#include "WebosTapGestureRecognizer.h"
+#include "ScreenEdgeFlickGesture.h"
+#include "FlickGesture.h"
 #include "QtUtils.h"
 
 
@@ -428,7 +434,14 @@ WindowServer::WindowServer()
 	if (!viewportWidget)
 		viewportWidget = new QWidget;
 
-	QGestureRecognizer::registerRecognizer(new SingleClickGestureRecognizer);
+    QGestureRecognizer::registerRecognizer(new WebosTapGestureRecognizer);
+
+    Qt::GestureType customType = QGestureRecognizer::registerRecognizer(new SingleClickGestureRecognizer);
+    SingleClickGesture::setGestureType(customType);
+
+    customType = QGestureRecognizer::registerRecognizer(new WebosTapAndHoldGestureRecognizer);
+    WebosTapAndHoldGesture::setGestureType(customType);
+
 
 	viewportWidget->setAttribute(Qt::WA_AcceptTouchEvents);
 	viewportWidget->setAttribute(Qt::WA_OpaquePaintEvent, true);
@@ -457,12 +470,18 @@ WindowServer::WindowServer()
 	scene->setItemIndexMethod(QGraphicsScene::NoIndex);
 
 	viewportWidget->grabGesture(Qt::TapGesture);
-	viewportWidget->grabGesture(Qt::TapAndHoldGesture);
 	viewportWidget->grabGesture(Qt::PinchGesture);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+	viewportWidget->grabGesture(Qt::TapAndHoldGesture);
 	viewportWidget->grabGesture((Qt::GestureType) SysMgrGestureFlick);
 	viewportWidget->grabGesture((Qt::GestureType) SysMgrGestureSingleClick);
 	viewportWidget->grabGesture((Qt::GestureType) SysMgrGestureScreenEdgeFlick);
-
+#else
+    viewportWidget->grabGesture(WebosTapAndHoldGesture::gestureType());
+    viewportWidget->grabGesture(FlickGesture::gestureType());
+    viewportWidget->grabGesture(SingleClickGesture::gestureType());
+    viewportWidget->grabGesture(ScreenEdgeFlickGesture::gestureType());
+#endif
 	m_uiRootItem.setBoundingRect(QRectF(-SystemUiController::instance()->currentUiWidth()/2, -SystemUiController::instance()->currentUiHeight()/2,
 						         SystemUiController::instance()->currentUiWidth(), SystemUiController::instance()->currentUiHeight()));
 

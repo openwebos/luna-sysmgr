@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2010-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -26,13 +26,31 @@
 
 #include <QGesture>
 #include <QPoint>
-
-#include <SysMgrDefs.h>
 #include "Settings.h"
+#include <SysMgrDefs.h>
 
 class SingleClickGesture : public QGesture
 {
     Q_OBJECT
+private:
+    int m_timerId;
+    int m_timerValue;
+    QPointF m_penDownPos;
+    bool m_mouseDown;
+    bool m_triggerSingleClickOnRelease;
+    Qt::KeyboardModifiers m_modifiers;
+    static Qt::GestureType type;
+
+    void startSingleClickTimer() {
+        m_timerId = startTimer(Settings::LunaSettings()->tapDoubleClickDuration);
+    }
+
+    void stopSingleClickTimer() {
+        if (m_timerId) {
+        killTimer(m_timerId);
+        m_timerId = 0;
+        }
+    }
 
 public:
 	SingleClickGesture(QObject* parent = 0)
@@ -41,7 +59,7 @@ public:
 #else
         : QGesture(parent)
 #endif
-	    , m_timerId(0), m_triggerSingleClickOnRelease (false), m_mouseDown (false)
+        , m_timerId(0), m_triggerSingleClickOnRelease (false), m_mouseDown (false)
 	    , m_modifiers (0)
             {
 	        m_timerValue = Settings::LunaSettings()->tapDoubleClickDuration;
@@ -55,24 +73,9 @@ public:
 
 	Qt::KeyboardModifiers modifiers() const { return m_modifiers; }
 
-private:
-	int m_timerId;
-	int m_timerValue;
-	QPointF m_penDownPos;
-	bool m_mouseDown;
-	bool m_triggerSingleClickOnRelease;
-	Qt::KeyboardModifiers m_modifiers;
+    static Qt::GestureType gestureType() { return type;}
+    static void setGestureType (Qt::GestureType t) {  type = t;}
 
-	void startSingleClickTimer() {
-	    m_timerId = startTimer(Settings::LunaSettings()->tapDoubleClickDuration);
-	}
-
-	void stopSingleClickTimer() {
-	    if (m_timerId) {
-		killTimer(m_timerId);
-		m_timerId = 0;
-	    }
-	}
 private:
 	friend class SingleClickGestureRecognizer;
 
