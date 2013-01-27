@@ -48,7 +48,7 @@ ENV_BUILD_TYPE = $$(BUILD_TYPE)
 CONFIG += no_keywords
 
 CONFIG += link_pkgconfig
-PKGCONFIG = glib-2.0 gthread-2.0
+PKGCONFIG = glib-2.0 gthread-2.0 LunaSysMgrIpc
 
 QT = core gui network
 
