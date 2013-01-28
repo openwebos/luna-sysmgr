@@ -15,7 +15,7 @@ This repository contains the webOS System Manager, which is a key webOS componen
 * Providing for the coordinated rendering of applications
 * Rendering webOS card view, lock screen, status bar, system menus, virtual keyboard, notifications, and launcher, in addition to other system management features that viewable in the System Manager User interface
 
-WebAppMgr is provided by System Manager and is responsible for running Enyo applications.
+WebAppMgr, now a separate component, is responsible for running Enyo applications.
 
 
 LunaSysmgr
@@ -138,10 +138,6 @@ which corresponds to a stable point.
 The 'unstable' branch is used for significant changes while those changes
 are under active development, and allows for the ongoing review of these changes.  
 
-Presently, the 'unstable' branch of luna-sysmgr is being used for the project to
-separate out WebAppMgr, and should be viewed in conjunction with the
-the 'master' branches of webappmanager and luna-sysmgr-common.  
-
 
 How to Build on Linux
 =====================
@@ -173,7 +169,7 @@ Cautions:
 
 All content, including all source code files and documentation files in this repository except otherwise noted are: 
 
- Copyright (c) 2008-2012 Hewlett-Packard Development Company, L.P.
+ Copyright (c) 2008-2013 Hewlett-Packard Development Company, L.P.
 
 All content, including all source code files and documentation files in this repository except otherwise noted are:
 Licensed under the Apache License, Version 2.0 (the "License");
