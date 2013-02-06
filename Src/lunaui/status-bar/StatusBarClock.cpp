@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2010-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -114,6 +114,9 @@ void StatusBarClock::setDisplayDate(bool date)
 
 void StatusBarClock::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    painter->drawPixmap(-boundingRect().width() / 2, -boundingRect().height() / 2, m_textPixmap);
+#else
 	QPen oldPen = painter->pen();
 
 	QFont origFont = painter->font();
@@ -130,7 +133,7 @@ void StatusBarClock::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
 
 	painter->setPen(oldPen);
 	painter->setFont(origFont);
-
+#endif
 }
 
 void StatusBarClock::setTimeText(const char *time, bool doUpdate)
@@ -148,6 +151,18 @@ void StatusBarClock::setTimeText(const QString& time, bool doUpdate)
 	m_timeText = time;
 
 	m_textRect = fontMetrics.boundingRect(m_timeText);
+
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    m_textPixmap = QPixmap(boundingRect().width(), boundingRect().height());
+    m_textPixmap.fill(Qt::transparent);
+
+    QPainter p;
+    p.begin(&m_textPixmap);
+    p.setFont(*m_font);
+    p.setPen(QColor(0xFF, 0xFF, 0xFF, 0xFF));
+    p.drawText(m_textPixmap.rect(), Qt::AlignCenter, m_timeText);
+    p.end();
+#endif
 
 	if (doUpdate) {
 		update();

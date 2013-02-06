@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2010-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -315,11 +315,14 @@ void PageTab::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,QW
 
 //	painter->drawRect(m_labelGeom);
 //	painter->setPen(sp);
-
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    painter->drawPixmap(-boundingRect().width() / 2, -boundingRect().height() / 2, m_textPixmap);
+#else
 	QPen sp = painter->pen();
 	painter->setPen(m_currentMode == PageTabDisplayMode::Normal ? m_unselectedColor : m_selectedColor);
 	m_textLayoutObject.draw(painter,m_labelPosPntCS);
 	painter->setPen(sp);
+#endif
 }
 
 //virtual
@@ -496,6 +499,25 @@ void	PageTab::recalculateLabelPosition()
 	//TODO: MYSTERY! don't know why it needs the 2.0 bump in Y. investigate the geom creation in redoLabelTextLayout()
 	m_labelPosICS = QPointF(0,LayoutSettings::settings()->tabTextVerticalPosAdjust);
 	m_labelPosPntCS = (m_labelGeom.topLeft() + m_labelPosICS).toPoint();
+
+#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    qreal lineHeight = 0.0f;
+
+    if (m_textLayoutObject.lineCount() > 0) {
+        lineHeight = m_textLayoutObject.lineAt(0).height();
+    }
+
+    m_textPixmap = QPixmap(boundingRect().width(), boundingRect().height());
+    m_textPixmap.fill(Qt::transparent);
+
+    QPainter p;
+    p.begin(&m_textPixmap);
+    p.setPen(m_currentMode == PageTabDisplayMode::Normal ?
+             m_unselectedColor : m_selectedColor);
+    m_textLayoutObject.draw(&p,
+        QPointF(0.0f, boundingRect().height() / 2 - lineHeight / 2));
+    p.end();
+#endif
 }
 
 ////////////////	/////////////////////			//////////////////////////////////
