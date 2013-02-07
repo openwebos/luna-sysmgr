@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2010-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ public:
 
     virtual bool handleKeyNavigation(QKeyEvent* keyEvent) { return true; }
 
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     virtual void handleTouchBegin(QTouchEvent *e);
     virtual void handleTouchEnd(QTouchEvent *e);
     virtual void handleTouchUpdate(QTouchEvent *e);
@@ -115,7 +115,7 @@ public:
 
     virtual bool handleKeyNavigation(QKeyEvent* keyEvent);
 
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     virtual void handleTouchBegin(QTouchEvent *e);
     virtual void handleTouchEnd(QTouchEvent *e);
     virtual void handleTouchUpdate(QTouchEvent *e);
@@ -210,7 +210,7 @@ public:
 
 	virtual bool supportLauncherOverlay() const;
 
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     virtual void handleTouchBegin(QTouchEvent *e);
 #endif
 
@@ -236,7 +236,7 @@ public:
 
     virtual void relayout(const QRect& r, bool animate);
 
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     virtual void handleTouchBegin(QTouchEvent *e);
 #endif
 
@@ -271,7 +271,7 @@ public:
 
 	virtual void animationsFinished();
 
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     virtual void handleTouchEnd(QTouchEvent *e);
     virtual void handleTouchUpdate(QTouchEvent *e);
 #endif

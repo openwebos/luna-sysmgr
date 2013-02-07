@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2008-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2008-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@
 
 #include <ProcessKiller.h>
 
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include "MouseEventEater.h"
 #endif
 
@@ -692,7 +692,7 @@ int main( int argc, char** argv)
 	QApplication app(argc, argv);
 	QApplication::setStartDragDistance(settings->tapRadius);
 	QApplication::setDoubleClickInterval (Settings::LunaSettings()->tapDoubleClickDuration);
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     QCoreApplication::setAttribute(Qt::AA_SynthesizeTouchForUnhandledMouseEvents, true);
 #endif
 
@@ -734,7 +734,7 @@ int main( int argc, char** argv)
 	WindowServer *windowServer = WindowServer::instance();
 	windowServer->installEventFilter(windowServer);
 
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     MouseEventEater *eater = new MouseEventEater();
     QCoreApplication::instance()->installEventFilter(eater);
 #endif
@@ -756,7 +756,7 @@ int main( int argc, char** argv)
 	
 	app.exec();
 
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     delete eater;
 #endif
 

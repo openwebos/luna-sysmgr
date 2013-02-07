@@ -137,7 +137,7 @@ DashboardWindowManager::DashboardWindowManager(int maxWidth, int maxHeight)
 	                       this, SLOT(slotOpenDashboard()));
 	connect(SystemUiController::instance(), SIGNAL(signalCloseAlert()),
 	                       this, SLOT(slotCloseAlert()));
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     setAcceptTouchEvents(true);
 #endif
 }
@@ -1071,7 +1071,7 @@ bool DashboardWindowManager::sceneEvent(QEvent* event)
 		}
 		break;
 	}
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     case QEvent::TouchBegin:
     case QEvent::TouchUpdate:
         if (!m_isOverlay) {

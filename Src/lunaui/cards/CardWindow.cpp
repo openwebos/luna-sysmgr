@@ -98,7 +98,7 @@ CardWindow::CardWindow(WindowType::Type type, HostWindowData* data, IpcClientHos
 	, m_maximized(false)
 	, m_forceFocus(true)
 	, m_focused(false)
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     , m_touchEventsEnabled(true)
 #else
 	, m_touchEventsEnabled(false)
@@ -143,7 +143,7 @@ CardWindow::CardWindow(WindowType::Type type, const QPixmap& pixmap)
 	, m_maximized (false)
 	, m_forceFocus(true)
 	, m_focused(false)
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     , m_touchEventsEnabled(true)
 #else
     , m_touchEventsEnabled(false)
@@ -370,7 +370,7 @@ bool CardWindow::sceneEvent(QEvent* event)
 				}
 			}
 		}
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
         else if (event->type() == QEvent::TouchBegin ||
                    event->type() == QEvent::TouchUpdate ||
                    event->type() == QEvent::TouchEnd) {
@@ -525,7 +525,7 @@ void CardWindow::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	inputEvent(&ev);
 }
 
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 void CardWindow::handleTouchBegin(QTouchEvent *te)
 {
     switch (forwardToModal()) {
