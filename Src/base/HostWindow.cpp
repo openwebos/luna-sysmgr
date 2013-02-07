@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2010-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -177,7 +177,7 @@ void HostWindow::resizeEventSync(int w, int h, bool forceSync)
 	
 		bool hasAlpha = m_data->hasAlpha();
 		int oldKey = m_data->key();
-		int metaDataKey = m_data->metaDataBuffer()->key();
+        int metaDataKey = m_data->metaDataBuffer() ? m_data->metaDataBuffer()->key() : 0;
 		delete m_data;
 		m_data = HostWindowDataFactory::generate(newKey, metaDataKey, w, h, hasAlpha);
 		if (!m_data || !m_data->isValid()) {
