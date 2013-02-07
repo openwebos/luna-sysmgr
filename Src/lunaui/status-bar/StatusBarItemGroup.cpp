@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2010-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ StatusBarItemGroup::StatusBarItemGroup(int height, bool hasArrow, bool showSepar
 	}
 
 	layout();
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     setAcceptTouchEvents(true);
 #endif
 }
@@ -312,7 +312,7 @@ void StatusBarItemGroup::slotOverlayAnimationFinished()
 		m_menuObj->setVisible(false);
 }
 
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 bool StatusBarItemGroup::sceneEvent(QEvent *event)
 {
     bool ret = false;

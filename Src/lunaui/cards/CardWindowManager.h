@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2008-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2008-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -145,7 +145,7 @@ private:
 	void handleMouseReleaseMinimized(QGraphicsSceneMouseEvent* event);
 	void handleMouseReleaseReorder(QGraphicsSceneMouseEvent* event);
 
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     void handleTouchBeginMinimized(QTouchEvent* e);
 
     void handleTouchUpdateMinimized(QTouchEvent* e);
@@ -260,9 +260,9 @@ private:
     bool playAngryCardSounds() const;
     void updateAngryCardThreshold();
 
-        void markFirstCardDone();
+    void markFirstCardDone();
 
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     bool handleTouchBegin(QTouchEvent *e);
     bool handleTouchEnd(QTouchEvent *e);
     bool handleTouchUpdate(QTouchEvent *e);

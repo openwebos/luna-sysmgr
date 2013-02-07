@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2010-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -95,7 +95,7 @@ void CardWindowManagerState::resizeWindow(CardWindow* w, int width, int height)
 	}
 }
 
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 void CardWindowManagerState::handleTouchBegin(QTouchEvent *e)
 {
     e->ignore();
@@ -190,7 +190,7 @@ void MinimizeState::onEntry(QEvent* event)
 	SystemUiController::instance()->setMaximizedCardWindow(0);
 }
 
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 void MinimizeState::handleTouchBegin(QTouchEvent *e)
 {
     e->accept();
@@ -652,7 +652,7 @@ bool PreparingState::supportLauncherOverlay() const
 	return false;
 }
 
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 void PreparingState::handleTouchBegin(QTouchEvent *e)
 {
     e->accept();
@@ -713,7 +713,7 @@ void LoadingState::onExit(QEvent* event)
 	}
 }
 
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 void LoadingState::handleTouchBegin(QTouchEvent *e)
 {
     e->accept();
@@ -793,7 +793,7 @@ void ReorderState::onEntry(QEvent* event)
 	SystemUiController::instance()->enterOrExitCardReorder(true);
 }
 
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 void ReorderState::handleTouchEnd(QTouchEvent *e)
 {
     e->accept();

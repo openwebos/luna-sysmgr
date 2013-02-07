@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2008-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2008-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ static const int kMaxDragSide = 64; // clamp the drag image to 128x128
 
 static const char *kOverlayState = "overlayViewState";
 
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 static const int kTouchPointYOffset = 50;
 #endif
 
@@ -774,7 +774,7 @@ bool OverlayWindowManager::sceneEvent(QEvent* event)
 				return true;
 		}
     }
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     else if (event->type() == QEvent::TouchBegin ||
                event->type() == QEvent::TouchEnd ||
                event->type() == QEvent::TouchCancel ||
@@ -796,7 +796,7 @@ bool OverlayWindowManager::sceneEvent(QEvent* event)
 	return QGraphicsObject::sceneEvent(event);
 }
 
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 bool OverlayWindowManager::handleTouchBegin(QTouchEvent *e)
 {
     QPointF p = e->touchPoints().first().scenePos();
@@ -1355,7 +1355,7 @@ void OverlayWindowManager::mapCoordToWindow(Window* win, int& x, int& y) const
     if (!win)
         return;
 
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     y -= kTouchPointYOffset;
 #else
     QPointF pt = win->mapFromItem(this, x, y);

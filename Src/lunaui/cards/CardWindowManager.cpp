@@ -153,7 +153,7 @@ CardWindowManager::CardWindowManager(int maxWidth, int maxHeight)
     grabGesture(FlickGesture::gestureType());
 #endif
 
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     setAcceptTouchEvents(true);
 #endif
 }
@@ -1340,7 +1340,7 @@ bool CardWindowManager::sceneEvent(QEvent* event)
 			return true;
 		}
 	}
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     else if (event->type() == QEvent::TouchBegin ||
                event->type() == QEvent::TouchEnd ||
                event->type() == QEvent::TouchCancel ||
@@ -1362,7 +1362,7 @@ bool CardWindowManager::sceneEvent(QEvent* event)
 	return QGraphicsObject::sceneEvent(event);
 }
 
-#if defined TARGET_DESKTOP && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 bool CardWindowManager::handleTouchBegin(QTouchEvent *e)
 {
     if (m_penDown) {
