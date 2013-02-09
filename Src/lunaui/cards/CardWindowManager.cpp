@@ -1478,10 +1478,12 @@ void CardWindowManager::handleTouchUpdateMinimized(QTouchEvent* e)
         // the active window
         QPointF mappedPos = m_draggedWin->mapFromParent(p.scenePos());
 
-        if (mappedPos.x() < m_draggedWin->boundingRect().x() ||
-            mappedPos.x() >= m_draggedWin->boundingRect().right()) {
-            return;
-        }
+
+        // FIXME:  What is wrong with this on Qt5?
+        //if (mappedPos.x() < m_draggedWin->boundingRect().x() ||
+        //        mappedPos.x() >= m_draggedWin->boundingRect().right()) {
+        //    return;
+        //}
 
         if (delta.y() == 0) {
             return;

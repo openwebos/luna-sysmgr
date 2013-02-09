@@ -38,7 +38,7 @@ PROJECT_NUMBER         =
 # for a project that appears at the top of each page and should give viewer
 # a quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          =
+PROJECT_BRIEF          = "LunaSysMgr"
 
 # With the PROJECT_LOGO tag one can specify an logo or icon that is
 # included in the documentation. The maximum height of the logo should not
@@ -52,7 +52,7 @@ PROJECT_LOGO           =
 # If a relative path is entered, it will be relative to the location
 # where doxygen was started. If left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       =
+OUTPUT_DIRECTORY       = "./doc"
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create
 # 4096 sub-directories (in 2 levels) under the output directory of each output
@@ -656,9 +656,6 @@ INPUT                  = ../Src/base/HapticsController.cpp \
                          ../Src/base/AmbientLightSensor.cpp \
                          ../Src/base/BackupManager.cpp \
                          ../Src/base/application/ApplicationManagerService.cpp \
-                         ../Src/ime/VirtualKeyboard.h \
-                         ../Src/ime/InputMethod.h \
-                         ../Src/ime/IMEDataInterface.h \
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is
@@ -1320,7 +1317,7 @@ LATEX_BIB_STYLE        = plain
 # The RTF output is optimized for Word 97 and may not look very pretty with
 # other RTF readers or editors.
 
-GENERATE_RTF           = NO
+GENERATE_RTF           = YES
 
 # The RTF_OUTPUT tag is used to specify where the RTF docs will be put.
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be

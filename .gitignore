@@ -35,3 +35,7 @@ patches/
 /get-tests.sh
 use-this-*-folder.sh
 *.pro.user
+/doc/html/
+/doc/latex/
+/doc/rtf/
+
