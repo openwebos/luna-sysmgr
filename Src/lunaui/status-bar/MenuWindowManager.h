@@ -79,6 +79,12 @@ private:
 
 	void handleMousePress(QGraphicsSceneMouseEvent* event, int clickCount);
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    void handleTouchBegin(QTouchEvent *te);
+    void handleTouchEnd(QTouchEvent *te);
+    void handleTouchUpdate(QTouchEvent *te);
+#endif
+
 	virtual void addWindow(Window* win);
 	virtual void removeWindow(Window* win);
 	virtual void focusWindow(Window* win);

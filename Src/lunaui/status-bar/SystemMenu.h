@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2010-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -28,13 +28,8 @@
 #include <QTimer>
 #include "StatusBarServicesConnector.h"
 
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 class QDeclarativeEngine;
 class QDeclarativeComponent;
-#else
-class QQmlEngine;
-class QQmlComponent;
-#endif
 class MenuHandler;
 
 class SystemMenu : public QGraphicsObject
@@ -107,7 +102,7 @@ private Q_SLOTS:
 
 private:
 
-	bool sceneEvent(QEvent* event);
+    bool sceneEvent(QEvent* event);
 
 	void setAirplaneModeState(t_airplaneModeState state);
 	void launchApp(std::string appId, std::string params);
@@ -118,11 +113,7 @@ private:
 	bool m_restricted;
 	bool m_opened;
 	int m_rightEdgeOffset;
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     QDeclarativeComponent* m_qmlMenu;
-#else
-    QQmlComponent* m_qmlMenu;
-#endif
 	// Top Level Menu Object
 	QGraphicsObject* m_menuObject;
 
