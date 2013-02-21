@@ -23,11 +23,13 @@
 #define MOUSEEVENTEATER_H
 
 #include <QApplication>
+#include <QGraphicsSceneMouseEvent>
 #include <QMouseEvent>
 #include <QObject>
 #include <QWidget>
 
 #include "HostBase.h"
+#include "WindowServer.h"
 
 class MouseEventEater : public QObject
 {
@@ -38,6 +40,10 @@ public:
 
 protected:
     virtual bool eventFilter(QObject *o, QEvent *e) {
+        Q_UNUSED(o);
+
+        bool handled = false;
+
         if (e->type() == QEvent::MouseButtonRelease ||
             e->type() == QEvent::MouseButtonPress ||
             e->type() == QEvent::MouseButtonDblClick ||
@@ -52,15 +58,43 @@ protected:
                               w->geometry().height();
             }
 
-            // Filter out mouse events inside the window area, they will
-            // be converted to touch events by Qt
+            // Try sending incoming mouse events to QGraphicsScene first, then
+            // filter out the ones not handled by the scene. They will be
+            // converted to touch events by Qt
             if (me->globalY() < (info.displayHeight + frameHeight)) {
-                e->ignore();
-                return true;
+                QGraphicsScene *scene = WindowServer::instance()->scene();
+                QPointF pos(me->globalPos());
+                pos.setY(pos.y() - frameHeight);
+
+                QGraphicsSceneMouseEvent *event = 0;
+
+                if (me->type() == QEvent::MouseButtonPress) {
+                    event = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMousePress);
+                } else if (me->type() == QEvent::MouseButtonRelease) {
+                    event = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
+                } else if (me->type() == QEvent::MouseButtonDblClick) {
+                    event = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseDoubleClick);
+                } else if (me->type() == QEvent::MouseMove) {
+                    event = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseMove);
+                }
+
+                if (event) {
+                    event->setScenePos(pos);
+                    event->setScreenPos(me->globalPos());
+                    event->setButton(me->button());
+                    event->setButtons(me->buttons());
+                    event->setModifiers(me->modifiers());
+                    handled = QApplication::sendEvent(scene, event);
+                    delete event;
+                }
+
+                if (handled) {
+                    e->ignore();
+                }
             }
         }
 
-        return false;
+        return handled;
     }
 };
 
