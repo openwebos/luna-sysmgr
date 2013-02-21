@@ -799,7 +799,8 @@ bool OverlayWindowManager::sceneEvent(QEvent* event)
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 bool OverlayWindowManager::handleTouchBegin(QTouchEvent *e)
 {
-    QPointF p = e->touchPoints().first().scenePos();
+    //QPointF p = e->touchPoints().first().scenePos();
+    QPointF p = e->touchPoints().first().pos();
     Event ev;
 	ev.type = Event::PenDown;
 	ev.setMainFinger(true);
@@ -820,7 +821,8 @@ bool OverlayWindowManager::handleTouchBegin(QTouchEvent *e)
 
 bool OverlayWindowManager::handleTouchEnd(QTouchEvent *e)
 {
-    QPointF p = e->touchPoints().first().scenePos();
+//    /QPointF p = e->touchPoints().first().scenePos();
+    QPointF p = e->touchPoints().first().pos();
     Event ev;
 	ev.setMainFinger(true);
 	ev.x = p.x();
@@ -849,7 +851,8 @@ bool OverlayWindowManager::handleTouchEnd(QTouchEvent *e)
 
 bool OverlayWindowManager::handleTouchUpdate(QTouchEvent *e)
 {
-    QPointF p = e->touchPoints().first().scenePos();
+    //QPointF p = e->touchPoints().first().scenePos();
+    QPointF p = e->touchPoints().first().pos();
     Event ev;
 	ev.type = Event::PenMove;
 	ev.setMainFinger(true);
@@ -1356,7 +1359,9 @@ void OverlayWindowManager::mapCoordToWindow(Window* win, int& x, int& y) const
         return;
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-    y -= kTouchPointYOffset;
+	QPointF pt = win->mapFromItem(this, x, y);
+    x =pt.x();
+    y = pt.y();
 #else
     QPointF pt = win->mapFromItem(this, x, y);
     QRectF br = win->boundingRect();
