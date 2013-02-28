@@ -33,7 +33,6 @@
 
 class PIpcChannel;
 class IpcClientHost;
-class QGraphicsSceneWheelEvent;
 
 class HostWindow : public Window
 				 , public PIpcChannelListener
@@ -88,7 +87,7 @@ private Q_SLOTS:
 	void slotAboutToSendSyncMessage();
 
 protected:
-    virtual void wheelEvent(QGraphicsSceneWheelEvent *event);
+
 	virtual void onEditorFocusChanged(bool focus, const PalmIME::EditorState& state);
     void onAutoCapChanged(bool enabled);
 	virtual void onEnableTouchEvents(bool) {}

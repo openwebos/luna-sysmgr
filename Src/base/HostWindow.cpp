@@ -23,14 +23,12 @@
 
 #include "HostWindow.h"
 
-#include <QGraphicsSceneWheelEvent>
 #include <PIpcChannel.h>
 #include "HostWindowData.h"
 #include "IpcClientHost.h"
 #include "SystemUiController.h"
 #include "WindowServer.h"
 #include "IMEController.h"
-#include "Time.h"
 
 #define MESSAGES_INTERNAL_FILE "SysMgrMessagesInternal.h"
 #include <PIpcMessageMacros.h>
@@ -350,15 +348,3 @@ void HostWindow::removeInputFocus()
 		m_channel->sendAsyncMessage(new View_RemoveInputFocus(routingId()));
 }
 
-void HostWindow::wheelEvent(QGraphicsSceneWheelEvent *event)
-{
-    Event ev;
-    ev.type = Event::MouseWheel;
-    ev.mouseWheelDelta = event->delta();
-    ev.time = Time::curSysTimeMs();
-
-    if (m_channel) {
-        m_channel->sendAsyncMessage(new View_InputEvent(routingId(),
-                                                        SysMgrEventWrapper(&ev)));
-    }
-}
