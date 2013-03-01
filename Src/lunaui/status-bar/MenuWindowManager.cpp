@@ -91,9 +91,6 @@ MenuWindowManager::MenuWindowManager(int maxWidth, int maxHeight)
 		m_sysMenu->setParentItem(this);
 		connect(m_sysMenu, SIGNAL(signalCloseMenu()), this, SLOT(slotCloseSystemMenu()));
 	}
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-    setAcceptTouchEvents(true);
-#endif
 }
 
 MenuWindowManager::~MenuWindowManager()
@@ -366,129 +363,6 @@ void MenuWindowManager::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	}
 }
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-void MenuWindowManager::handleTouchBegin(QTouchEvent *te)
-{
-    te->ignore();
-
-    if (te->touchPoints().isEmpty()) {
-        return;
-    }
-
-    if (m_systemMenuOpened) {
-        te->accept();
-        return;
-    }
-
-    QTouchEvent::TouchPoint p = te->touchPoints().first();
-
-    m_penDownState = PenDownInvalid;
-
-    Window* targetWin = 0;
-    QPointF pos = p.scenePos();
-
-    if (!m_winArray.empty() &&
-        m_positiveSpace.contains(p.pos().x() - boundingRect().x(),
-                                 p.pos().y() - boundingRect().y())) {
-        m_penDownState = PenDownInMenu;
-        targetWin = m_winArray.first();
-    }
-
-    if (targetWin) {
-        Event ev;
-        ev.type = Event::PenDown;
-        ev.setMainFinger(true);
-        ev.x = pos.x();
-        ev.y = pos.y();
-        ev.clickCount = 1;
-        ev.modifiers = Event::modifiersFromQt(te->modifiers());
-        ev.time = Time::curSysTimeMs();
-        mapCoordToWindow(targetWin, ev.x, ev.y);
-        WebAppMgrProxy::instance()->inputEvent(targetWin, &ev);
-
-        te->accept();
-    }
-}
-
-void MenuWindowManager::handleTouchEnd(QTouchEvent *te)
-{
-    te->ignore();
-
-    if (te->touchPoints().isEmpty()) {
-        return;
-    }
-
-    if (m_systemMenuOpened) {
-        closeMenu();
-        te->accept();
-        return;
-    }
-
-    QTouchEvent::TouchPoint p = te->touchPoints().first();
-
-    Window* targetWin = 0;
-    QPointF pos = p.scenePos();
-    Event ev;
-
-    if (te->type() == QEvent::TouchEnd) {
-        ev.type = Event::PenUp;
-    } else {
-        ev.type = Event::PenCancel;
-    }
-
-    ev.x = pos.x();
-    ev.y = pos.y();
-    ev.modifiers = Event::modifiersFromQt(te->modifiers());
-    ev.setMainFinger(true);
-    ev.clickCount = 0;
-    ev.time = Time::curSysTimeMs();
-
-    if (m_penDownState == PenDownInMenu && !m_winArray.empty()) {
-        targetWin = m_winArray.first();
-    }
-
-    m_penDownState = PenDownInvalid;
-
-    if (targetWin) {
-        mapCoordToWindow(targetWin, ev.x, ev.y);
-        WebAppMgrProxy::instance()->inputEvent(targetWin, &ev);
-        te->accept();
-    }
-}
-
-void MenuWindowManager::handleTouchUpdate(QTouchEvent *te)
-{
-    te->ignore();
-
-    if (te->touchPoints().isEmpty()) {
-        return;
-    }
-
-    if (m_systemMenuOpened) {
-        te->accept();
-        return;
-    }
-
-    QTouchEvent::TouchPoint p = te->touchPoints().first();
-
-    if (!m_winArray.empty()) {
-        Window* targetWin = m_winArray.first();
-        QPointF pos = p.scenePos();
-
-        Event ev;
-        ev.type = Event::PenMove;
-        ev.setMainFinger(true);
-        ev.x = pos.x();
-        ev.y = pos.y();
-        ev.time = Time::curSysTimeMs();
-        ev.modifiers = Event::modifiersFromQt(te->modifiers());
-        mapCoordToWindow(targetWin, ev.x, ev.y);
-        WebAppMgrProxy::instance()->inputEvent(targetWin, &ev);
-        te->accept();
-    }
-}
-#endif
-
 void MenuWindowManager::positionCornerWindows(const QRect& r)
 {
 	if(!Settings::LunaSettings()->tabletUi) {
@@ -664,20 +538,6 @@ bool MenuWindowManager::sceneEvent(QEvent* event)
 			return true;
 		}
 	}
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-        case QEvent::TouchBegin:
-            handleTouchBegin(static_cast<QTouchEvent *>(event));
-            return event->isAccepted();
-
-        case QEvent::TouchEnd:
-        case QEvent::TouchCancel:
-            handleTouchEnd(static_cast<QTouchEvent *>(event));
-            return event->isAccepted();
-
-        case QEvent::TouchUpdate:
-            handleTouchUpdate(static_cast<QTouchEvent *>(event));
-            return event->isAccepted();
-#endif
 	default:
 		break;
 	}

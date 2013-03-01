@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2011-2013 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2011-2012 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -23,9 +23,15 @@
 
 #include <qglobal.h>
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include <QDeclarativeComponent>
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
+#else
+#include <QQmlComponent>
+#include <QQmlContext>
+#include <QQmlEngine>
+#endif
 #include <QUrl>
 
 #include "QmlAlertWindow.h"
@@ -35,12 +41,24 @@
 QmlAlertWindow::QmlAlertWindow(const QString& path, int width, int height)
 	: AlertWindow(WindowType::Type_PopupAlert, width, height, true)
 {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	QDeclarativeEngine* qmlEngine = WindowServer::instance()->declarativeEngine();
+#else
+    QQmlEngine* qmlEngine = WindowServer::instance()->qmlEngine();
+#endif
 	if (qmlEngine) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		QDeclarativeContext* context =	qmlEngine->rootContext();
+#else
+        QQmlContext* context =	qmlEngine->rootContext();
+#endif
 		Settings* settings = Settings::LunaSettings();
 		QUrl url = QUrl::fromLocalFile(path);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		m_qmlComp = new QDeclarativeComponent(qmlEngine, url, this);
+#else
+        m_qmlComp = new QQmlComponent(qmlEngine, url, this);
+#endif
         if (m_qmlComp) {
 			m_gfxObj = qobject_cast<QGraphicsObject*>(m_qmlComp->create());
 			if (m_gfxObj) {

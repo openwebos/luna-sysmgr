@@ -55,7 +55,11 @@
 #include "QtUtils.h"
 #include "ClockWindow.h"
 #include "IMEController.h"
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include "QmlInputItem.h"
+#else
+#include "QmlInputItemQt5.h"
+#endif
 
 #include <QPropertyAnimation>
 #include <QTextLayout>
@@ -63,8 +67,13 @@
 #include <QHash>
 #include <QGraphicsPixmapItem>
 #include <QPainterPath>
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
+#else
+#include <QQmlContext>
+#include <QQmlEngine>
+#endif
 
 
 // includes for the 9tile
@@ -464,21 +473,42 @@ void LockWindow::init()
 			(quint32)(kShadowWidth + kBackgroundCornerWidth));
 
 	// Unlock Dialog
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     QDeclarativeEngine* qmlEngine = WindowServer::instance()->declarativeEngine();
+#else
+    QQmlEngine* qmlEngine = WindowServer::instance()->qmlEngine();
+#endif
     if(qmlEngine) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
         QDeclarativeContext* context =	qmlEngine->rootContext();
+#else
+        QQmlContext* context = qmlEngine->rootContext();
+#endif
 
 		std::string qmlPath = settings->lunaQmlUiComponentsPath + "UnlockPanel/UnlockPanel.qml";
 		QUrl url = QUrl::fromLocalFile(qmlPath.c_str());
         qmlRegisterType<InputItem>("CustomComponents", 1, 0, "InputItem");
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		m_qmlUnlockPanel = new QDeclarativeComponent(qmlEngine, url, this);
+#else
+        m_qmlUnlockPanel = new QQmlComponent(qmlEngine, url, this);
+#endif
         if(m_qmlUnlockPanel) {
 			m_unlockPanel = qobject_cast<InputItem *>(m_qmlUnlockPanel->create());
 			if(m_unlockPanel) {
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
                 m_unlockPanel->setPos (-m_unlockPanel->boundingRect().width()/2, -m_unlockPanel->boundingRect().height()/2);
+#else
+                m_unlockPanel->setX (-m_unlockPanel->boundingRect().width()/2);
+                m_unlockPanel->setY (-m_unlockPanel->boundingRect().height()/2);
+#endif
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 				static_cast<QGraphicsObject*>(m_unlockPanel)->setParentItem(this);
+#else
+                m_unlockPanel->setParent(this);
+#endif
 				m_unlockPanel->setVisible(false);
 				m_unlockPanel->setOpacity(0.0);
 
@@ -490,7 +520,11 @@ void LockWindow::init()
 
 		qmlPath = settings->lunaQmlUiComponentsPath + "MessageDialog/MessageDialog.qml";
 		url = QUrl::fromLocalFile(qmlPath.c_str());
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		m_qmlUnlockDialog = new QDeclarativeComponent(qmlEngine, url, this);
+#else
+        m_qmlUnlockDialog = new QQmlComponent(qmlEngine, url, this);
+#endif
 		if(m_qmlUnlockDialog) {
 			m_unlockDialog = qobject_cast<QGraphicsObject *>(m_qmlUnlockDialog->create());
 			if(m_unlockPanel) {
@@ -587,7 +621,11 @@ void LockWindow::resize(int width, int height)
 void LockWindow::slotUiRotationCompleted()
 {
 	if(m_state == StatePinEntry) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		static_cast<QGraphicsObject*>(m_unlockPanel)->setFocus(); // make sure the PIN [anel has focus when in PIN entry mode
+#else
+        m_unlockPanel->setFocus(true);
+#endif
 	}
 }
 
@@ -1540,14 +1578,22 @@ void LockWindow::slotPasswordSubmitted(QString password, bool isPIN)
 void LockWindow::slotPinPanelFocusRequest(bool focusRequest)
 {
 	if(focusRequest) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		static_cast<QGraphicsObject*>(m_unlockPanel)->setFocus();
+#else
+        m_unlockPanel->setFocus(true);
+#endif
 
 		IMEController::instance()->setClient(m_unlockPanel);
 		IMEController::instance()->notifyInputFocusChange(m_unlockPanel, true);
 		IMEController::instance()->notifyAutoCapChanged(m_unlockPanel, false);
 
 	} else {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		m_unlockPanel->clearFocus();
+#else
+        m_unlockPanel->setFocus(false);
+#endif
 
 		IMEController::instance()->removeClient(m_unlockPanel);
 	}
@@ -2093,11 +2139,21 @@ void LockWindow::showPinPanel()
 									  Q_ARG(QVariant, fromStdUtf8(hintStr)), Q_ARG(QVariant, minLen>0), Q_ARG(QVariant, (int)minLen));
 		}
 	}
-
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
  	if(isPin)
  		m_unlockPanel->setPos (-m_unlockPanel->boundingRect().width()/2, -m_unlockPanel->boundingRect().height()/2);
  	else
  		m_unlockPanel->setPos (-m_unlockPanel->boundingRect().width()/2, -m_unlockPanel->boundingRect().height());
+#else
+    if(isPin) {
+        m_unlockPanel->setX (-m_unlockPanel->boundingRect().width()/2);
+        m_unlockPanel->setY (-m_unlockPanel->boundingRect().height()/2);
+    }
+    else {
+        m_unlockPanel->setX (-m_unlockPanel->boundingRect().width()/2);
+        m_unlockPanel->setY (-m_unlockPanel->boundingRect().height());
+    }
+#endif
 
 	QMetaObject::invokeMethod(m_unlockPanel, "fade", Q_ARG(QVariant, true), Q_ARG(QVariant, AS(lockFadeDuration)));
 }

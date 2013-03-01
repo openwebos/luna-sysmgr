@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2008-2013 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2008-2012 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -47,7 +47,12 @@ class WindowManagerBase;
 class QGraphicsPixmapItem;
 class FullEraseConfirmationWindow;
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 class QDeclarativeEngine;
+#else
+class QQmlEngine;
+#endif
+
 
 class WindowServerLuna : public WindowServer
 {
@@ -85,7 +90,11 @@ public:
 
 	virtual bool okToResizeUi(bool ignorePendingRequests=false);
 	void resizeWindowManagers(int width, int height);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     virtual QDeclarativeEngine* declarativeEngine() { return m_qmlEngine; }
+#else
+    virtual QQmlEngine* declarativeEngine() { return m_qmlEngine; }
+#endif
 
 	virtual QRectF mapRectToRoot(const QGraphicsItem* item, const QRectF& rect) const;
 
@@ -147,7 +156,11 @@ private:
 	WindowManagerBase* m_dockModeMenuMgr;
 	WindowManagerBase* m_dockModeMgr;
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     QDeclarativeEngine* m_qmlEngine;
+#else
+    QQmlEngine* m_qmlEngine;
+#endif
 
 	QString  m_wallpaperFileName;
 	QPixmap  m_normalWallpaperImage, m_rotatedWallpaperImage;

@@ -56,8 +56,13 @@
 #include <QEvent>
 #include <QGraphicsPixmapItem>
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include <QDeclarativeEngine>
 #include <QDeclarativeContext>
+#else
+#include <QQmlEngine>
+#include <QQmlContext>
+#endif
 
 #if defined(HAVE_OPENGL) && defined(TARGET_DEVICE)
 #include <QGLContext>
@@ -101,7 +106,11 @@ WindowServerLuna::WindowServerLuna()
 	// Cache the wallpaper in a QPixmapCache to improve speed
         setCacheMode(QGraphicsView::CacheBackground);
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     m_qmlEngine = new QDeclarativeEngine;
+#else
+    m_qmlEngine = new QQmlEngine;
+#endif
 
 	m_qmlEngine->rootContext()->setContextProperty("runtime", Runtime::instance());
 
