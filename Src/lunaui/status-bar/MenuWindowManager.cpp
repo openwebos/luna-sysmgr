@@ -537,6 +537,7 @@ bool MenuWindowManager::sceneEvent(QEvent* event)
 			flickGestureEvent(ge);
 			return true;
 		}
+		break;
 	}
 	default:
 		break;
