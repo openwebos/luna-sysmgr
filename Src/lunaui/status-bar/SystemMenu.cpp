@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2010-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -18,21 +18,18 @@
 
 
 
-
 #include "SystemMenu.h"
 
 #include <QPainter>
 #include <SysMgrDeviceKeydefs.h>
 
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include <QDeclarativeEngine>
 #include <QDeclarativeComponent>
 #include <QDeclarativeContext>
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #define KEYS Qt
 #else
-#include <QQmlEngine>
-#include <QQmlComponent>
-#include <QQmlContext>
 #define KEYS
 #endif
 
@@ -138,12 +135,7 @@ void SystemMenu::setOpened(bool opened)
 
 void SystemMenu::init()
 {
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	QDeclarativeEngine* qmlEngine = WindowServer::instance()->declarativeEngine();
-#else
-    QQmlEngine* qmlEngine = WindowServer::instance()->qmlEngine();
-#endif
-
 	// Instantiates and initialized the services connector
 	StatusBarServicesConnector* svcConnector = StatusBarServicesConnector::instance();
 
@@ -165,11 +157,7 @@ void SystemMenu::init()
 	}
 
 	 if(qmlEngine) {
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		 QDeclarativeContext* context =	qmlEngine->rootContext();
-#else
-         QQmlContext* context =	qmlEngine->rootContext();
-#endif
 		 if(context) {
 			 context->setContextProperty("NativeSystemMenuHandler", m_menuHandler);
 		 }
@@ -177,11 +165,7 @@ void SystemMenu::init()
 		 Settings* settings = Settings::LunaSettings();
 		 std::string systemMenuQmlPath = settings->lunaQmlUiComponentsPath + "SystemMenu/SystemMenu.qml";
 		 QUrl url = QUrl::fromLocalFile(systemMenuQmlPath.c_str());
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		 m_qmlMenu = new QDeclarativeComponent(qmlEngine, url, this);
-#else
-         m_qmlMenu = new QQmlComponent(qmlEngine, url, this);
-#endif
 		 if(m_qmlMenu) {
 			 m_menuObject = qobject_cast<QGraphicsObject *>(m_qmlMenu->create());
 			 if(m_menuObject) {
