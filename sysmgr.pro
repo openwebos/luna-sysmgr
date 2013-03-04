@@ -52,11 +52,7 @@ PKGCONFIG = glib-2.0 gthread-2.0 LunaSysMgrIpc
 
 QT = core gui network
 
-contains(QT_VERSION, "^5.*") {
-    QT += quick
-} else {
-    QT += declarative
-}
+QT += declarative
 
 VPATH = \
 		./Src \
@@ -390,13 +386,11 @@ HEADERS = \
     ScreenEdgeFlickGesture.h \
     WebosTapAndHoldGesture.h \
     ScreenEdgeFlickGestureRecognizer.h \
-    FlickEvent.h
+    FlickEvent.h \
+    QmlInputItem.h
 
 contains(QT_VERSION, "^5.*") {
-    HEADERS += QmlInputItemQt5.h \
-        MouseEventEater.h
-} else {
-    HEADERS += QmlInputItem.h
+    HEADERS += MouseEventEater.h
 }
 
 ####### LAUNCHER ADDITIONS ########

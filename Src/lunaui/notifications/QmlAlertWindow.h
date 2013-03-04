@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2011-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2011-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -26,11 +26,7 @@
 
 #include "AlertWindow.h"
 
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 class QDeclarativeComponent;
-#else
-class QQmlComponent;
-#endif
 class QGraphicsObject;
 
 class QmlAlertWindow : public AlertWindow
@@ -54,11 +50,7 @@ private:
 
 	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	QDeclarativeComponent* m_qmlComp;
-#else
-    QQmlComponent* m_qmlComp;
-#endif
 	QGraphicsObject* m_gfxObj;
 };
 

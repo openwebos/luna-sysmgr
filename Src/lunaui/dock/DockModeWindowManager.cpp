@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2010-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -60,13 +60,8 @@
 #include <QTextLayout>
 #include <QCoreApplication>
 
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
-#else
-#include <QQmlContext>
-#include <QQmlEngine>
-#endif
 
 #include "cjson/json.h"
 
