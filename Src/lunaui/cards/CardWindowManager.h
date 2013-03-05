@@ -87,10 +87,12 @@ public:
 
 protected:
 
-	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
 	virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event);
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
 	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
+#endif // QT_VERISON < 5.0.0
 	void tapGestureEvent(QTapGesture* event);
 	void tapAndHoldGestureEvent(QTapAndHoldGesture* event);
 	void flickGestureEvent(QGestureEvent* event);
@@ -137,6 +139,7 @@ private:
 	void performPostModalWindowRemovedActions(Window* win, bool restore = true);
 	void initiateRemovalOfActiveModalWindow();
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	void handleMousePressMinimized(QGraphicsSceneMouseEvent* event);
 
 	void handleMouseMoveMinimized(QGraphicsSceneMouseEvent* event);
@@ -145,7 +148,7 @@ private:
 	void handleMouseReleaseMinimized(QGraphicsSceneMouseEvent* event);
 	void handleMouseReleaseReorder(QGraphicsSceneMouseEvent* event);
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#else
     void handleTouchBeginMinimized(QTouchEvent* e);
 
     void handleTouchUpdateMinimized(QTouchEvent* e);
@@ -153,7 +156,7 @@ private:
 
     void handleTouchEndMinimized(QTouchEvent* e);
     void handleTouchEndReorder(QTouchEvent* e);
-#endif
+#endif // QT_VERSION < 5.0.0
 
 	void handleFlickGestureMinimized(QGestureEvent* event);
 

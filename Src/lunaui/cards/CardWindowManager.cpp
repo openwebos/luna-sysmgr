@@ -1239,6 +1239,7 @@ void CardWindowManager::setActiveCardOffScreen(bool fullsize)
 	activeCard->setPosition(pos);
 }
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 void CardWindowManager::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
 	// We may get a second pen down. Just ignore it.
@@ -1276,6 +1277,7 @@ void CardWindowManager::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 
 	resetMouseTrackState();
 }
+#endif // QT_VERSION < 5.0.0
 
 bool CardWindowManager::playAngryCardSounds() const
 {
@@ -1705,6 +1707,7 @@ void CardWindowManager::handleFlickGestureMinimized(QGestureEvent* event)
 	}
 }
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 void CardWindowManager::handleMousePressMinimized(QGraphicsSceneMouseEvent* event)
 {
 	// try to capture the card the user first touched
@@ -1839,6 +1842,7 @@ void CardWindowManager::handleMouseMoveReorder(QGraphicsSceneMouseEvent* event)
 		}
 	}
 }
+#endif // QT_VERSION < 5.0.0
 
 CardWindowManager::ReorderZone CardWindowManager::getReorderZone(QPoint pt)
 {
@@ -2066,6 +2070,7 @@ void CardWindowManager::arrangeWindowsAfterReorderChange(int duration, QEasingCu
 	startAnimations();
 }
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 void CardWindowManager::handleMouseReleaseMinimized(QGraphicsSceneMouseEvent* event)
 {
 	if (m_groups.empty() || m_seenFlickOrTap)
@@ -2076,18 +2081,10 @@ void CardWindowManager::handleMouseReleaseMinimized(QGraphicsSceneMouseEvent* ev
 		// Did we go too close to the top?
 		if (m_draggedWin) {
             QRectF pr = m_draggedWin->mapRectToParent(m_draggedWin->boundingRect());
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
             if ((!event->canceled()) && (pr.center().y() > boundingRect().bottom())) {
-#else
-            if ((event->isAccepted()) && (pr.center().y() > boundingRect().bottom())) {
-#endif
                 closeWindow(m_draggedWin, true);
             }
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
             else if ((!event->canceled()) && (pr.center().y() < boundingRect().top())) {
-#else
-            else if ((event->isAccepted()) && (pr.center().y() < boundingRect().top())) {
-#endif
 				closeWindow(m_draggedWin);
 			}
 			else {
@@ -2097,12 +2094,7 @@ void CardWindowManager::handleMouseReleaseMinimized(QGraphicsSceneMouseEvent* ev
 		}
 	}
 	else if (m_movement == MovementHLocked) {
-
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		if(!event->canceled())
-#else
-        if(event->isAccepted())
-#endif
 			setActiveGroup(groupClosestToCenterHorizontally());
 		slideAllGroups();
 	}
@@ -2125,6 +2117,7 @@ void CardWindowManager::handleMouseReleaseReorder(QGraphicsSceneMouseEvent* even
 
 	slideAllGroups();
 }
+#endif // QT_VERSION < 5.0.0
 
 void CardWindowManager::handleTapGestureMinimized(QTapGesture* event)
 {
@@ -2804,7 +2797,11 @@ QRect CardWindowManager::normalOrScreenBounds(CardWindow* win) const
 
 void CardWindowManager::cancelReorder(bool dueToPenCancel)
 {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	handleMouseReleaseReorder(NULL);
+#else
+    handleTouchEndReorder(NULL);
+#endif
 }
 
 void CardWindowManager::closeWindow(CardWindow* win, bool angryCard)

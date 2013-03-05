@@ -758,6 +758,7 @@ bool WindowServer::viewportEvent(QEvent* event)
 	}
 
 	switch (event->type()) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	case QEvent::MouseButtonRelease:
 		if (G_UNLIKELY(Settings::LunaSettings()->perfTesting)) {
 			// hook for automated performance testing
@@ -774,6 +775,7 @@ bool WindowServer::viewportEvent(QEvent* event)
 			return true;
 		}
 		break;
+#endif // QT_VERSION < 5.0.0
 	case QEvent::Gesture: {
 		if (sysmgrEventFilters(event)) {
 			return true;

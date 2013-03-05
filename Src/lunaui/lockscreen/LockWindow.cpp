@@ -1617,6 +1617,7 @@ bool LockWindow::handleMouseEvent(QMouseEvent *event)
 	ev.modifiers = Event::modifiersFromQt(event->modifiers());
 
 	switch (event->type()) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
         case QEvent::MouseButtonPress:
             mouseDown = true;
             mouseDownPos = event->pos();
@@ -1645,7 +1646,7 @@ bool LockWindow::handleMouseEvent(QMouseEvent *event)
             ev.type = Event::PenMove;
             handlePenMoveEvent(&ev);
             break;
-
+#endif // QT_VERSION < 5.0.0
         default:
             ret = false;
             break;
@@ -1735,21 +1736,21 @@ bool LockWindow::handleFilteredSceneEvent(QEvent* event)
 		return true;
 	}
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     if (event->type() == QEvent::MouseButtonPress ||
         event->type() == QEvent::MouseButtonRelease ||
         event->type() == QEvent::MouseMove) {
         return handleMouseEvent(static_cast<QMouseEvent *>(event));
     }
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    return true;
+#else
     else if (event->type() == QEvent::TouchBegin ||
                event->type() == QEvent::TouchEnd ||
                event->type() == QEvent::TouchUpdate) {
         return handleTouchEvent(static_cast<QTouchEvent *>(event));
     }
 	return false;
-#else
-    return true;
-#endif
+#endif // QT_VERSION < 5.0.0
 }
 
 

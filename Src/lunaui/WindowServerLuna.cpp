@@ -1141,16 +1141,18 @@ bool WindowServerLuna::sysmgrEventFilters(QEvent* event)
 		return true;
 	}
 
-	if (type == QEvent::MouseButtonPress ||
+	if (
+        type == QEvent::KeyPress ||
+        type == QEvent::KeyRelease ||
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+        type == QEvent::MouseButtonPress ||
         type == QEvent::MouseButtonRelease ||
         type == QEvent::MouseMove ||
-		type == QEvent::KeyPress ||
-        type == QEvent::KeyRelease ||
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#else
         type == QEvent::TouchBegin ||
         type == QEvent::TouchEnd ||
         type == QEvent::TouchUpdate ||
-#endif
+#endif // QT_VERSION < 5.0.0
         type == QEvent::GestureOverride)
     {
 		if(!SystemUiController::instance()->isInDockMode()) {

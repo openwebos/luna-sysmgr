@@ -3111,7 +3111,9 @@ bool DisplayManager::handleEvent(QEvent *event)
 		keyEvent = static_cast<QKeyEvent*>(event);
 	} else if (QEvent::MouseButtonPress == event->type() || QEvent::MouseButtonRelease == event->type()
 			|| QEvent::MouseMove == event->type()) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 		mouseEvent = static_cast<QMouseEvent*>(event);
+#endif // QT_VERSION < 5.0.0
 	}
 
     if (m_slidingNow == SLIDING_WAIT && m_slidingStart + SLIDER_MINTIME < Time::curTimeMs()) {

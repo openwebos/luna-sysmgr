@@ -48,9 +48,11 @@ class CardWindowManagerState : public QState
 public:
 	CardWindowManagerState(CardWindowManager* wm);
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event) {}
 	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {}
+#endif // QT_VERSION < 5.0.0
 	virtual void flickGestureEvent(QGestureEvent* event) {}
 	virtual void tapGestureEvent(QTapGesture* event) {}
 	virtual void tapAndHoldGestureEvent(QTapAndHoldGesture* event) {}
@@ -100,9 +102,11 @@ public:
 	MinimizeState(CardWindowManager* wm) 
 				: CardWindowManagerState(wm) { setObjectName("Minimize"); }
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
 	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
+#endif // QT_VERSION < 5.0.0
 
 	virtual void flickGestureEvent(QGestureEvent* event);
 	virtual void tapGestureEvent(QTapGesture* event);
@@ -137,7 +141,9 @@ class MaximizeState : public CardWindowManagerState
 public:
 	MaximizeState(CardWindowManager* wm);
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
+#endif // QT_VERSION < 5.0.0
 
 	virtual void windowAdded(CardWindow* win);
 	virtual void windowRemoved(CardWindow* win);
@@ -203,7 +209,9 @@ public:
 	PreparingState(CardWindowManager* wm)
 		: CardWindowManagerState(wm) { setObjectName("Preparing"); }
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
+#endif // QT_VERSION < 5.0.0
 
 	virtual void windowAdded(CardWindow* win);
 	virtual void windowTimedOut(CardWindow* win);
@@ -226,7 +234,9 @@ public:
 	LoadingState(CardWindowManager* wm)
 		: CardWindowManagerState(wm) { setObjectName("Loading"); }
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
+#endif // QT_VERSION < 5.0.0
 
 	virtual void windowAdded(CardWindow* win);
 
@@ -266,8 +276,10 @@ public:
 	ReorderState(CardWindowManager* wm)
 		: CardWindowManagerState(wm), m_grid(0) { setObjectName("Reorder"); }
 
+#if (QT_VERSION < QT_VERSION_CHECK(5,0,0))
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
 	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
+#endif // QT_VERSION < 5.0.0
 
 	virtual void animationsFinished();
 

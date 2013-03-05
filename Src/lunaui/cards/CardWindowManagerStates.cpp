@@ -40,10 +40,12 @@ CardWindowManagerState::CardWindowManagerState(CardWindowManager* wm)
 {
 }
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 void CardWindowManagerState::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
 	event->accept();
 }
+#endif // QT_VERSION < 5.0.0
 
 void CardWindowManagerState::windowAdded(CardWindow* win)
 {
@@ -113,7 +115,7 @@ void CardWindowManagerState::handleTouchUpdate(QTouchEvent *e)
 #endif
 
 // --------------------------------------------------------------------------------------------------
-
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 void MinimizeState::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
     CardWindowManagerState::mousePressEvent(event);
@@ -130,6 +132,7 @@ void MinimizeState::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
 	m_wm->handleMouseReleaseMinimized(event);
 }
+#endif // QT_VERSION < 5.0.0
 
 void MinimizeState::flickGestureEvent(QGestureEvent* event)
 {
@@ -226,11 +229,13 @@ MaximizeState::MaximizeState(CardWindowManager* wm)
 	connect(trans, SIGNAL(triggered()), SLOT(slotIncomingPhoneCall()));
 }
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 void MaximizeState::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
 	// CardWindow should always accept but just in case
 	event->ignore();
 }
+#endif // QT_VERSION < 5.0.0
 
 void MaximizeState::windowAdded(CardWindow* win)
 {
@@ -617,12 +622,14 @@ void PreparingState::onEntry(QEvent* event)
 	m_wm->prepareAddWindowSibling(win);
 }
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 void PreparingState::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
 	event->accept();
 
 	m_wm->minimizeActiveWindow();
 }
+#endif // QT_VERSION < 5.0.0
 
 void PreparingState::windowAdded(CardWindow* win)
 {
@@ -662,12 +669,14 @@ void PreparingState::handleTouchBegin(QTouchEvent *e)
 
 // --------------------------------------------------------------------------------------------------
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 void LoadingState::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
 	event->accept();
 
 	m_wm->minimizeActiveWindow();
 }
+#endif // QT_VERSION < 5.0.0
 
 void LoadingState::windowAdded(CardWindow* win)
 {
@@ -747,6 +756,7 @@ void ReorderGrid::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWid
 	painter->setPen(oldPen);
 }
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 void ReorderState::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
 	m_wm->handleMouseMoveReorder(event);
@@ -756,6 +766,7 @@ void ReorderState::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
 	m_wm->handleMouseReleaseReorder(event);
 }
+#endif // QT_VERSION < 5.0.0
 
 void ReorderState::animationsFinished()
 {
