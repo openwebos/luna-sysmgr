@@ -1358,10 +1358,22 @@ void OverlayWindowManager::mapCoordToWindow(Window* win, int& x, int& y) const
     if (!win)
         return;
 
+
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-	QPointF pt = win->mapFromItem(this, x, y);
+    int frameHeight = 0;
+    QWidget *w = QApplication::activeWindow();
+
+    if (w) {
+        frameHeight = w->frameGeometry().height() -
+                      w->geometry().height();
+    }
+    QPointF pt = win->mapFromItem(this, x, y);
     x =pt.x();
     y = pt.y();
+    QRectF br = win->boundingRect();
+    x -= br.x();
+    y -= br.y();
+    y -= frameHeight;
 #else
     QPointF pt = win->mapFromItem(this, x, y);
     QRectF br = win->boundingRect();
