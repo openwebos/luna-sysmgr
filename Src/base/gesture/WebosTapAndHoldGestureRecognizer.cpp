@@ -83,7 +83,6 @@ WebosTapAndHoldGestureRecognizer::recognize(QGesture *state, QObject *object,
         return QGestureRecognizer::Ignore;
     }
     return result;
-//#endif // QT_WEBOS
 }
 
 void WebosTapAndHoldGestureRecognizer::reset(QGesture *state)
