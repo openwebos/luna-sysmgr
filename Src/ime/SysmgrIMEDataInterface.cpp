@@ -20,6 +20,7 @@
 
 
 #include "SysmgrIMEDataInterface.h"
+#include <glib.h>
 #include "HostBase.h"
 #include "IMEController.h"
 #include "Settings.h"
@@ -33,10 +34,11 @@
 #include "BannerMessageEventFactory.h"
 
 #include <QApplication>
+#include <QDebug>
 #include <QWidget>
 #include <ime/IMEData.h>
 
-SysmgrIMEModel::SysmgrIMEModel() : m_inputMethod(NULL)
+SysmgrIMEModel::SysmgrIMEModel() : m_inputMethod(NULL),m_serviceHandle(NULL)
 {
 	const HostInfo& info = HostBase::instance()->getInfo();
 	m_availableSpace.set(QRect(0, 0, info.displayWidth, info.displayHeight));
@@ -93,9 +95,21 @@ VirtualKeyboardPreferences &SysmgrIMEModel::virtualKeyboardPreferences()
     return VirtualKeyboardPreferences::instance();
 }
 
-GMainLoop *SysmgrIMEModel::getMainLoop()
+// If service handle exists, return it, otherwise create it then return it
+// In an error situation, this could return NULL
+LSHandle *SysmgrIMEModel::getLunaServiceHandle()
 {
-    return HostBase::instance()->mainLoop();
+    if (!m_serviceHandle) {
+        LSError lserror;
+        LSErrorInit(&lserror);
+        if (LSRegister(NULL, &m_serviceHandle, &lserror))
+            LSGmainAttach(m_serviceHandle, HostBase::instance()->mainLoop(), &lserror);
+        if (LSErrorIsSet(&lserror)) {
+            qCritical() << lserror.message << lserror.file << lserror.line << lserror.func;
+            LSErrorFree(&lserror);
+        }
+    }
+    return m_serviceHandle;
 }
 
 void SysmgrIMEModel::touchEvent(const QTouchEvent& te)

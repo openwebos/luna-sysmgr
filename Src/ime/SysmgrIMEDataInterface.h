@@ -24,10 +24,10 @@
 
 #include "IMEDataInterface.h"
 #include "InputMethod.h"
+#include <lunaservice.h>
 #include <qnamespace.h>
 #include <QString>
 #include <string>
-#include <glib.h>
 
 class VirtualKeyboardPreferences;
 
@@ -96,10 +96,12 @@ public:
 
     virtual VirtualKeyboardPreferences &virtualKeyboardPreferences();
 
-    virtual GMainLoop *getMainLoop();
+    virtual LSHandle *getLunaServiceHandle();
+
 
 private:
 	InputMethod *	m_inputMethod;
+    LSHandle *     m_serviceHandle;
 };
 
 #endif // SYSMGRDATAINTERFACE_H
