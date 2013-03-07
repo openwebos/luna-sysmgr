@@ -63,8 +63,7 @@ protected:
             // converted to touch events by Qt
             if (me->globalY() < (info.displayHeight + frameHeight)) {
                 QGraphicsScene *scene = WindowServer::instance()->scene();
-                QPointF pos(me->globalPos());
-                pos.setY(pos.y() - frameHeight);
+                QPointF pos(me->pos());
 
                 QGraphicsSceneMouseEvent *event = 0;
 

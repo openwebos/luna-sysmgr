@@ -355,10 +355,10 @@ void HostWindow::wheelEvent(QGraphicsSceneWheelEvent *event)
     Event ev;
     ev.type = Event::MouseWheel;
 
-    QPointF eventPos = pos() + event->scenePos();
+    QRectF br = boundingRect();
 
-    ev.mouseWheelX = eventPos.x();
-    ev.mouseWheelY = eventPos.y();
+    ev.mouseWheelX = event->pos().x() - br.x();
+    ev.mouseWheelY = event->pos().y() - br.y();
     if (event->orientation() == Qt::Horizontal) {
         ev.mouseWheelDeltaX = event->delta();
         ev.mouseWheelDeltaY = 0;

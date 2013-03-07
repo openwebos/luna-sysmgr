@@ -662,12 +662,11 @@ void CardHostWindow::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
 
 	Event evt;
 	evt.type = Event::MouseHover;
-	QPointF oldPos = pos() + event->lastScenePos();
-	evt.mouseHoverOldX = oldPos.x();
-	evt.mouseHoverOldY = oldPos.y();
-	QPointF newPos = pos() + event->scenePos();
-	evt.mouseHoverX = newPos.x();
-	evt.mouseHoverY = newPos.y();
+	QRectF br = boundingRect();
+	evt.mouseHoverOldX = event->lastPos().x() - br.x();
+	evt.mouseHoverOldY = event->lastPos().y() - br.y();
+	evt.mouseHoverX = event->pos().x() - br.x();
+	evt.mouseHoverY = event->pos().y() - br.y();
 	evt.time = Time::curSysTimeMs();
 	if (m_channel)
 		m_channel->sendAsyncMessage(new View_InputEvent(routingId(),
