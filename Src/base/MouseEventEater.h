@@ -61,7 +61,7 @@ protected:
             // Try sending incoming mouse events to QGraphicsScene first, then
             // filter out the ones not handled by the scene. They will be
             // converted to touch events by Qt
-            if (me->globalY() < (info.displayHeight + frameHeight)) {
+            if (me->pos().y() < (info.displayHeight + frameHeight)) {
                 QGraphicsScene *scene = WindowServer::instance()->scene();
                 QPointF pos(me->pos());
 
