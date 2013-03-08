@@ -68,7 +68,6 @@ CardHostWindow::CardHostWindow(WindowType::Type type, HostWindowData* data, IpcC
 	m_prepareAddedToWm = true; // host windows don't get prepared
 	m_touchEventsEnabled = true;
 	setAcceptTouchEvents(true);
-	setAcceptHoverEvents(true);
 
 	int animationStrength = AS(cardTransitionCurve);
 	m_rotateEquation =  AS_EASEOUT(animationStrength);
@@ -654,23 +653,6 @@ void CardHostWindow::mousePressEvent(QGraphicsSceneMouseEvent* event)
 void CardHostWindow::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 {
 	event->accept();
-}
-
-void CardHostWindow::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
-{
-	event->accept();
-
-	Event evt;
-	evt.type = Event::MouseHover;
-	QRectF br = boundingRect();
-	evt.mouseHoverOldX = event->lastPos().x() - br.x();
-	evt.mouseHoverOldY = event->lastPos().y() - br.y();
-	evt.mouseHoverX = event->pos().x() - br.x();
-	evt.mouseHoverY = event->pos().y() - br.y();
-	evt.time = Time::curSysTimeMs();
-	if (m_channel)
-		m_channel->sendAsyncMessage(new View_InputEvent(routingId(),
-								SysMgrEventWrapper(&evt)));
 }
 
 void CardHostWindow::mouseMoveEvent(QGraphicsSceneMouseEvent* event)

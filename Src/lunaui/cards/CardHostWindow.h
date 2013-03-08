@@ -65,7 +65,6 @@ protected:
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
 	virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event);
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
-	virtual void hoverMoveEvent(QGraphicsSceneHoverEvent* event);
 	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
 	virtual void refreshAdjustmentAngle();
 	virtual void onSetAppFixedOrientation(int orientation, bool isPortrait);
