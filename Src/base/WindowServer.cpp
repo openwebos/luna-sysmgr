@@ -92,6 +92,7 @@
 #include "WebosTapGestureRecognizer.h"
 #include "ScreenEdgeFlickGesture.h"
 #include "FlickGesture.h"
+#include "FlickGestureRecognizer.h"
 #include "QtUtils.h"
 
 
@@ -442,6 +443,8 @@ WindowServer::WindowServer()
     customType = QGestureRecognizer::registerRecognizer(new WebosTapAndHoldGestureRecognizer);
     WebosTapAndHoldGesture::setGestureType(customType);
 
+    customType = QGestureRecognizer::registerRecognizer(new FlickGestureRecognizer);
+    FlickGesture::setGestureType(customType);
 
 	viewportWidget->setAttribute(Qt::WA_AcceptTouchEvents);
 	viewportWidget->setAttribute(Qt::WA_OpaquePaintEvent, true);

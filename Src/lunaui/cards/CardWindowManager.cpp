@@ -44,7 +44,6 @@
 #include "FlickGesture.h"
 #include "GhostCard.h"
 #include "IMEController.h"
-#include "WebosTapAndHoldGesture.h"
 
 #include <QTapGesture>
 #include <QTapAndHoldGesture>
@@ -143,13 +142,12 @@ CardWindowManager::CardWindowManager(int maxWidth, int maxHeight)
 
 	connect(&m_anims, SIGNAL(finished()), SLOT(slotAnimationsFinished()));
 
+    grabGesture(Qt::TapGesture);
+    grabGesture(Qt::TapAndHoldGesture);
+
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
-	grabGesture(Qt::TapGesture);
-	grabGesture(Qt::TapAndHoldGesture);
 	grabGesture((Qt::GestureType) SysMgrGestureFlick);
 #else
-	grabGesture(Qt::TapGesture);
-	grabGesture(WebosTapAndHoldGesture::gestureType());
     grabGesture(FlickGesture::gestureType());
 #endif
 
@@ -1293,7 +1291,7 @@ bool CardWindowManager::sceneEvent(QEvent* event)
 			event->accept();
 			return true;
 		}
-		g = ge->gesture(WebosTapAndHoldGesture::gestureType());
+        g = ge->gesture(Qt::TapAndHoldGesture);
 		if (g) {
 			event->accept();
 			return true;
@@ -1319,7 +1317,7 @@ bool CardWindowManager::sceneEvent(QEvent* event)
 			}
 			return true;
 		}
-		g = ge->gesture(WebosTapAndHoldGesture::gestureType());
+        g = ge->gesture(Qt::TapAndHoldGesture);
 		if (g) {
 			QTapAndHoldGesture* hold = static_cast<QTapAndHoldGesture*>(g);
 			if (hold->state() == Qt::GestureFinished) {
@@ -1344,9 +1342,9 @@ bool CardWindowManager::sceneEvent(QEvent* event)
 	}
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     else if (event->type() == QEvent::TouchBegin ||
-               event->type() == QEvent::TouchEnd ||
-               event->type() == QEvent::TouchCancel ||
-               event->type() == QEvent::TouchUpdate) {
+             event->type() == QEvent::TouchEnd ||
+             event->type() == QEvent::TouchCancel ||
+             event->type() == QEvent::TouchUpdate) {
         QTouchEvent *e = static_cast<QTouchEvent *>(event);
 
         if (e->touchPoints().isEmpty()) {
@@ -1467,7 +1465,7 @@ void CardWindowManager::handleTouchUpdateMinimized(QTouchEvent* e)
         }
     } else if (m_movement == MovementVLocked) {
         if (!m_draggedWin) {
-            if (m_activeGroup->setActiveCard(p.scenePos())) {
+            if (m_activeGroup->setActiveCard(p.pos())) {
                 m_draggedWin = m_activeGroup->activeCard();
             }
 
@@ -1478,14 +1476,12 @@ void CardWindowManager::handleTouchUpdateMinimized(QTouchEvent* e)
 
         // ignore pen movements outside the vertical pillar around
         // the active window
-        QPointF mappedPos = m_draggedWin->mapFromParent(p.scenePos());
+        QPointF mappedPos = m_draggedWin->mapFromParent(p.pos());
 
-
-        // FIXME:  What is wrong with this on Qt5?
-        //if (mappedPos.x() < m_draggedWin->boundingRect().x() ||
-        //        mappedPos.x() >= m_draggedWin->boundingRect().right()) {
-        //    return;
-        //}
+        if (mappedPos.x() < m_draggedWin->boundingRect().x() ||
+            mappedPos.x() >= m_draggedWin->boundingRect().right()) {
+            return;
+        }
 
         if (delta.y() == 0) {
             return;
@@ -2141,7 +2137,12 @@ void CardWindowManager::handleTapGestureMinimized(QTapGesture* event)
 	}
 	else {
 		// first test to see if the tap is not above/below the active group
-		QPointF pt = mapFromScene(event->position());
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+        QPointF pt = mapFromScene(event->position());
+#else
+        QPointF pt = event->position();
+#endif // QT_VERSION_CHECK
+
 		if (!m_activeGroup->withinColumn(pt)) {
 			if (pt.x() < 0) {
 				// tapped to the left of the active group
