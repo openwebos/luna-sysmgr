@@ -429,6 +429,7 @@ WindowServer::WindowServer()
 		QGLWidget* glWidget = new QGLWidget(glFormat);
 		glWidget->makeCurrent();
 		viewportWidget = glWidget;
+		QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 	}
 #endif
 
