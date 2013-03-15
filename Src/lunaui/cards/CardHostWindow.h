@@ -61,7 +61,7 @@ protected:
 
 	virtual void fullScreenEnabled(bool enabled);
 
-	virtual bool touchEvent(QTouchEvent* event);
+    virtual bool touchEvent(QTouchEvent* event);
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
 	virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event);
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);

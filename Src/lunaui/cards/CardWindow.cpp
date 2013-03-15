@@ -1,6 +1,7 @@
 /* @@@LICENSE
 *
 *      Copyright (c) 2008-2013 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2013 LG Electronics
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -574,20 +575,6 @@ void CardWindow::handleTouchBegin(QTouchEvent *te)
         te->ignore();
         return;
     }
-
-    Event ev;
-    ev.type = Event::PenDown;
-    ev.setMainFinger(true);
-    qreal x = te->touchPoints().first().pos().x();
-    qreal y = te->touchPoints().first().pos().y();
-    mapCoordinates(x, y);
-    ev.x = x;
-    ev.y = y;
-    ev.clickCount = 1;
-    ev.modifiers = Event::modifiersFromQt(te->modifiers());
-    ev.time = Time::curSysTimeMs();
-
-    inputEvent(&ev);
 }
 
 void CardWindow::handleTouchEnd(QTouchEvent *te)
@@ -603,27 +590,6 @@ void CardWindow::handleTouchEnd(QTouchEvent *te)
             m_modalChild->handleTouchEnd(te);
             return;
     }
-
-    QPointF pos = te->touchPoints().first().pos();
-    Event ev;
-
-    if (te->type() == QTouchEvent::TouchCancel) {
-        ev.type = Event::PenCancel;
-    } else {
-        ev.type = Event::PenUp;
-    }
-
-    ev.setMainFinger(true);
-    qreal x = pos.x();
-    qreal y = pos.y();
-    mapCoordinates(x,y);
-    ev.x = x;
-    ev.y = y;
-    ev.clickCount = 0;
-    ev.modifiers = Event::modifiersFromQt(te->modifiers());
-    ev.time = Time::curSysTimeMs();
-
-    inputEvent(&ev);
 }
 
 void CardWindow::handleTouchUpdate(QTouchEvent *te)
@@ -639,20 +605,6 @@ void CardWindow::handleTouchUpdate(QTouchEvent *te)
             m_modalChild->handleTouchUpdate(te);
             return;
     }
-
-    QPointF pos = te->touchPoints().first().pos();
-    Event ev;
-    ev.type = Event::PenMove;
-    ev.setMainFinger(true);
-    qreal x = pos.x();
-    qreal y = pos.y();
-    mapCoordinates(x,y);
-    ev.x = x;
-    ev.y = y;
-    ev.modifiers = Event::modifiersFromQt(te->modifiers());
-    ev.time = Time::curSysTimeMs();
-
-    inputEvent(&ev);
 }
 #endif
 
@@ -1803,9 +1755,11 @@ bool CardWindow::touchEvent(QTouchEvent* event)
 		return true;
 	}
 
-    if (m_channel) {
-		QRectF br = boundingRect();
-		m_channel->sendAsyncMessage(new View_TouchEvent(routingId(), SysMgrTouchEvent(event, -br.x(), -br.y())));
+    if (event->spontaneous()) { // Send system touch events only, not synthesized
+        if (m_channel) {
+            QRectF br = boundingRect();
+            m_channel->sendAsyncMessage(new View_TouchEvent(routingId(), SysMgrTouchEvent(event, -br.x(), -br.y())));
+        }
     }
 	
     return true;
