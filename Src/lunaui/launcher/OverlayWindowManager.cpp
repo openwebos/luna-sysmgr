@@ -810,7 +810,7 @@ bool OverlayWindowManager::handleTouchBegin(QTouchEvent *e)
 	ev.clickCount = 1;
 	ev.time = Time::curSysTimeMs();
 
-    if (handlePenDownEvent(&ev)) {
+    if (handlePenDownEvent(&ev) && !IMEController::instance()->isIMEOpened()) {
 		e->accept();
 	} else {
 		e->ignore();
@@ -840,7 +840,7 @@ bool OverlayWindowManager::handleTouchEnd(QTouchEvent *e)
 		handled = handlePenCancelEvent(&ev);
 	}
 
-    if (handled) {
+    if (handled && !IMEController::instance()->isIMEOpened()) {
         e->accept();
     } else {
         e->ignore();

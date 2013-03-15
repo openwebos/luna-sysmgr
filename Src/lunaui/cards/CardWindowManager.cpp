@@ -1288,6 +1288,12 @@ bool CardWindowManager::sceneEvent(QEvent* event)
 		QGestureEvent* ge = static_cast<QGestureEvent*>(event);
 		QGesture* g = ge->gesture(Qt::TapGesture);
 		if (g) {
+
+            if (SystemUiController::instance()->isUniversalSearchShown()) {
+                event->ignore();
+                return false;
+            }
+
 			event->accept();
 			return true;
 		}
