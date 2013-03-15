@@ -27,7 +27,6 @@
 #include <QMouseEvent>
 #include <QObject>
 #include <QWidget>
-
 #include "HostBase.h"
 #include "WindowServer.h"
 
@@ -40,7 +39,30 @@ public:
 
 protected:
     virtual bool eventFilter(QObject *o, QEvent *e) {
+
+#if defined(TARGET_DESKTOP)
+        bool insideGestureStrip(false);
+
+        static QString gestureStrip("GestureStrip");
+        QString objectClassName(o->metaObject()->className());
+
+        if (objectClassName == gestureStrip) {
+            insideGestureStrip = true;
+        } else if (o->parent()) {
+            QString parentClassName(o->parent()->metaObject()->className());
+            if (parentClassName == gestureStrip) {
+                insideGestureStrip = true;
+            }
+        }
+
+        if (insideGestureStrip) {
+            e->ignore();
+            return false;
+        }
+#else
         Q_UNUSED(o);
+#endif
+
 
         bool handled = false;
 
