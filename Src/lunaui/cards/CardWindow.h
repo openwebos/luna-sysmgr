@@ -260,7 +260,6 @@ protected:
 	virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event);
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
 	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
-	virtual void hoverMoveEvent(QGraphicsSceneHoverEvent* event);
 
 	bool mouseFlickEvent(QGestureEvent* event);
 	bool pinchEvent(QGestureEvent* event);

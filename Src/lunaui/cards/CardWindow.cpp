@@ -190,8 +190,6 @@ void CardWindow::init()
     grabGesture(SingleClickGesture::gestureType());
 #endif
 
-	setAcceptHoverEvents(true);
-
 	connect(DisplayManager::instance(), SIGNAL(signalDisplayStateChange(int)),
 										   SLOT(slotDisplayStateChanged(int)));
 
@@ -527,33 +525,6 @@ void CardWindow::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 
 	inputEvent(&ev);
 }
-
-void CardWindow::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
-{
-	switch(forwardToModal()) {
-		case ParentHandleEvent:
-			break;
-		case WaitForChildToAcceptEvents:
-			return;
-		case ForwardEventToChild:
-			m_modalChild->hoverMoveEvent(event);
-			return;
-	}
-	event->accept();
-
-	Event ev;
-	ev.type = Event::MouseHover;
-	QRectF br = boundingRect();
-	ev.mouseHoverOldX = event->lastPos().x() - br.x();
-	ev.mouseHoverOldY = event->lastPos().y() - br.y();
-	ev.mouseHoverX = event->pos().x() - br.x();
-	ev.mouseHoverY = event->pos().y() - br.y();
-	ev.modifiers = Event::modifiersFromQt(event->modifiers());
-	ev.time = Time::curSysTimeMs();
-
-	inputEvent(&ev);
-}
-
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 void CardWindow::handleTouchBegin(QTouchEvent *te)
