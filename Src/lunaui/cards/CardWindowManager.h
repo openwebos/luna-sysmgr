@@ -1,6 +1,7 @@
 /* @@@LICENSE
 *
 *      Copyright (c) 2008-2013 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2013 LG Electronics
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -156,6 +157,8 @@ private:
 
     void handleTouchEndMinimized(QTouchEvent* e);
     void handleTouchEndReorder(QTouchEvent* e);
+
+    void slideAllGroupsOnTouchUpdate(int xOffset);
 #endif // QT_VERSION < 5.0.0
 
 	void handleFlickGestureMinimized(QGestureEvent* event);

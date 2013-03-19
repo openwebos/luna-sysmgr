@@ -1,6 +1,7 @@
 /* @@@LICENSE
 *
 *      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2013 LG Electronics
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -86,6 +87,10 @@ public:
     QList<QPropertyAnimation*> animateCloseWithOffset(int duration,
                                             QEasingCurve::Type curve,
                                             int groupXOffset);
+
+    // Sets positions for the group and the cards based on groupXOffset
+    // without creating any animations.
+    void setCardPositions(int groupXOffset);
 
 	QList<QPropertyAnimation*> maximizeActiveCard(qreal centerOffset);
 

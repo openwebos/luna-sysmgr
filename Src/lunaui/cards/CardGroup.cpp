@@ -1,6 +1,7 @@
 /* @@@LICENSE
 *
 *      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2013 LG Electronics
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -286,6 +287,18 @@ QList<QPropertyAnimation*> CardGroup::animateCloseWithOffset(int duration, QEasi
 		anims.append(anim);
 	}
 	return anims;
+}
+
+void CardGroup::setCardPositions(int groupXOffset)
+{
+    setX((qreal)groupXOffset);
+
+    QVector<CardWindow::Position> positions =
+        calculateOpenedPositions(groupXOffset);
+
+    for (int i = 0; i < positions.count(); ++i) {
+        m_cards[i]->setPosition(positions[i]);
+    }
 }
 
 void CardGroup::layoutCards(bool open, bool includeActiveCard)

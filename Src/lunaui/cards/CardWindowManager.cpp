@@ -1,6 +1,7 @@
 /* @@@LICENSE
 *
 *      Copyright (c) 2008-2013 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2013 LG Electronics
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -1369,6 +1370,32 @@ bool CardWindowManager::sceneEvent(QEvent* event)
 }
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+void CardWindowManager::slideAllGroupsOnTouchUpdate(int xOffset)
+{
+    if (m_groups.empty() || !m_activeGroup) {
+        return;
+    }
+
+    m_activeGroup->setCardPositions(xOffset);
+
+    int activeGrpIndex = m_groups.indexOf(m_activeGroup);
+    int centerX = -m_activeGroup->left() - kGapBetweenGroups + xOffset;
+
+    for (int i = activeGrpIndex - 1; i >= 0; --i) {
+        centerX += -m_groups[i]->right();
+        m_groups[i]->setCardPositions(centerX);
+        centerX += -kGapBetweenGroups - m_groups[i]->left();
+    }
+
+    centerX = m_activeGroup->right() + kGapBetweenGroups + xOffset;
+
+    for (int i = activeGrpIndex + 1; i < m_groups.size(); ++i) {
+        centerX += m_groups[i]->left();
+        m_groups[i]->setCardPositions(centerX);
+        centerX += kGapBetweenGroups + m_groups[i]->right();
+    }
+}
+
 bool CardWindowManager::handleTouchBegin(QTouchEvent *e)
 {
     if (m_penDown) {
@@ -1397,7 +1424,8 @@ bool CardWindowManager::handleTouchEnd(QTouchEvent *e)
         e->accept();
     }
 
-	resetMouseTrackState();
+    resetMouseTrackState();
+    updateAllowWindowUpdates();
 
     return e->isAccepted();
 }
@@ -1467,7 +1495,7 @@ void CardWindowManager::handleTouchUpdateMinimized(QTouchEvent* e)
 
         if (!m_trackWithinGroup) {
             m_activeGroupPivot += diff.x();
-            slideAllGroupsTo(m_activeGroupPivot);
+            slideAllGroupsOnTouchUpdate(m_activeGroupPivot);
         }
     } else if (m_movement == MovementVLocked) {
         if (!m_draggedWin) {
