@@ -1,6 +1,7 @@
 /* @@@LICENSE
 *
 *      Copyright (c) 2009-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2013 LG Electronics
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -502,6 +503,7 @@ bool CardHostWindow::rotateTimerTicked()
 	return true;
 }
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 bool CardHostWindow::touchEvent(QTouchEvent* event)
 {
     if (!m_focused || m_pendingFocus == PendingFocusFalse) {
@@ -624,6 +626,7 @@ bool CardHostWindow::touchEvent(QTouchEvent* event)
 
     return true;
 }
+#endif
 
 void CardHostWindow::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
@@ -631,6 +634,13 @@ void CardHostWindow::mousePressEvent(QGraphicsSceneMouseEvent* event)
 		event->ignore();
 		return;
 	}
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        if (!m_paused) {
+                CardWindow::mousePressEvent(event);
+                return;
+        }
+#endif
 
 	event->accept();
 
@@ -653,6 +663,18 @@ void CardHostWindow::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
 void CardHostWindow::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        if (!m_focused || m_pendingFocus == PendingFocusFalse) {
+                event->ignore();
+                return;
+        }
+
+        if (!m_paused) {
+                CardWindow::mouseDoubleClickEvent(event);
+                return;
+        }
+#endif
+
 	event->accept();
 }
 
@@ -675,6 +697,18 @@ void CardHostWindow::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
 
 void CardHostWindow::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        if (!m_focused || m_pendingFocus == PendingFocusFalse) {
+                event->ignore();
+                return;
+        }
+
+        if (!m_paused) {
+                CardWindow::mouseMoveEvent(event);
+                return;
+        }
+#endif
+
 	event->accept();
 
 	if (!m_penInPlayButton)
@@ -702,6 +736,18 @@ void CardHostWindow::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 
 void CardHostWindow::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        if (!m_focused || m_pendingFocus == PendingFocusFalse) {
+                event->ignore();
+                return;
+        }
+
+        if (!m_paused) {
+                CardWindow::mouseReleaseEvent(event);
+                return;
+        }
+#endif
+
 	event->accept();
 
 	if (!m_penInPlayButton)

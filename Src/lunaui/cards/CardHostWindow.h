@@ -1,6 +1,7 @@
 /* @@@LICENSE
 *
 *      Copyright (c) 2009-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2013 LG Electronics
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -61,7 +62,9 @@ protected:
 
 	virtual void fullScreenEnabled(bool enabled);
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     virtual bool touchEvent(QTouchEvent* event);
+#endif
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
 	virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event);
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
