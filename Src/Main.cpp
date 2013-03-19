@@ -752,7 +752,7 @@ int main( int argc, char** argv)
 		WebAppMgrProxy::setAppToLaunchUponConnection(s_appToLaunchStr);
 	}
 	else
-	    g_timeout_add(0, finishBootup, 0);
+	    g_timeout_add_seconds(10, finishBootup, 0);
 	
 	app.exec();
 

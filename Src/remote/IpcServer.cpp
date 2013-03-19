@@ -151,6 +151,7 @@ IpcServer::IpcServer()
 	// flash needs this:
 	chmod("/tmp/pipcserver.sysmgr", S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP);
 	chown((char*)"/tmp/pipcserver.sysmgr", 0, kGroupId);
+    system("/sbin/initctl emit --no-wait LunaSysMgr-ipc-ready");
 }
 
 

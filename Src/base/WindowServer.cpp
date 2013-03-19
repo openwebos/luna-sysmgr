@@ -1186,6 +1186,11 @@ OrientationEvent::Orientation WindowServer::getInitialDeviceOrientation()
 
 void WindowServer::bootupFinished()
 {
+    // Prevent multiple calls to bootupFinished from having effect --
+    // it is called on a timeout in Main, as well as when WebAppMgrProxy connects.
+    if(!m_bootingUp) {
+        return;
+    }
     if(Preferences::instance()->rotationLock() == OrientationEvent::Orientation_Invalid) {
         OrientationEvent::Orientation initialOrientation = getInitialDeviceOrientation();
 		setUiOrientation(initialOrientation, Rotation_NoAnimation);
