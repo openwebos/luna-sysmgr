@@ -1,6 +1,7 @@
 # @@@LICENSE
 #
-#      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+#   Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+#   Copyright (c) 2013 LG Electronics
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -63,6 +64,10 @@ contains (CONFIG_BUILD, webosemulator) {
             $$(STAGING_INCDIR)/PmLogLib/IncsPublic \
             $$(STAGING_INCDIR)/luna-sysmgr-common \
             $$(STAGING_INCDIR)/ime \
+
+    contains(QT_VERSION, "^5.*") {
+        DEFINES += USE_KEY_FILTER USE_MOUSE_FILTER
+    }
 
 } else {
     warning($$MACHINE_NAME not matched in emulator.pri)
