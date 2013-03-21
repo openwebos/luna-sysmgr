@@ -1,6 +1,7 @@
 /* @@@LICENSE
 *
 *      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2013 LG Electronics
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -45,7 +46,6 @@
 #include "IpcServer.h"
 #include "SystemUiController.h"
 #include "WindowServer.h"
-//#include "WebAppManager.h"
 #include "Settings.h"
 #include "ApplicationDescription.h"
 #include "ApplicationManager.h"
@@ -56,6 +56,7 @@
 #include "MemoryMonitor.h"
 #include "CustomEvents.h"
 #include "HostWindowData.h"
+#include "Time.h"
 
 static WebAppMgrProxy* s_instance = NULL;
 static gchar* s_appToLaunchWhenConnectedStr = NULL;
@@ -558,6 +559,10 @@ std::string WebAppMgrProxy::appLaunch(const std::string& appId,
 			return "";
 		}
 	}
+
+    if (G_UNLIKELY(Settings::LunaSettings()->perfTesting)) {
+        g_message("SYSMGR PERF: APP LAUNCHED app id: %s, start time: %d", appId.c_str(), Time::curTimeMs());
+    }
 
 	if (desc->type() == ApplicationDescription::Type_Web) {
         // Verify that the app doesn't have a security issue
