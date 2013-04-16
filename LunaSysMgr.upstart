@@ -25,12 +25,9 @@ end script
 script
 
 	# Choose our malloc
-    if grep -qs "qemu" /etc/hostname ; then
-        export LD_PRELOAD="/usr/lib/libptmalloc3.so"
-        export HOME=/var/home/root
-    else
-        export LD_PRELOAD="/usr/lib/libptmalloc3.so /usr/lib/libmemcpy.so"
-    fi
+	if grep -qs "qemu" /etc/hostname ; then
+		export HOME=/var/home/root
+	fi
 
 	#check for MFTboot flag and attempt to launch MFT if present
 	if [ `grep -c MFTboot /proc/cmdline` == "1" ]
