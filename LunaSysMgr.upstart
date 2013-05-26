@@ -23,8 +23,6 @@ pre-start script
 end script
 
 script
-
-	# Choose our malloc
 	if grep -qs "qemu" /etc/hostname ; then
 		export HOME=/var/home/root
 	fi
@@ -40,9 +38,7 @@ script
 			exec /usr/bin/LunaSysMgr -s `cat /var/luna/preferences/sysmgr-args`
 		fi
 	fi
-	#if grep -qs "qemu" /etc/hostname ; then
-	#	export HOME=/var/home/root
-	#fi
+
 	exec ionice -c 2 -n 0 /usr/bin/LunaSysMgr -s `cat /var/luna/preferences/sysmgr-args`
 end script
 
