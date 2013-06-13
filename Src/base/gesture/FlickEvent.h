@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Hewlett-Packard Development Company, L.P.
+** Copyright (c) 2013 LG Electronics, Inc.
 ** All rights reserved.
 **
 ** $QT_BEGIN_LICENSE:LGPL$

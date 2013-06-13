@@ -169,7 +169,7 @@ Cautions:
 
 All content, including all source code files and documentation files in this repository except otherwise noted are: 
 
- Copyright (c) 2008-2013 Hewlett-Packard Development Company, L.P.
+ Copyright (c) 2008-2013 LG Electronics, Inc.
 
 All content, including all source code files and documentation files in this repository except otherwise noted are:
 Licensed under the Apache License, Version 2.0 (the "License");
