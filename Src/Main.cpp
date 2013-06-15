@@ -15,6 +15,13 @@
 * limitations under the License.
 *
 * LICENSE@@@ */
+/**
+ * @file
+ * 
+ * Main entry point for Luna
+ *
+ * @author Hewlett-Packard Development Company, L.P.
+ */
 
 
 
@@ -100,24 +107,71 @@ static gboolean s_forceSoftwareRendering = false;
 static gchar* s_mallocStatsFileStr = NULL;
 static int s_mallocStatsInterval = -1;
 
-// debugCrashes indicates whether the user has specified "-x on" in the command
-// line args to enable debugging of crashes.
+/**
+ * Whether or not to debug crashes
+ * debugCrashes indicates whether the user has specified "-x on" in the command
+ * line args to enable debugging of crashes.
+ */ 
 static bool debugCrashes = false;
 
-// Used to allow us to bail from the handler when we're done debugging.  This
-// is meant to be set only from within a gdb seesion.
+/**
+ * Used to allow us to bail from the handler when we're done debugging. 
+ *
+ * This is meant to be set only from within a gdb seesion.
+ */
 volatile bool stayInLoop = true;
 
+/**
+ * Crash log file descriptor
+ */
 int crashLogFD = -1;
+
+/**
+ * Process ID of the current process
+ */
 pid_t sysmgrPid;
 
+/**
+ * Process ID of the bootup animation process
+ * 
+ * Set by {@link spawnBootupAnimationProcess() spawnBootupAnimationProcess()}.
+ */
 pid_t bootAnimPid;
-int   bootAnimPipeFd=-1, sysmgrPipeFd=-1;
-int   WebAppMgrPipeFd=-1, IpcServerPipeFd=-1;
+
+/**
+ * File descriptor of pipe to write to to talk to the boot animation process fork
+ */
+int   bootAnimPipeFd=-1;
+
+/**
+ * File descriptor for boot animation process fork to read messages from the parent process from
+ */
+int   sysmgrPipeFd=-1;
+
+/**
+ * File descriptor of pipe to write to to talk to the WebAppManager process fork
+ */
+int   WebAppMgrPipeFd=-1;
+
+/**
+ * File descriptor for WebAppManager process fork to read messages from the parent process from
+ */
+int   IpcServerPipeFd=-1;
+
+/**
+ * Message to be passed from parent process to WebAppManager process when the IpcServer is ready
+ */
 char  msgOkToContinue = 0xAB;
 
-// Safe printf that does not call malloc (to avoid re-entrancy issue when
-// called from the signal handler.
+/**
+ * printf for crash logging purposes
+ * 
+ * Safe printf that does not call malloc (to avoid re-entrancy issue when
+ * called from the signal handler.
+ * 
+ * @param	format		Format of output string
+ * @param	...		List of values to include in the output string
+ */
 static void crash_printf(const char *format, ...) {
     // Allocate the buffer staticly because we don't want to assume that
     // there's a lot of stack space left at the time of the crash:
@@ -131,6 +185,9 @@ static void crash_printf(const char *format, ...) {
 	Q_UNUSED(result);
 }
 
+/**
+ * Flushes the crash log to disk
+ */
 static void crash_flush() {
     fsync(crashLogFD);
 }
@@ -152,6 +209,13 @@ const char *const regNames[NGREG] = {
 };
 #endif
 
+/**
+ * Log register values
+ * 
+ * @param	sig		The signal which triggered this handler
+ * @param	info		Pointer to information about the signal
+ * @param	data		Pointer to a ucontext_t with info on the crashing process
+ */
 void logCrashRegisterContext(int sig, siginfo_t *info, void *data) {
     ucontext_t *context = reinterpret_cast<ucontext_t *>(data);
     crash_printf("reg context {\n");
@@ -170,6 +234,13 @@ void logCrashRegisterContext(int sig, siginfo_t *info, void *data) {
 #elif defined(__arm__)
 
 // Register context dumper for ARM:
+/**
+ * Log register values
+ * 
+ * @param	sig		The signal which triggered this handler
+ * @param	info		Pointer to information about the signal
+ * @param	data		Pointer to a ucontext_t with info on the crashing process
+ */
 void logCrashRegisterContext(int sig, siginfo_t *info, void *data) {
     ucontext_t *context = reinterpret_cast<ucontext_t *>(data);
     sigcontext *scon = &context->uc_mcontext;
@@ -212,11 +283,24 @@ void logCrashRegisterContext(int sig, siginfo_t *info, void *data) {
 
 #endif // __arm__
 
+/**
+ * Whether or not innerCrashHandler() has handled a signal
+ * 
+ * This variable is set to true by {@link innerCrashHandler() innerCrashHandler()} when it handles a signal.
+ * 
+ * @see innerCrashHandler()
+ */
 static volatile bool hasCrashedInCrashHandler = false;
 
 static void innerCrashHandler(int sig, siginfo_t *info, void *data);
 static void outerCrashHandler(int sig, siginfo_t *info, void *data);
 
+/**
+ * Installs innerCrashHandler as the handler for a given signal
+ * 
+ * @param	sig		The signal to handle using {@link innerCrashHandler innerCrashHandler}
+ * @param	previous_crash_action		Pointer at which to store the previous crash handler when installing this one
+ */
 static void installInnerCrashHandler(int sig,
                                      struct sigaction *previous_crash_action)
 {
@@ -231,6 +315,11 @@ static void installInnerCrashHandler(int sig,
     sigaction(sig, &crash_action, previous_crash_action);
 }
 
+/**
+ * Installs outerCrashHandler as the handler for a given signal
+ * 
+ * @param	sig		The signal to handle using {@link outerCrashHandler outerCrashHandler}
+ */
 static void installOuterCrashHandler(int sig)
 {
     struct sigaction crash_action;
@@ -245,6 +334,13 @@ static void installOuterCrashHandler(int sig)
     sigaction(sig, &crash_action, NULL);
 }
 
+/**
+ * Writes malloc statistics to stderr
+ * 
+ * @param	data			Data of some sort - currently unused
+ * 
+ * @return				Always returns TRUE
+ */
 static gboolean mallocStatsCb(gpointer data)
 {
 	char buf[30];
@@ -281,6 +377,12 @@ static gboolean mallocStatsCb(gpointer data)
 	return TRUE;
 }
 
+/**
+ * Sets up mallocStatsCb to run at a specified time interval
+ * 
+ * @param	mainLoop		Pointer to main loop of parent
+ * @param	secs			Number of seconds between calls to mallocStatsCb
+ */
 static void initMallocStatsCb(GMainLoop* mainLoop, int secs)
 {
 	// negative means no stats
@@ -291,6 +393,13 @@ static void initMallocStatsCb(GMainLoop* mainLoop, int secs)
 	g_source_attach(timeoutSource, g_main_loop_get_context(mainLoop));
 }
 
+/**
+ * Attempts to open a file for logging malloc statistics
+ * 
+ * Logs a critical error message if unable to open the given file.
+ * 
+ * @param	mallocStatsFile			Filename of file to log malloc statistics to
+ */
 static void setupMallocStats(const char* mallocStatsFile)
 {
 	FILE* file = ::freopen(mallocStatsFile, "a+", stderr);
@@ -300,6 +409,19 @@ static void setupMallocStats(const char* mallocStatsFile)
 	}
 }
 
+/**
+ * Handle a SIGSEGV signal
+ * 
+ * If on ARM, this skips instructions which are trying to access non-accessible memory.
+ * This function also logs the fact that it has run by setting {@link hasCrashedInCrashHandler hasCrashedInCrashHandler] to true.
+ * If it does anything, it also reinstalls itself as the signal handler for the signal type so next time it happens it runs again.
+ * 
+ * @see hasCrashedInCrashHandler
+ * 
+ * @param	sig		The signal which triggered this handler
+ * @param	info		Pointer to information about the signal
+ * @param	data		Pointer to a ucontext_t with info on the crashing process
+ */
 static void innerCrashHandler(int sig, siginfo_t *info, void *data)
 {
     if (sig == SIGSEGV) {
@@ -327,6 +449,18 @@ static void innerCrashHandler(int sig, siginfo_t *info, void *data)
     }
 }
 
+/**
+ * Handle a process signal
+ * 
+ * Steps are as follows:
+ * - Attempt to let WebKit handle the signal.  If it does, keep running and reinstall the handler.  Otherwise, continue.
+ * - Log crash diagnostics.
+ * - If debugging is enabled, start an infinite loop to give gdb a chance to connect and see what's going on.
+ * 
+ * @param	sig		The signal which triggered this handler
+ * @param	info		Pointer to information about the signal
+ * @param	data		Pointer to a ucontext_t with info on the crashing process
+ */
 static void outerCrashHandler(int sig, siginfo_t *info, void *data)
 {
     // Let webkit handle the crash if it wants to.  If it returns true,
@@ -410,6 +544,19 @@ static void outerCrashHandler(int sig, siginfo_t *info, void *data)
 }
 
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+/**
+ * Calls different message logging functions depending on message type
+ * 
+ * For the different possible values of type, it calls:
+ * - QtDebugMsg = g_debug
+ * - QtWarningMsg = g_warning
+ * - QtCriticalMsg = g_critical
+ * - QtFatalMsg = g_error
+ * - Anything else = g_message
+ * 
+ * @param	type		Message type
+ * @param	str		Message to log
+ */
 void qtMsgHandler(QtMsgType type, const char *str) {
     switch(type)
     {
@@ -453,6 +600,15 @@ void qtMsgHandler(QtMsgType type, const QMessageLogContext&, const QString& str)
 }
 #endif
 
+/**
+ * Parses command-line options
+ *
+ * This function parses command-line arguments and sets the corresponding variables
+ * in Settings::LunaSettings()
+ *
+ * @param	argc		Number of arguments
+ * @param	argv		Pointer to list of char* pointers for each of the arguments
+ */
 static void parseCommandlineOptions(int argc, char** argv)
 {
     GError* error = NULL;
@@ -517,6 +673,9 @@ static void parseCommandlineOptions(int argc, char** argv)
     g_option_context_free(context);
 }
 
+/**
+ * Crashes the program
+ */
 static void generateGoodBacktraceTerminateHandler()
 {
 	volatile int* p = 0;
@@ -524,10 +683,45 @@ static void generateGoodBacktraceTerminateHandler()
 	exit(-1);
 }
 
-
-
+/**
+ * Number of arguments Luna was started with
+ * 
+ * This variable is set in main().
+ * 
+ * @see main()
+ */
 int appArgc = 0;
+
+/**
+ * Pointer to char* of arguments Luna was started with
+ * 
+ * This variable is set in main().
+ * 
+ * @see main()
+ */
 char** appArgv = 0;
+
+/**
+ * Runs the bootup animation
+ * 
+ * What this does:
+ * - Sets the process name
+ * - Lowers the process priority
+ * - Starts a QCoreApplication with the global appArgc and appArgv
+ * - Initializes a new BootupAnimation and connects it to the global sysmgrPipeFd
+ * - Starts the bootup animation
+ * - Starts the QCoreApplication
+ * 
+ * @see QCoreApplication
+ * @see BootupAnimation
+ * @see sysmgrPipeFd
+ * @see appArgc
+ * @see appArgv
+ * 
+ * @param	data			Pointer to data of some sort (currently unused)
+ * 
+ * @return				Always returns 0
+ */
 
 static int RunBootupAnimationTask(void* data)
 {
@@ -552,7 +746,11 @@ static int RunBootupAnimationTask(void* data)
 	return 0;
 }
 
-
+/**
+ * Forks the process, runs the bootup animation in the forked process, and sets up pipes for IPC
+ * 
+ * @return				The PID of the forked process
+ */
 pid_t spawnBootupAnimationProcess()
 {
 	int fd[2];
@@ -585,6 +783,21 @@ gboolean finishBootup(gpointer data)
     return FALSE;
 }
 
+/**
+ * Main program entry point
+ *
+ * This function is the one called by the operating system to start Luna.
+ * 
+ * This function sets {@link appArgc appArgc} and {@link appArgv appArgv}.
+ * 
+ * @see appArgc
+ * @see appArgv
+ *
+ * @param	argc		Number of command-line arguments
+ * @param	argv		Pointer to list of char* of each of the arguments
+ *
+ * @return			0 = success, anything else = failure
+ */
 int main( int argc, char** argv)
 {
 	appArgc = argc;
